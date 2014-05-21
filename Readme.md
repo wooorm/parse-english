@@ -35,7 +35,7 @@ rootNode = parse(require('fs').readFileSync('./document.txt', 'utf-8'));
 ````
 
 ## API
-See below for an abbreviated [IDL definition](#IDL).
+See below for an abbreviated [IDL definition](#idl).
 
 Lets say all the following examples start with this code. Any changes made by below examples are discarded uppong their ending.
 
@@ -161,11 +161,12 @@ partial interface Parent {
 }
 
 partial interface module {
-  [NewObject] RootNode exports((String or Node)? source)
+  [NewObject] RootNode exports((String or Node)? source);
 };
 
 partial interface exports {
-  [NewObject] RootNode fromAST(String source)
+  [NewObject] RootNode fromAST(String source);
+  attribute dictionary TextOM;
 };
 ```
 
