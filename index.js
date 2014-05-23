@@ -8,7 +8,7 @@
         EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE,
         EXPRESSION_ABBREVIATION_AFFIX, EXPRESSION_INITIALISM,
         EXPRESSION_FULL_STOP, EXPRESSION_SENTENCE_END,
-        EXPRESSION_SENTENCE_SPACE, EXPRESSION_WHITE_SPACE,
+        EXPRESSION_SENTENCE_SPACE, EXPRESSION_WHITE_SPACE, EXPRESSION_ORDINAL,
         constructors, types;
 
     /**
@@ -257,8 +257,18 @@
      * @constant
      */
     EXPRESSION_WORD_DIGIT_LETTER = new RegExp('([' + GROUP_NUMERICAL +
-        ']+)[' + GROUP_ALPHABETIC + ']+', 'g'
+        ']+)([' + GROUP_ALPHABETIC + ']+)', 'g'
     );
+
+    /**
+     * `EXPRESSION_ORDINAL` matches an ordinal suffix: `th`, `st`, `nd`,
+     * or `rd`.
+     *
+     * @global
+     * @private
+     * @constant
+     */
+    EXPRESSION_ORDINAL = /^(th|st|nd|rd)$/i;
 
     /**
      * `EXPRESSION_MULTILINEBREAK` finds between-paragraph white space. Also
@@ -735,7 +745,9 @@
 
         /* Break on one or more digits followed by one or more letters. */
         while (match = EXPRESSION_WORD_DIGIT_LETTER.exec(value)) {
-            tokenBreakPoints.push(match.index + match[1].length);
+            if (!EXPRESSION_ORDINAL.test(match[2])) {
+                tokenBreakPoints.push(match.index + match[1].length);
+            }
         }
 
         tokenBreakPoints.sort(BREAKPOINT_SORT);

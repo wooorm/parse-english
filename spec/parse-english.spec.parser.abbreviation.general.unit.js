@@ -689,8 +689,7 @@ describe('Abbreviations: time references', function () {
                 { "type": "WhiteSpaceNode", "value": " " },
                 { "type": "WordNode", "value": "the" },
                 { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "12" },
-                { "type": "WordNode", "value": "th" },
+                { "type": "WordNode", "value": "12th" },
                 { "type": "PunctuationNode", "value": "." }
             ]}]}]}));
         });
