@@ -9,7 +9,7 @@
         EXPRESSION_ABBREVIATION_AFFIX, EXPRESSION_INITIALISM,
         EXPRESSION_FULL_STOP, EXPRESSION_SENTENCE_END,
         EXPRESSION_SENTENCE_SPACE, EXPRESSION_WHITE_SPACE, EXPRESSION_ORDINAL,
-        constructors, types;
+        GROUP_COMBINING_NONSPACING_MARK, constructors, types;
 
     /**
      * Module dependencies.
@@ -154,13 +154,45 @@
 
     /**
      * Expose `GROUP_COMBINING_DIACRITICAL_MARK`. Unicode Combining
-     * Diacritical Marks block.
+     * Diacritical Marks, and Combining Diacritical Marks for Symbols, Blocks.
      *
      * @global
      * @private
      * @constant
      */
-    GROUP_COMBINING_DIACRITICAL_MARK = expand('0300-036F');
+    GROUP_COMBINING_DIACRITICAL_MARK = expand('20D0-20FF0300-036F');
+
+    /**
+     * Expose `GROUP_COMBINING_NONSPACING_MARK`. Unicode Mark, Nonspacing,
+     * Block.
+     *
+     * @global
+     * @private
+     * @constant
+     */
+    GROUP_COMBINING_NONSPACING_MARK = expand('0300-036F0483-04870591-05BD' +
+        '05BF05C105C205C405C505C70610-061A064B-065F067006D6-06DC06DF-06E4' +
+        '06E706E806EA-06ED07110730-074A07A6-07B007EB-07F30816-0819081B-0823' +
+        '0825-08270829-082D0859-085B08E4-08FE0900-0902093A093C0941-0948094D' +
+        '0951-095709620963098109BC09C1-09C409CD09E209E30A010A020A3C0A410A42' +
+        '0A470A480A4B-0A4D0A510A700A710A750A810A820ABC0AC1-0AC50AC70AC80ACD' +
+        '0AE20AE30B010B3C0B3F0B41-0B440B4D0B560B620B630B820BC00BCD0C3E-0C40' +
+        '0C46-0C480C4A-0C4D0C550C560C620C630CBC0CBF0CC60CCC0CCD0CE20CE30D41' +
+        '-0D440D4D0D620D630DCA0DD2-0DD40DD60E310E34-0E3A0E47-0E4E0EB10EB4-' +
+        '0EB90EBB0EBC0EC8-0ECD0F180F190F350F370F390F71-0F7E0F80-0F840F86' +
+        '0F870F8D-0F970F99-0FBC0FC6102D-10301032-10371039103A103D103E1058' +
+        '1059105E-10601071-1074108210851086108D109D135D-135F1712-17141732-' +
+        '1734175217531772177317B417B517B7-17BD17C617C9-17D317DD180B-180D' +
+        '18A91920-19221927192819321939-193B1A171A181A561A58-1A5E1A601A62' +
+        '1A65-1A6C1A73-1A7C1A7F1B00-1B031B341B36-1B3A1B3C1B421B6B-1B731B80' +
+        '1B811BA2-1BA51BA81BA91BAB1BE61BE81BE91BED1BEF-1BF11C2C-1C331C36' +
+        '1C371CD0-1CD21CD4-1CE01CE2-1CE81CED1CF41DC0-1DE61DFC-1DFF20D0-20DC' +
+        '20E120E5-20F02CEF-2CF12D7F2DE0-2DFF302A-302D3099309AA66FA674-A67D' +
+        'A69FA6F0A6F1A802A806A80BA825A826A8C4A8E0-A8F1A926-A92DA947-A951' +
+        'A980-A982A9B3A9B6-A9B9A9BCAA29-AA2EAA31AA32AA35AA36AA43AA4CAAB0' +
+        'AAB2-AAB4AAB7AAB8AABEAABFAAC1AAECAAEDAAF6ABE5ABE8ABEDFB1EFE00-FE0F' +
+        'FE20-FE26'
+    );
 
     /**
      * Expose `GROUP_TERMINAL_MARKER`. Interrobang, question-, and
@@ -218,13 +250,13 @@
      */
     EXPRESSION_WORD_CONTRACTION = [
         /* e.g., (I)('(ll)), the(y)('(re)) */
-        /(.)(['’](ll|re|ve|s|m|d|em))\b/ig,
+        /([\s\S])(['’](ll|re|ve|s|m|d|em))\b/ig,
         /* e.g., c(a)(n't) */
-        /(.)(n['’]t)\b/ig,
+        /([\s\S])(n['’]t)\b/ig,
         /* e.g., (o')(c)lock, (y')(a)ll */
-        /\b([oy]['’])(.)\b/ig,
+        /\b([oy]['’])([\s\S])\b/ig,
         /* ('T)(w)as */
-        /(['’]t)(.)/ig,
+        /(['’]t)([\s\S])/ig,
         /\b(can)(not)\b/ig,
         /\b(d)(['’]ye)\b/ig,
         /\b(gim)(me)\b/ig,
@@ -243,9 +275,12 @@
      * @private
      * @constant
      */
-    EXPRESSION_WORD_MULTIPUNCTUATION = new RegExp('[\\uD800-\\uDBFF]' +
-        '[\\uDC00-\\uDFFF]|([^' + GROUP_NUMERICAL + GROUP_ALPHABETIC +
-        GROUP_COMBINING_DIACRITICAL_MARK + '])\\1*', 'g'
+    EXPRESSION_WORD_MULTIPUNCTUATION = new RegExp(
+        '([\\uD800-\\uDBFF][\\uDC00-\\uDFFF])+|[\\s\\S][' +
+        GROUP_COMBINING_DIACRITICAL_MARK + GROUP_COMBINING_NONSPACING_MARK +
+        ']{2,}|([^' + GROUP_NUMERICAL + GROUP_ALPHABETIC +
+        GROUP_COMBINING_DIACRITICAL_MARK + GROUP_COMBINING_NONSPACING_MARK +
+        '])\\2*', 'g'
     );
 
     /**
@@ -524,7 +559,7 @@
      * @constant
      */
     EXPRESSION_SENTENCE_SPACE = new RegExp(
-        '^([' + GROUP_WHITE_SPACE + ']+)?((.|[\\n\\r])+)$'
+        '^([' + GROUP_WHITE_SPACE + ']+)?([\\s\\S]+)$'
     );
 
     /**
@@ -647,9 +682,9 @@
             if (sentenceNoBreakPoints.indexOf(pointer) === -1) {
                 /*
                  * If three was set, the delimiter is followed by a comma
-                 * character, thus it's probably not a terminal marker.
+                 * character, or a number, thus it's probably not a terminal
+                 * marker.
                  */
-                /* istanbul ignore next: Might be usefull, not sure. */
                 if (match[3]) {
                     continue;
                 }
@@ -738,7 +773,6 @@
          */
         while (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(value)) {
             pointer = match.index;
-
             tokenBreakPoints.push(pointer);
             tokenBreakPoints.push(pointer + match[0].length);
         }

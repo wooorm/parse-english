@@ -1,6 +1,6 @@
 # parse-english [![Build Status](https://travis-ci.org/wooorm/parse-english.png)](https://travis-ci.org/wooorm/parse-english)
 
-**parse-english** is an English language parser in JavaScript. Build on top of [TextOM](https://github.com/wooorm/textom/). NodeJS, and the browser. Lots of tests (180+). 100% coverage.
+**parse-english** is an English language parser in JavaScript. Build on top of [TextOM](https://github.com/wooorm/textom/). NodeJS, and the browser. Lots of tests (330+), including 630+ assertions. 100% coverage.
 
 ## Installation
 

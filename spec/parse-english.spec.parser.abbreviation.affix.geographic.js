@@ -614,7 +614,7 @@ describe('Abbreviations: latin', function () {
     });
 
     it('should *not* treat the dot-character succeeding (Canadian) states (e.g., `Alta`, `Man`, &c.), as a terminal marker', function () {
-        var states = 'Ala|Ariz|Ark|Cal|Calif|Col|Colo|Conn|Del|Fla|Ga|Ida|Id|Ill|Ind|Ia|Kan|Kans|Ken|Ky|La|Me|Md|Mass|Mich|Minn|Miss|Mo|Mont|Neb|Nebr|Nev|Mex|Dak|Okla|Ok|Ore|Penna|Penn|Pa|Tenn|Tex|Ut|Vt|Va|Wash|Wis|Wisc|Wyo',
+        var states = 'Alta|Man|Ont|Qué|Que|Sask|Yuk',
             root;
 
         states.split('|').forEach(function (state) {
