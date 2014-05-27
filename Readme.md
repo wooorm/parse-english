@@ -172,8 +172,9 @@ partial interface exports {
 
 ## Related
 
-  [textom](https://github.com/wooorm/textom "TextOM")
-  More to come.
+  * [textom](https://github.com/wooorm/textom "TextOM")
+
+More to come.
 
 ## License
 
