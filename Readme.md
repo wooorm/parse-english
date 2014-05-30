@@ -159,15 +159,6 @@ partial interface Parent {
   void removeContent();
   [NewObject] Range replaceContent(String? value);
 }
-
-partial interface module {
-  [NewObject] RootNode exports((String or Node)? source);
-};
-
-partial interface exports {
-  [NewObject] RootNode fromAST(String source);
-  attribute dictionary TextOM;
-};
 ```
 
 ## Related
