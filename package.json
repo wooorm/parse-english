@@ -27,8 +27,5 @@
   },
   "scripts": {
     "test": "make test"
-  },
-  "files": [
-    "index.js"
-  ]
+  }
 }
