@@ -18,6 +18,6 @@ complexity:
 
 cover:
 	# Cover (and test):
-	@./node_modules/.bin/istanbul cover --report html ./node_modules/.bin/_mocha -- -- --reporter min --check-leaks -u exports spec/*.spec*.js
+	@./node_modules/.bin/istanbul cover --report html ./node_modules/.bin/_mocha -- -- spec/*.spec*.js
 
 .PHONY: make test watch lint cover complexity
