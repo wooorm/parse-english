@@ -731,6 +731,8 @@
                 sentences.push(sentence);
             } else if (sentences.length) {
                 sentences[sentences.length - 1] += sentence;
+            } else if (iterator === length - 1) {
+                sentences.push(sentence);
             } else {
                 end -= sentence.length;
             }
