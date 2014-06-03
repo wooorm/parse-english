@@ -475,3 +475,22 @@ describe('A simple sentence testing a sentence starting with ellipsis without sp
         }));
     });
 });
+
+describe('A simple sentence without alphabetic content', function () {
+    it('should equal the test AST', function () {
+        var source = "\uD83D\uDC38.";
+        assert(converter(source).head.head.toAST() === JSON.stringify({
+            "type": "SentenceNode",
+            "children": [
+                {
+                    "type": "PunctuationNode",
+                    "value": "\uD83D\uDC38"
+                },
+                {
+                    "type": "PunctuationNode",
+                    "value": "."
+                }
+            ]
+        }));
+    });
+});
