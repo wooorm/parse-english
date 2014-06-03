@@ -4,7 +4,7 @@
         GROUP_CLOSING_PUNCTUATION, GROUP_FINAL_PUNCTUATION,
         EXPRESSION_WORD_CONTRACTION, EXPRESSION_WORD_MULTIPUNCTUATION,
         EXPRESSION_WORD_DIGIT_LETTER, EXPRESSION_MULTILINEBREAK, STRING_PIPE,
-        EXPRESSION_ABBREVIATION_PREFIX,
+        EXPRESSION_ABBREVIATION_PREFIX, EXPRESSION_WORD_CHARACTER,
         EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE,
         EXPRESSION_ABBREVIATION_AFFIX, EXPRESSION_INITIALISM,
         EXPRESSION_FULL_STOP, EXPRESSION_SENTENCE_END,
@@ -531,6 +531,15 @@
     EXPRESSION_FULL_STOP = /\./g;
 
     /**
+     * `EXPRESSION_WORD_CHARACTER` finds a word character.
+     *
+     * @global
+     * @private
+     * @constant
+     */
+    EXPRESSION_WORD_CHARACTER = new RegExp('[' + GROUP_ALPHABETIC + ']');
+
+    /**
      * `EXPRESSION_SENTENCE_END` finds probable sentence ends.
      *
      * A probable sentence end:
@@ -547,7 +556,7 @@
         '(\\.|[' + GROUP_TERMINAL_MARKER + ']+)' +
         '([' + GROUP_CLOSING_PUNCTUATION + GROUP_FINAL_PUNCTUATION + '])?' +
         '([,\\.' + GROUP_NUMERICAL + '])?' +
-        '(\\ +[' + GROUP_ALPHABETIC + '])?',
+        '(\\ +[\\.' + GROUP_ALPHABETIC + '])?',
     'g');
 
     /**
@@ -638,6 +647,7 @@
      */
     function tokenizeParagraph(paragraph, value) {
         var sentences = [],
+            sentenceBreakPoints = [],
             sentenceNoBreakPoints = [],
             iterator = -1,
             start, sentence, match, submatch, pointer, $0, $4, length, end;
@@ -704,18 +714,26 @@
                     pointer += match[2].length;
                 }
 
-                sentences.push(pointer);
+                sentenceBreakPoints.push(pointer);
             }
         }
 
-        sentences.sort(BREAKPOINT_SORT);
-        length = sentences.length + 1;
+        sentenceBreakPoints.sort(BREAKPOINT_SORT);
+        length = sentenceBreakPoints.length + 1;
         start = 0;
 
         while (++iterator < length) {
-            end = sentences[iterator];
+            end = sentenceBreakPoints[iterator];
 
-            sentences[iterator] = value.slice(start, end);
+            sentence = value.slice(start, end);
+
+            if (EXPRESSION_WORD_CHARACTER.test(sentence)) {
+                sentences.push(sentence);
+            } else if (sentences.length) {
+                sentences[sentences.length - 1] += sentence;
+            } else {
+                end -= sentence.length;
+            }
 
             start = end;
         }

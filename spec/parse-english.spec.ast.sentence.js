@@ -377,3 +377,101 @@ describe('A simple sentence testing for an abbreviation followed by a full-stop,
         }));
     });
 });
+
+describe('A simple sentence testing a sentence starting with ellipsis containing spaces', function () {
+    it('should equal the test AST', function () {
+        var source = ". . . to be continued.";
+        assert(converter(source).head.head.toAST() === JSON.stringify({
+            "type": "SentenceNode",
+            "children": [
+                {
+                    "type": "PunctuationNode",
+                    "value": "."
+                },
+                {
+                    "type": "WhiteSpaceNode",
+                    "value": " "
+                },
+                {
+                    "type": "PunctuationNode",
+                    "value": "."
+                },
+                {
+                    "type": "WhiteSpaceNode",
+                    "value": " "
+                },
+                {
+                    "type": "PunctuationNode",
+                    "value": "."
+                },
+                {
+                    "type": "WhiteSpaceNode",
+                    "value": " "
+                },
+                {
+                    "type": "WordNode",
+                    "value": "to"
+                },
+                {
+                    "type": "WhiteSpaceNode",
+                    "value": " "
+                },
+                {
+                    "type": "WordNode",
+                    "value": "be"
+                },
+                {
+                    "type": "WhiteSpaceNode",
+                    "value": " "
+                },
+                {
+                    "type": "WordNode",
+                    "value": "continued"
+                },
+                {
+                    "type": "PunctuationNode",
+                    "value": "."
+                }
+            ]
+        }));
+    });
+});
+
+describe('A simple sentence testing a sentence starting with ellipsis without spaces', function () {
+    it('should equal the test AST', function () {
+        var source = "...To be continued.";
+        assert(converter(source).head.head.toAST() === JSON.stringify({
+            "type": "SentenceNode",
+            "children": [
+                {
+                    "type": "PunctuationNode",
+                    "value": "..."
+                },
+                {
+                    "type": "WordNode",
+                    "value": "To"
+                },
+                {
+                    "type": "WhiteSpaceNode",
+                    "value": " "
+                },
+                {
+                    "type": "WordNode",
+                    "value": "be"
+                },
+                {
+                    "type": "WhiteSpaceNode",
+                    "value": " "
+                },
+                {
+                    "type": "WordNode",
+                    "value": "continued"
+                },
+                {
+                    "type": "PunctuationNode",
+                    "value": "."
+                }
+            ]
+        }));
+    });
+});
