@@ -10,11 +10,10 @@ lint:
 	# Lint (passes when empty):
 	@./node_modules/.bin/jshint index.js spec/*.spec*.js
 	@./node_modules/.bin/jscs ./index.js --reporter=inline
-	
 
 complexity:
 	# Complexity (passes when empty):
-	@./node_modules/.bin/cr -l --maxcyc 16 --format minimal --silent index.js
+	@./node_modules/.bin/cr -l --maxcyc 20 --format minimal --silent index.js
 
 cover:
 	# Cover (and test):
