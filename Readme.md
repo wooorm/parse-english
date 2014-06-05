@@ -73,7 +73,7 @@ Parse a JSON object or string—a (parsed?) result of [`Node#toAST()`](#textomno
 
 ### Extensions to TextOM
 
-#### TextOM.Node#toAST(delimeter?)
+#### TextOM.Node#toAST(delimiter?)
 
 ```js
 var parse = require('parse-english'),
@@ -84,7 +84,7 @@ rootNode.toAST(); // '{"type":"RootNode","children":[{"type":"ParagraphNode","ch
 
 Stringify an object model into a `JSON.stringify`d AST, can later be passed to [`ParseEnglish.fromAST()`](#parseenglishfromastast).
 
-- `delimeter` (`Null`, `Number`, or `String`): Causes the AST to be pretty printed. Passed to `JSON.stringify` (See [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#space_argument) for docs).
+- `delimeter` (`null`, `Number`, or `String`): Causes the AST to be pretty printed. Passed to `JSON.stringify` (See [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#space_argument) for docs).
 
 #### TextOM.Parent#prependContent(value)
 
@@ -132,8 +132,8 @@ Removes the current content of the parent.
 var parse = require('parse-english'),
     rootNode = parse('A sentence');
 
-rootNode.replaceContent('One sentene. Two sentences.');
-rootNode.toString(); // 'One sentene. Two sentences.'
+rootNode.replaceContent('One sentence. Two sentences.');
+rootNode.toString(); // 'One sentence. Two sentences.'
 ```
 
 Removes the current content of the parent, and replaces it with the parsed value.
