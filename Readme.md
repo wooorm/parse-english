@@ -4,18 +4,8 @@
 
 ## Installation
 
-### With NPM
-
 ```sh
 $ npm install parse-english
-```
-
-### Git
-
-```sh
-git clone https://github.com/wooorm/parse-english.git
-cd parse-english
-npm install
 ```
 
 ## Usage
