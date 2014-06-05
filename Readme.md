@@ -35,7 +35,6 @@ rootNode = parse(require('fs').readFileSync('./document.txt', 'utf-8'));
 ````
 
 ## API
-See below for an abbreviated [IDL definition](#idl).
 
 Lets say all the following examples start with this code. Any changes made by below examples are discarded uppong their ending.
 
@@ -144,22 +143,6 @@ rootNode.toString(); // 'One sentene. Two sentences.'
 Removes the current content of the parent, and replaces it with the parsed value.
 
 - `value` (`String`): The to-parse and insert inside content.
-
-
-### IDL
-
-```idl
-partial interface Node {
-  String toAST((String or unsigned long)? delimeter);
-}
-
-partial interface Parent {
-  [NewObject] Range prependContent(String value);
-  [NewObject] Range appendContent(String value);
-  void removeContent();
-  [NewObject] Range replaceContent(String? value);
-}
-```
 
 ## Related
 
