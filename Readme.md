@@ -146,6 +146,7 @@ Removes the current content of the parent, and replaces it with the parsed value
 
 ## Related
 
+  * [retext](https://github.com/wooorm/retext "Retext")
   * [textom](https://github.com/wooorm/textom "TextOM")
 
 More to come.
