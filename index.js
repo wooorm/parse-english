@@ -1121,7 +1121,7 @@
      * `Node.prototype.toAST` converts the operated on node into an AST
      * object.
      *
-     * @param {?(String|Number)} delimeter - When given, pretty prints the
+     * @param {?(String|Number)} delimiter - When given, pretty prints the
      *                                       stringified object—indenting
      *                                       each level either with the given
      *                                       string or with the given number
@@ -1131,8 +1131,8 @@
      * @api public
      * @memberof Node.prototype
      */
-    TextOM.Node.prototype.toAST = function (delimeter) {
-        return JSON.stringify(toAST(this), null, delimeter);
+    TextOM.Node.prototype.toAST = function (delimiter) {
+        return JSON.stringify(toAST(this), null, delimiter);
     };
 
     /**
