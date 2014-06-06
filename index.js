@@ -852,7 +852,8 @@
      * @constant
      */
     constructors = (function () {
-        var result = [], value;
+        var result = [],
+            value;
 
         Object.keys(TextOM).forEach(function (key) {
             value = TextOM[key] && TextOM[key].prototype;
@@ -894,19 +895,22 @@
      * @private
      */
     function toAST (node) {
+        var ast, result, item;
+
         if (!node || !(node instanceof TextOM.Node)) {
             throw new TypeError('Illegal invocation: \'' + node +
                 '\' is not a valid argument for \'toAST\'');
         }
 
-        var ast = {
+        ast = {
             'type' : types[node.type]
         };
 
         if (!('length' in node)) {
             ast.value = node.toString();
         } else {
-            var result = [], item = node.head;
+            result = [];
+            item = node.head;
 
             while (item) {
                 result.push(toAST(item));
@@ -928,6 +932,9 @@
      * @private
      */
     function fromAST(ast) {
+        var iterator = -1,
+            children, node;
+
         if (ast instanceof String) {
             ast = ast.toString();
         }
@@ -946,16 +953,14 @@
                 'attributes)');
         }
 
-        var node = new (TextOM[ast.type])();
+        node = new TextOM[ast.type]();
 
         if ('children' in ast) {
-            var iterator = -1,
-                children = ast.children,
-                child;
+            iterator = -1;
+            children = ast.children;
 
-            /*jshint boss:true */
-            while (child = children[++iterator]) {
-                node.append(fromAST(child));
+            while (children[++iterator]) {
+                node.append(fromAST(children[iterator]));
             }
         } else {
             node.fromString(ast.value);
@@ -979,14 +984,15 @@
      * @api private
      */
     function insert(parent, item, source) {
+        var hierarchy, child, range, children, method, iterator;
+
         if (!parent || !(parent instanceof TextOM.Parent ||
             parent instanceof TextOM.Element)) {
                 throw new TypeError('Type Error');
         }
 
-        var hierarchy = parent.hierarchy + 1,
-            child = parser(source),
-            range, children, method;
+        hierarchy = parent.hierarchy + 1;
+        child = parser(source);
 
         if (!child.length) {
             throw new TypeError('Illegal invocation: \'' + source +
@@ -1009,17 +1015,19 @@
             }
         }
 
-        /*jshint expr:true */
-        children || (children = [child]);
+        if (!children) {
+            children = [child];
+        }
 
         range = new TextOM.Range();
         range.setStart(children[0]);
         range.setEnd(children[children.length - 1]);
 
-        /*jshint boss:true */
-        while (child = children.pop()) {
+        iterator = children.length;
+
+        while (children[--iterator]) {
             (item ? item.after : parent.prepend).call(
-                item || parent, child
+                item || parent, children[iterator]
             );
         }
 
@@ -1033,17 +1041,17 @@
      * @api private
      */
     function remove(items) {
+        var iterator;
+
         if (!items || !('length' in items)) {
             throw new TypeError('Type Error');
         }
 
-        var item;
-
         items = [].slice.call(items);
+        iterator = items.length;
 
-        /*jshint boss:true */
-        while (item = items.pop()) {
-            item.remove();
+        while (items[--iterator]) {
+            items[iterator].remove();
         }
     }
 
@@ -1197,8 +1205,7 @@
      * @memberof module.exports
      */
     function parser(source) {
-        /*jshint eqnull:true*/
-        if (source == null) {
+        if (source === null || source === undefined) {
             source = '';
         } else if (source instanceof TextOM.Node ||
             source instanceof String) {
