@@ -1,6 +1,6 @@
 {
   "name": "parse-english",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "English (natural language) parser build on TextOM",
   "keywords": [
     "english",
