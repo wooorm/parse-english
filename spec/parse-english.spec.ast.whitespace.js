@@ -38,18 +38,18 @@ describe('A simple sentence testing for white space characters', function () {
         it('should equal the test AST when using `' + character + '`',
             function () {
                 assert(converter(source).toAST() === JSON.stringify({
-                    "type": "RootNode",
-                    "children": [
+                    'type': 'RootNode',
+                    'children': [
                         {
-                            "type": "ParagraphNode",
-                            "children": [
+                            'type': 'ParagraphNode',
+                            'children': [
                                 {
-                                    "type": "SentenceNode",
-                                    "children": [
-                                        { "type": "WordNode", "value": "A" },
-                                        { "type": "WhiteSpaceNode", "value": character },
-                                        { "type": "WordNode", "value": "house" },
-                                        { "type": "PunctuationNode", "value": "." }
+                                    'type': 'SentenceNode',
+                                    'children': [
+                                        { 'type': 'WordNode', 'value': 'A' },
+                                        { 'type': 'WhiteSpaceNode', 'value': character },
+                                        { 'type': 'WordNode', 'value': 'house' },
+                                        { 'type': 'PunctuationNode', 'value': '.' }
                                     ]
                                 }
                             ]

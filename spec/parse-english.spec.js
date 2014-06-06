@@ -49,26 +49,26 @@ describe('ParseEnglish.TextOM.Node#toAST(delimeter)', function () {
     });
 
     it('should convert a `Node` into a stringified AST', function () {
-        var ast = JSON.stringify({"type":"RootNode","children":[{"type":"ParagraphNode","children":[{"type":"SentenceNode","children":[
-            { "type": "WordNode", "value": "A" },
-            { "type": "WhiteSpaceNode", "value": " " },
-            { "type": "WordNode", "value": "simple" },
-            { "type": "WhiteSpaceNode", "value": " " },
-            { "type": "WordNode", "value": "sentence" },
-            { "type": "PunctuationNode", "value": "." }
+        var ast = JSON.stringify({'type':'RootNode','children':[{'type':'ParagraphNode','children':[{'type':'SentenceNode','children':[
+            { 'type': 'WordNode', 'value': 'A' },
+            { 'type': 'WhiteSpaceNode', 'value': ' ' },
+            { 'type': 'WordNode', 'value': 'simple' },
+            { 'type': 'WhiteSpaceNode', 'value': ' ' },
+            { 'type': 'WordNode', 'value': 'sentence' },
+            { 'type': 'PunctuationNode', 'value': '.' }
         ]}]}]});
 
         assert(converter('A simple sentence.').toAST() === ast);
     });
 
     it('should convert a `Node` into a stringified AST using the given delimeter', function () {
-        var ast = JSON.stringify({"type":"RootNode","children":[{"type":"ParagraphNode","children":[{"type":"SentenceNode","children":[
-            { "type": "WordNode", "value": "A" },
-            { "type": "WhiteSpaceNode", "value": " " },
-            { "type": "WordNode", "value": "simple" },
-            { "type": "WhiteSpaceNode", "value": " " },
-            { "type": "WordNode", "value": "sentence" },
-            { "type": "PunctuationNode", "value": "." }
+        var ast = JSON.stringify({'type':'RootNode','children':[{'type':'ParagraphNode','children':[{'type':'SentenceNode','children':[
+            { 'type': 'WordNode', 'value': 'A' },
+            { 'type': 'WhiteSpaceNode', 'value': ' ' },
+            { 'type': 'WordNode', 'value': 'simple' },
+            { 'type': 'WhiteSpaceNode', 'value': ' ' },
+            { 'type': 'WordNode', 'value': 'sentence' },
+            { 'type': 'PunctuationNode', 'value': '.' }
         ]}]}]}, null, '\t');
 
         assert(converter('A simple sentence.').toAST('\t') === ast);
@@ -102,13 +102,13 @@ describe('ParseEnglish.fromAST(ast)', function () {
     });
 
     it('should convert a stringified AST into an object model', function () {
-        var ast = JSON.stringify({"type":"RootNode","children":[{"type":"ParagraphNode","children":[{"type":"SentenceNode","children":[
-            { "type": "WordNode", "value": "A" },
-            { "type": "WhiteSpaceNode", "value": " " },
-            { "type": "WordNode", "value": "simple" },
-            { "type": "WhiteSpaceNode", "value": " " },
-            { "type": "WordNode", "value": "sentence" },
-            { "type": "PunctuationNode", "value": "." }
+        var ast = JSON.stringify({'type':'RootNode','children':[{'type':'ParagraphNode','children':[{'type':'SentenceNode','children':[
+            { 'type': 'WordNode', 'value': 'A' },
+            { 'type': 'WhiteSpaceNode', 'value': ' ' },
+            { 'type': 'WordNode', 'value': 'simple' },
+            { 'type': 'WhiteSpaceNode', 'value': ' ' },
+            { 'type': 'WordNode', 'value': 'sentence' },
+            { 'type': 'PunctuationNode', 'value': '.' }
         ]}]}]});
 
         assert(converter.fromAST(ast).toAST() === ast);
@@ -118,13 +118,13 @@ describe('ParseEnglish.fromAST(ast)', function () {
     });
 
     it('should convert an AST into an object model', function () {
-        var ast = {"type":"RootNode","children":[{"type":"ParagraphNode","children":[{"type":"SentenceNode","children":[
-            { "type": "WordNode", "value": "A" },
-            { "type": "WhiteSpaceNode", "value": " " },
-            { "type": "WordNode", "value": "simple" },
-            { "type": "WhiteSpaceNode", "value": " " },
-            { "type": "WordNode", "value": "sentence" },
-            { "type": "PunctuationNode", "value": "." }
+        var ast = {'type':'RootNode','children':[{'type':'ParagraphNode','children':[{'type':'SentenceNode','children':[
+            { 'type': 'WordNode', 'value': 'A' },
+            { 'type': 'WhiteSpaceNode', 'value': ' ' },
+            { 'type': 'WordNode', 'value': 'simple' },
+            { 'type': 'WhiteSpaceNode', 'value': ' ' },
+            { 'type': 'WordNode', 'value': 'sentence' },
+            { 'type': 'PunctuationNode', 'value': '.' }
         ]}]}]};
 
         assert(converter.fromAST(ast).toAST() === JSON.stringify(ast));

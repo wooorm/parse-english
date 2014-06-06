@@ -8,18 +8,18 @@ describe('Abbreviations: decimals (affixed by a full-stop)', function () {
 
         digits.split('').forEach(function (digit) {
             root = converter('See § ' + digit + '. ¶ 2.');
-            assert(root.toAST() === JSON.stringify({"type":"RootNode","children":[{"type":"ParagraphNode","children":[{"type":"SentenceNode","children":[
-                { "type": "WordNode", "value": "See" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "PunctuationNode", "value": "§" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": digit },
-                { "type": "PunctuationNode", "value": "." },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "PunctuationNode", "value": "¶" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "2" },
-                { "type": "PunctuationNode", "value": "." }
+            assert(root.toAST() === JSON.stringify({'type':'RootNode','children':[{'type':'ParagraphNode','children':[{'type':'SentenceNode','children':[
+                { 'type': 'WordNode', 'value': 'See' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'PunctuationNode', 'value': '§' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': digit },
+                { 'type': 'PunctuationNode', 'value': '.' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'PunctuationNode', 'value': '¶' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': '2' },
+                { 'type': 'PunctuationNode', 'value': '.' }
             ]}]}]}));
         });
     });

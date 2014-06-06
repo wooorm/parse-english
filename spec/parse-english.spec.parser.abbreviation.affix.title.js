@@ -8,26 +8,26 @@ describe('Abbreviations: title abbreviations', function () {
 
         titles.split('|').forEach(function (title) {
             root = converter('You should talk to ' + title + '. Smith about these questions.');
-            assert(root.toAST() === JSON.stringify({"type":"RootNode","children":[{"type":"ParagraphNode","children":[{"type":"SentenceNode","children":[
-                { "type": "WordNode", "value": "You" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "should" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "talk" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "to" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": title },
-                { "type": "PunctuationNode", "value": "." },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "Smith" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "about" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "these" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "questions" },
-                { "type": "PunctuationNode", "value": "." }
+            assert(root.toAST() === JSON.stringify({'type':'RootNode','children':[{'type':'ParagraphNode','children':[{'type':'SentenceNode','children':[
+                { 'type': 'WordNode', 'value': 'You' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': 'should' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': 'talk' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': 'to' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': title },
+                { 'type': 'PunctuationNode', 'value': '.' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': 'Smith' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': 'about' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': 'these' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': 'questions' },
+                { 'type': 'PunctuationNode', 'value': '.' }
             ]}]}]}));
         });
     });

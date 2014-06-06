@@ -8,24 +8,24 @@ describe('Abbreviations: title abbreviations', function () {
 
         domains.split('|').forEach(function (domain) {
             root = converter('The domain .' + domain + ' is a top-level domain.');
-            assert(root.toAST() === JSON.stringify({"type":"RootNode","children":[{"type":"ParagraphNode","children":[{"type":"SentenceNode","children":[
-                { "type": "WordNode", "value": "The" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "domain" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "PunctuationNode", "value": "." },
-                { "type": "WordNode", "value": domain },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "is" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "a" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "top" },
-                { "type": "PunctuationNode", "value": "-" },
-                { "type": "WordNode", "value": "level" },
-                { "type": "WhiteSpaceNode", "value": " " },
-                { "type": "WordNode", "value": "domain" },
-                { "type": "PunctuationNode", "value": "." }
+            assert(root.toAST() === JSON.stringify({'type':'RootNode','children':[{'type':'ParagraphNode','children':[{'type':'SentenceNode','children':[
+                { 'type': 'WordNode', 'value': 'The' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': 'domain' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'PunctuationNode', 'value': '.' },
+                { 'type': 'WordNode', 'value': domain },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': 'is' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': 'a' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': 'top' },
+                { 'type': 'PunctuationNode', 'value': '-' },
+                { 'type': 'WordNode', 'value': 'level' },
+                { 'type': 'WhiteSpaceNode', 'value': ' ' },
+                { 'type': 'WordNode', 'value': 'domain' },
+                { 'type': 'PunctuationNode', 'value': '.' }
             ]}]}]}));
         });
     });

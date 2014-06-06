@@ -10,13 +10,13 @@ describe('Abbreviations: alphabetical', function () {
 
         alphabet.split('').forEach(function (character) {
             root = converter('Thomas ' + character + '. Swift');
-            assert(root.toAST() === JSON.stringify({"type":"RootNode","children":[{"type":"ParagraphNode","children":[{"type":"SentenceNode","children":[
-              { "type": "WordNode", "value": "Thomas" },
-              { "type": "WhiteSpaceNode", "value": " " },
-              { "type": "WordNode", "value": character },
-              { "type": "PunctuationNode", "value": "." },
-              { "type": "WhiteSpaceNode", "value": " " },
-              { "type": "WordNode", "value": "Swift" }
+            assert(root.toAST() === JSON.stringify({'type':'RootNode','children':[{'type':'ParagraphNode','children':[{'type':'SentenceNode','children':[
+              { 'type': 'WordNode', 'value': 'Thomas' },
+              { 'type': 'WhiteSpaceNode', 'value': ' ' },
+              { 'type': 'WordNode', 'value': character },
+              { 'type': 'PunctuationNode', 'value': '.' },
+              { 'type': 'WhiteSpaceNode', 'value': ' ' },
+              { 'type': 'WordNode', 'value': 'Swift' }
             ]}]}]}));
         });
     });
