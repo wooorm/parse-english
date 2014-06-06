@@ -31,31 +31,35 @@ var converter = require('..'),
         '\u3000'  // IDEOGRAPHIC SPACE
     ];
 
-describe('A simple sentence testing for white space characters', function () {
+describe('White space characters', function () {
     whiteSpaceCharacters.forEach(function (character) {
         var source = sentenceStart + character + sentenceEnd;
-        
+
         it('should equal the test AST when using `' + character + '`',
             function () {
-                assert(converter(source).toAST() === JSON.stringify({
-                    'type': 'RootNode',
-                    'children': [
-                        {
-                            'type': 'ParagraphNode',
-                            'children': [
-                                {
-                                    'type': 'SentenceNode',
-                                    'children': [
-                                        { 'type': 'WordNode', 'value': 'A' },
-                                        { 'type': 'WhiteSpaceNode', 'value': character },
-                                        { 'type': 'WordNode', 'value': 'house' },
-                                        { 'type': 'PunctuationNode', 'value': '.' }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }));
+                assert(
+                    converter(source).head.head.toAST() === JSON.stringify({
+                        'type' : 'SentenceNode',
+                        'children' : [
+                            {
+                                'type' : 'WordNode',
+                                'value' : 'A'
+                            },
+                            {
+                                'type' : 'WhiteSpaceNode',
+                                'value' : character
+                            },
+                            {
+                                'type' : 'WordNode',
+                                'value' : 'house'
+                            },
+                            {
+                                'type' : 'PunctuationNode',
+                                'value' : '.'
+                            }
+                        ]
+                    })
+                );
             }
         );
     });
