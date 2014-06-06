@@ -4,42 +4,82 @@ var converter = require('..'),
 /*
  * Note the pile of poo, in ECMAScript 5 written using a surrogate pair.
  */
-describe('A simple sentence testing for astral-plane characters', function () {
-    var source = 'The unicode character \uD83D\uDCA9 is pile of poo.';
-    it('should equal the test AST', function () {
-        assert(converter(source).toAST() === JSON.stringify({
-            'type': 'RootNode',
-            'children': [
-                {
-                    'type': 'ParagraphNode',
-                    'children': [
-                        {
-                            'type': 'SentenceNode',
-                            'children': [
-                                { 'type': 'WordNode', 'value': 'The' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'unicode' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'character' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'PunctuationNode', 'value': '\uD83D\uDCA9' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'is' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'pile' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'of' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'poo' },
-                                { 'type': 'PunctuationNode', 'value': '.' }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }));
-    });
-});
+describe('A simple sentence testing for astral-plane characters',
+    function () {
+        var source = 'The unicode character \uD83D\uDCA9 is pile of poo.';
+        it('should equal the test AST', function () {
+            assert(converter(source).head.head.toAST() === JSON.stringify({
+                'type' : 'SentenceNode',
+                'children' : [
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'The'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'unicode'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'character'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '\uD83D\uDCA9'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'is'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'pile'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'of'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'poo'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    }
+                ]
+            }));
+        });
+    }
+);
 
 /*
  * Note the DIGIT ZERO, VARIATION SELECTOR-16, and COMBINING ENCLOSING KEYCAP,
@@ -48,28 +88,42 @@ describe('A simple sentence testing for astral-plane characters', function () {
 describe('Double combining marks', function () {
     var source = 'He scored 0\uFE0F\u20E3 points.';
     it('should equal the test AST', function () {
-        assert(converter(source).toAST() === JSON.stringify({
-            'type': 'RootNode',
-            'children': [
-                {
-                    'type': 'ParagraphNode',
-                    'children': [
-                        {
-                            'type': 'SentenceNode',
-                            'children': [
-                                { 'type': 'WordNode', 'value': 'He' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'scored' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'PunctuationNode', 'value': '0\uFE0F\u20E3' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'points' },
-                                { 'type': 'PunctuationNode', 'value': '.' }
-                            ]
-                        }
-                    ]
+        assert(converter(source).head.head.toAST() === JSON.stringify({
+        'type' : 'SentenceNode',
+        'children' : [
+            {
+                    'type' : 'WordNode',
+                    'value' : 'He'
+                },
+            {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+            {
+                    'type' : 'WordNode',
+                    'value' : 'scored'
+                },
+            {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+            {
+                    'type' : 'PunctuationNode',
+                    'value' : '0\uFE0F\u20E3'
+                },
+            {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+            {
+                    'type' : 'WordNode',
+                    'value' : 'points'
+                },
+            {
+                    'type' : 'PunctuationNode',
+                    'value' : '.'
                 }
-            ]
+        ]
         }));
     });
 });
@@ -189,103 +243,260 @@ var diacritics = [
     '\u036F'  // COMBINING LATIN SMALL LETTER X (U+036F)
 ];
 
-describe('A simple sentence testing for combining diacritical marks', function () {
-    diacritics.forEach(function (diacritic) {
-        var source = 'This is a' + diacritic + ' house.';
-        it('should equal the test AST when using \u25CC' + diacritic, function () {
-            assert(converter(source).toAST() === JSON.stringify({
-                'type': 'RootNode',
-                'children': [
-                    {
-                        'type': 'ParagraphNode',
-                        'children': [
-                            {
-                                'type': 'SentenceNode',
-                                'children': [
-                                    { 'type': 'WordNode', 'value': 'This' },
-                                    { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                    { 'type': 'WordNode', 'value': 'is' },
-                                    { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                    { 'type': 'WordNode', 'value': 'a' + diacritic },
-                                    { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                    { 'type': 'WordNode', 'value': 'house' },
-                                    { 'type': 'PunctuationNode', 'value': '.' },
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }));
+describe('A simple sentence testing for combining diacritical marks',
+    function () {
+        diacritics.forEach(function (diacritic) {
+            var source = 'This is a' + diacritic + ' house.';
+            it('should equal the test AST when using \u25CC' + diacritic,
+                function () {
+                    assert(
+                        converter(source).head.head.toAST() ===
+                        JSON.stringify({
+                            'type' : 'SentenceNode',
+                            'children' : [
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'This'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'is'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'a' + diacritic
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'house'
+                                },
+                                {
+                                    'type' : 'PunctuationNode',
+                                    'value' : '.'
+                                }
+                            ]
+                        })
+                    );
+                }
+            );
         });
-    });
-});
+    }
+);
 
 /*
  * From wikipedias list: http://en.wikipedia.org/wiki/Contraction_(grammar)
 */
 describe('A simple sentence testing for common contractions', function () {
-    var source = 'Common examples of contractions include: Ain\'t, let\'s, I\'m, we\'re, what\'s, where\'d, and I\'ll.';
+    var source = 'Common examples of contractions include: Ain\'t, ' +
+        'let\'s, I\'m, we\'re, what\'s, where\'d, and I\'ll.';
+
     it('should equal the test AST', function () {
-        assert(converter(source).toAST() === JSON.stringify({
-            'type': 'RootNode',
-            'children': [
+        assert(converter(source).head.head.toAST() === JSON.stringify({
+            'type' : 'SentenceNode',
+            'children' : [
                 {
-                    'type': 'ParagraphNode',
-                    'children': [
-                        {
-                            'type': 'SentenceNode',
-                            'children': [
-                                { 'type': 'WordNode', 'value': 'Common' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'examples' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'of' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'contractions' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'include' },
-                                { 'type': 'PunctuationNode', 'value': ':' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'Ai' },
-                                { 'type': 'WordNode', 'value': 'n' },
-                                { 'type': 'PunctuationNode', 'value': '\'' },
-                                { 'type': 'WordNode', 'value': 't' },
-                                { 'type': 'PunctuationNode', 'value': ',' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'let' },
-                                { 'type': 'PunctuationNode', 'value': '\'' },
-                                { 'type': 'WordNode', 'value': 's' },
-                                { 'type': 'PunctuationNode', 'value': ',' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'I' },
-                                { 'type': 'PunctuationNode', 'value': '\'' },
-                                { 'type': 'WordNode', 'value': 'm' },
-                                { 'type': 'PunctuationNode', 'value': ',' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'we' },
-                                { 'type': 'PunctuationNode', 'value': '\'' },
-                                { 'type': 'WordNode', 'value': 're' },
-                                { 'type': 'PunctuationNode', 'value': ',' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'what' },
-                                { 'type': 'PunctuationNode', 'value': '\'' },
-                                { 'type': 'WordNode', 'value': 's' },
-                                { 'type': 'PunctuationNode', 'value': ',' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'where' },
-                                { 'type': 'PunctuationNode', 'value': '\'' },
-                                { 'type': 'WordNode', 'value': 'd' },
-                                { 'type': 'PunctuationNode', 'value': ',' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'and' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'I' },
-                                { 'type': 'PunctuationNode', 'value': '\'' },
-                                { 'type': 'WordNode', 'value': 'll' },
-                                { 'type': 'PunctuationNode', 'value': '.' }
-                            ]
-                        }
-                    ]
+                    'type' : 'WordNode',
+                    'value' : 'Common'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'examples'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'of'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'contractions'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'include'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : ':'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'Ai'
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'n'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '\''
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 't'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : ','
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'let'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '\''
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 's'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : ','
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'I'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '\''
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'm'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : ','
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'we'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '\''
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 're'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : ','
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'what'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '\''
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 's'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : ','
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'where'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '\''
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'd'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : ','
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'and'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'I'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '\''
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'll'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '.'
                 }
             ]
         }));
@@ -296,253 +507,716 @@ describe('A simple sentence testing for common contractions', function () {
  * From wikipedias list: http://en.wikipedia.org/wiki/Tie_(typography)
 */
 describe('Simple sentences testing for tie characters', function () {
-    it('should equal the test AST, when using the combinding double breve \u25CC\u035D\u25CC', function () {
-        var source = 'e.g. the combining double breve o\u035Do.';
-        assert(converter(source)[0][0].toAST() === JSON.stringify({
-            'type': 'SentenceNode',
-            'children': [
-                { 'type': 'WordNode', 'value': 'e' },
-                { 'type': 'PunctuationNode', 'value': '.' },
-                { 'type': 'WordNode', 'value': 'g' },
-                { 'type': 'PunctuationNode', 'value': '.' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'the' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'combining' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'double' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'breve' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'o\u035Do' },
-                { 'type': 'PunctuationNode', 'value': '.' }
-            ]
-        }));
-    });
+    it('should equal the test AST, when using the combinding double ' +
+        'breve \u25CC\u035D\u25CC', function () {
+            var source = 'e.g. the combining double breve o\u035Do.';
+            assert(converter(source)[0][0].toAST() === JSON.stringify({
+                'type' : 'SentenceNode',
+                'children' : [
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'e'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'g'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'the'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'combining'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'double'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'breve'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'o\u035Do'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    }
+                ]
+            }));
+        }
+    );
 
-    it('should equal the test AST, when using the combinding double inverted breve \u25CC\u0361\u25CC', function () {
-        var source = 'e.g. the combining double inverted breve /k\u0361p/';
-        assert(converter(source)[0][0].toAST() === JSON.stringify({
-            'type': 'SentenceNode',
-            'children': [
-                { 'type': 'WordNode', 'value': 'e' },
-                { 'type': 'PunctuationNode', 'value': '.' },
-                { 'type': 'WordNode', 'value': 'g' },
-                { 'type': 'PunctuationNode', 'value': '.' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'the' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'combining' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'double' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'inverted' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'breve' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'PunctuationNode', 'value': '/' },
-                { 'type': 'WordNode', 'value': 'k\u0361p' },
-                { 'type': 'PunctuationNode', 'value': '/' }
-            ]
-        }));
-    });
+    it('should equal the test AST, when using the combinding double ' +
+        'inverted breve \u25CC\u0361\u25CC', function () {
+            var source =
+                'e.g. the combining double inverted breve /k\u0361p/';
 
-    it('should equal the test AST, when using the combinding double breve below \u25CC\u035C\u25CC', function () {
-        var source = 'e.g. the combining double breve below /k\u035Cp/';
-        assert(converter(source)[0][0].toAST() === JSON.stringify({
-            'type': 'SentenceNode',
-            'children': [
-                { 'type': 'WordNode', 'value': 'e' },
-                { 'type': 'PunctuationNode', 'value': '.' },
-                { 'type': 'WordNode', 'value': 'g' },
-                { 'type': 'PunctuationNode', 'value': '.' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'the' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'combining' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'double' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'breve' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'below' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'PunctuationNode', 'value': '/' },
-                { 'type': 'WordNode', 'value': 'k\u035Cp' },
-                { 'type': 'PunctuationNode', 'value': '/' }
-            ]
-        }));
-    });
+            assert(converter(source)[0][0].toAST() === JSON.stringify({
+                'type' : 'SentenceNode',
+                'children' : [
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'e'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'g'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'the'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'combining'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'double'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'inverted'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'breve'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '/'
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'k\u0361p'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '/'
+                    }
+                ]
+            }));
+        }
+    );
 
-    it('should equal the test AST, when using the undertie \u203F', function () {
-        var source = 'e.g. the undertie /vuz\u203Fave/';
-        assert(converter(source)[0][0].toAST() === JSON.stringify({
-            'type': 'SentenceNode',
-            'children': [
-                { 'type': 'WordNode', 'value': 'e' },
-                { 'type': 'PunctuationNode', 'value': '.' },
-                { 'type': 'WordNode', 'value': 'g' },
-                { 'type': 'PunctuationNode', 'value': '.' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'the' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'undertie' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'PunctuationNode', 'value': '/' },
-                { 'type': 'WordNode', 'value': 'vuz' },
-                { 'type': 'PunctuationNode', 'value': '\u203F' },
-                { 'type': 'WordNode', 'value': 'ave' },
-                { 'type': 'PunctuationNode', 'value': '/' }
-            ]
-        }));
-    });
+    it('should equal the test AST, when using the combinding double breve ' +
+        'below \u25CC\u035C\u25CC', function () {
+            var source = 'e.g. the combining double breve below /k\u035Cp/';
+            assert(converter(source)[0][0].toAST() === JSON.stringify({
+                'type' : 'SentenceNode',
+                'children' : [
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'e'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'g'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'the'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'combining'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'double'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'breve'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'below'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '/'
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'k\u035Cp'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '/'
+                    }
+                ]
+            }));
+        }
+    );
 
-    it('should equal the test AST, when using the character tie \u2040', function () {
-        var source = 'e.g. the character tie s\u2040t';
-        assert(converter(source)[0][0].toAST() === JSON.stringify({
-            'type': 'SentenceNode',
-            'children': [
-                { 'type': 'WordNode', 'value': 'e' },
-                { 'type': 'PunctuationNode', 'value': '.' },
-                { 'type': 'WordNode', 'value': 'g' },
-                { 'type': 'PunctuationNode', 'value': '.' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'the' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'character' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'tie' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 's' },
-                { 'type': 'PunctuationNode', 'value': '\u2040' },
-                { 'type': 'WordNode', 'value': 't' }
-            ]
-        }));
-    });
+    it('should equal the test AST, when using the undertie \u203F',
+        function () {
+            var source = 'e.g. the undertie /vuz\u203Fave/';
+            assert(converter(source)[0][0].toAST() === JSON.stringify({
+                'type' : 'SentenceNode',
+                'children' : [
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'e'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'g'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'the'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'undertie'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '/'
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'vuz'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '\u203F'
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'ave'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '/'
+                    }
+                ]
+            }));
+        }
+    );
 
-    it('should equal the test AST, when using the inverted undertie \u2054', function () {
-        var source = 'e.g. the inverted undertie o\u2054o';
-        assert(converter(source)[0][0].toAST() === JSON.stringify({
-            'type': 'SentenceNode',
-            'children': [
-                { 'type': 'WordNode', 'value': 'e' },
-                { 'type': 'PunctuationNode', 'value': '.' },
-                { 'type': 'WordNode', 'value': 'g' },
-                { 'type': 'PunctuationNode', 'value': '.' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'the' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'inverted' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'undertie' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'o' },
-                { 'type': 'PunctuationNode', 'value': '\u2054' },
-                { 'type': 'WordNode', 'value': 'o' }
-            ]
-        }));
-    });
+    it('should equal the test AST, when using the character tie \u2040',
+        function () {
+            var source = 'e.g. the character tie s\u2040t';
+            assert(converter(source)[0][0].toAST() === JSON.stringify({
+                'type' : 'SentenceNode',
+                'children' : [
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'e'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'g'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'the'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'character'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'tie'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 's'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '\u2040'
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 't'
+                    }
+                ]
+            }));
+        }
+    );
+
+    it('should equal the test AST, when using the inverted undertie \u2054',
+        function () {
+            var source = 'e.g. the inverted undertie o\u2054o';
+            assert(converter(source)[0][0].toAST() === JSON.stringify({
+                'type' : 'SentenceNode',
+                'children' : [
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'e'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'g'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'the'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'inverted'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'undertie'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'o'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '\u2054'
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'o'
+                    }
+                ]
+            }));
+        }
+    );
 });
 
+describe('Intelectual property marks', function () {
+    it('should equal the test AST, when using the copyright symbol \u00A9',
+        function () {
+            var source = '\u00A9 2011 John Smith';
+            assert(converter(source)[0][0].toAST() === JSON.stringify({
+                'type' : 'SentenceNode',
+                'children' : [
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '\u00A9'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : '2011'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'John'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'Smith'
+                    }
+                ]
+            }));
+        }
+    );
 
-describe('Simple sentences testing for intelectual property marks', function () {
-    it('should equal the test AST, when using the copyright symbol \u00A9', function () {
-        var source = '\u00A9 2011 John Smith';
-        assert(converter(source)[0][0].toAST() === JSON.stringify({
-            'type': 'SentenceNode',
-            'children': [
-                { 'type': 'PunctuationNode', 'value': '\u00A9' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': '2011' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'John' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'Smith' }
-            ]
-        }));
-    });
+    it('should equal the test AST, when using the sound recording ' +
+        'copyright symbol \u2117', function () {
+            var source =
+                'Designated by \u2117, the sound recording copyright symbol.';
 
-    it('should equal the test AST, when using the sound recording copyright symbol \u2117', function () {
-        var source = 'Designated by \u2117, the sound recording copyright symbol.';
-        assert(converter(source)[0][0].toAST() === JSON.stringify({
-            'type': 'SentenceNode',
-            'children': [
-                { 'type': 'WordNode', 'value': 'Designated' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'by' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'PunctuationNode', 'value': '\u2117' },
-                { 'type': 'PunctuationNode', 'value': ',' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'the' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'sound' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'recording' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'copyright' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'symbol' },
-                { 'type': 'PunctuationNode', 'value': '.' }
-            ]
-        }));
-    });
+            assert(converter(source)[0][0].toAST() === JSON.stringify({
+                'type' : 'SentenceNode',
+                'children' : [
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'Designated'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'by'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '\u2117'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : ','
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'the'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'sound'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'recording'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'copyright'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'symbol'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    }
+                ]
+            }));
+        }
+    );
 
-    it('should equal the test AST, when using the registered trademark symbol \u00AE', function () {
-        var source = 'Wikipedia\u00AE is a registered trademark.';
-        assert(converter(source)[0][0].toAST() === JSON.stringify({
-            'type': 'SentenceNode',
-            'children': [
-                { 'type': 'WordNode', 'value': 'Wikipedia' },
-                { 'type': 'PunctuationNode', 'value': '\u00AE' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'is' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'a' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'registered' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'trademark' },
-                { 'type': 'PunctuationNode', 'value': '.' }
-            ]
-        }));
-    });
+    it('should equal the test AST, when using the registered trademark ' +
+        'symbol \u00AE', function () {
+            var source = 'Wikipedia\u00AE is a registered trademark.';
+            assert(converter(source)[0][0].toAST() === JSON.stringify({
+                'type' : 'SentenceNode',
+                'children' : [
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'Wikipedia'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '\u00AE'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'is'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'a'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'registered'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'trademark'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    }
+                ]
+            }));
+        }
+    );
 
-    it('should equal the test AST, when using the service mark symbol \u2120', function () {
-        var source = 'ABC Law\u2120 legal services.';
-        assert(converter(source)[0][0].toAST() === JSON.stringify({
-            'type': 'SentenceNode',
-            'children': [
-                { 'type': 'WordNode', 'value': 'ABC' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'Law' },
-                { 'type': 'PunctuationNode', 'value': '\u2120' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'legal' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'services' },
-                { 'type': 'PunctuationNode', 'value': '.' }
-            ]
-        }));
-    });
+    it('should equal the test AST, when using the service mark symbol \u2120',
+        function () {
+            var source = 'ABC Law\u2120 legal services.';
+            assert(converter(source)[0][0].toAST() === JSON.stringify({
+                'type' : 'SentenceNode',
+                'children' : [
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'ABC'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'Law'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '\u2120'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'legal'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'services'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    }
+                ]
+            }));
+        }
+    );
 
-    it('should equal the test AST, when using the trademark symbol \u2122', function () {
-        var source = 'Mytrademark\u2122 is a trademark.';
-        assert(converter(source)[0][0].toAST() === JSON.stringify({
-            'type': 'SentenceNode',
-            'children': [
-                { 'type': 'WordNode', 'value': 'Mytrademark' },
-                { 'type': 'PunctuationNode', 'value': '\u2122' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'is' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'a' },
-                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                { 'type': 'WordNode', 'value': 'trademark' },
-                { 'type': 'PunctuationNode', 'value': '.' }
-            ]
-        }));
-    });
+    it('should equal the test AST, when using the trademark symbol \u2122',
+        function () {
+            var source = 'Mytrademark\u2122 is a trademark.';
+            assert(converter(source)[0][0].toAST() === JSON.stringify({
+                'type' : 'SentenceNode',
+                'children' : [
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'Mytrademark'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '\u2122'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'is'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'a'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'trademark'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    }
+                ]
+            }));
+        }
+    );
 });
 
 /*
@@ -551,39 +1225,92 @@ describe('Simple sentences testing for intelectual property marks', function () 
 describe('A simple sentence testing for digit-letters', function () {
     var source = 'iPhone 5S is a high-end smartphone developed by Apple.';
     it('should equal the test AST', function () {
-        assert(converter(source).toAST() === JSON.stringify({
-            'type': 'RootNode',
-            'children': [
+        assert(converter(source).head.head.toAST() === JSON.stringify({
+            'type' : 'SentenceNode',
+            'children' : [
                 {
-                    'type': 'ParagraphNode',
-                    'children': [
-                        {
-                            'type': 'SentenceNode',
-                            'children': [
-                                { 'type': 'WordNode', 'value': 'iPhone' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': '5' },
-                                { 'type': 'WordNode', 'value': 'S' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'is' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'a' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'high' },
-                                { 'type': 'PunctuationNode', 'value': '-' },
-                                { 'type': 'WordNode', 'value': 'end' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'smartphone' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'developed' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'by' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'Apple' },
-                                { 'type': 'PunctuationNode', 'value': '.' }
-                            ]
-                        }
-                    ]
+                    'type' : 'WordNode',
+                    'value' : 'iPhone'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : '5'
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'S'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'is'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'a'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'high'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '-'
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'end'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'smartphone'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'developed'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'by'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'Apple'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '.'
                 }
             ]
         }));
@@ -595,57 +1322,161 @@ describe('A simple sentence testing for digit-letters', function () {
  * Note the combining characters.
 */
 describe('A simple sentence testing for grapheme clusters', function () {
-    var source = 'Grapheme clusters such as \u0BA8\u0BBF and Hangul made of conjoining Jamo such as \u1101\u1161\u11A8, or other similar symbols.';
+    var source = 'Grapheme clusters such as \u0BA8\u0BBF and Hangul made ' +
+        'of conjoining Jamo such as \u1101\u1161\u11A8, or other similar ' +
+        'symbols.';
+
     it('should equal the test AST', function () {
-        assert(converter(source).toAST() === JSON.stringify({
-            'type': 'RootNode',
-            'children': [
+        assert(converter(source).head.head.toAST() === JSON.stringify({
+            'type' : 'SentenceNode',
+            'children' : [
                 {
-                    'type': 'ParagraphNode',
-                    'children': [
-                        {
-                            'type': 'SentenceNode',
-                            'children': [
-                                { 'type': 'WordNode', 'value': 'Grapheme' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'clusters' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'such' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'as' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': '\u0BA8\u0BBF' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'and' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'Hangul' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'made' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'of' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'conjoining' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'Jamo' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'such' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'as' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': '\u1101\u1161\u11A8' },
-                                { 'type': 'PunctuationNode', 'value': ',' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'or' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'other' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'similar' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'symbols' },
-                                { 'type': 'PunctuationNode', 'value': '.' }
-                            ]
-                        }
-                    ]
+                    'type' : 'WordNode',
+                    'value' : 'Grapheme'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'clusters'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'such'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'as'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : '\u0BA8\u0BBF'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'and'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'Hangul'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'made'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'of'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'conjoining'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'Jamo'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'such'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'as'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : '\u1101\u1161\u11A8'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : ','
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'or'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'other'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'similar'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'symbols'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '.'
                 }
             ]
         }));
@@ -657,69 +1488,188 @@ describe('A simple sentence testing for grapheme clusters', function () {
  * Note both the hexadecimal and Unicode escape sequences.
 */
 describe('A sentence testing for unicode parsing', function () {
-    var source = 'The \xC5 symbol invented by A. J. A\u030Angstro\u0308m (1814, Lo\u0308gdo\u0308, \u2013 1874) denotes the length 10\u207B\xB9\u2070 m.';
+    var source = 'The \xC5 symbol invented by A. J. A\u030Angstro\u0308m ' +
+        '(1814, Lo\u0308gdo\u0308, \u2013 1874) denotes the length ' +
+        '10\u207B\xB9\u2070 m.';
+
     it('should equal the test AST', function () {
-        assert(converter(source).toAST() === JSON.stringify({
-            'type': 'RootNode',
-            'children': [
+        assert(converter(source).head.head.toAST() === JSON.stringify({
+            'type' : 'SentenceNode',
+            'children' : [
                 {
-                    'type': 'ParagraphNode',
-                    'children': [
-                        {
-                            'type': 'SentenceNode',
-                            'children': [
-                                { 'type': 'WordNode', 'value': 'The' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                // NOT a combining ring! Just the unicode
-                                // A-ring character.
-                                { 'type': 'WordNode', 'value': '\xC5' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'symbol' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'invented' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'by' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'A' },
-                                { 'type': 'PunctuationNode', 'value': '.' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'J' },
-                                { 'type': 'PunctuationNode', 'value': '.' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                // A combining ring and a combining diaereses.
-                                { 'type': 'WordNode', 'value': 'A\u030Angstro\u0308m' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'PunctuationNode', 'value': '(' },
-                                { 'type': 'WordNode', 'value': '1814' },
-                                { 'type': 'PunctuationNode', 'value': ',' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                // Two combining diaereses.
-                                { 'type': 'WordNode', 'value': 'Lo\u0308gdo\u0308' },
-                                { 'type': 'PunctuationNode', 'value': ',' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                // En-dash
-                                { 'type': 'PunctuationNode', 'value': '\u2013' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': '1874' },
-                                { 'type': 'PunctuationNode', 'value': ')' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'denotes' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'the' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'length' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': '10' },
-                                // Superscript minus.
-                                { 'type': 'PunctuationNode', 'value': '\u207B' },
-                                // Superscript one and superscript two
-                                { 'type': 'WordNode', 'value': '\xB9\u2070' },
-                                { 'type': 'WhiteSpaceNode', 'value': ' ' },
-                                { 'type': 'WordNode', 'value': 'm' },
-                                { 'type': 'PunctuationNode', 'value': '.' }
-                            ]
-                        }
-                    ]
+                    'type' : 'WordNode',
+                    'value' : 'The'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                // NOT a combining ring! Just the unicode
+                // A-ring character.
+                {
+                    'type' : 'WordNode',
+                    'value' : '\xC5'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'symbol'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'invented'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'by'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'A'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '.'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'J'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '.'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                // A combining ring and a combining diaereses.
+                {
+                    'type' : 'WordNode',
+                    'value' : 'A\u030Angstro\u0308m'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '('
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : '1814'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : ','
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                // Two combining diaereses.
+                {
+                    'type' : 'WordNode',
+                    'value' : 'Lo\u0308gdo\u0308'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : ','
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                // En-dash
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '\u2013'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : '1874'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : ')'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'denotes'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'the'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'length'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : '10'
+                },
+                // Superscript minus.
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '\u207B'
+                },
+                // Superscript one and superscript two
+                {
+                    'type' : 'WordNode',
+                    'value' : '\xB9\u2070'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'm'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '.'
                 }
             ]
         }));
