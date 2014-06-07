@@ -12,7 +12,7 @@
   "author": "Titus Wormer <tituswormer@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "textom": "~0.0.12"
+    "textom": "~0.0.13"
   },
   "devDependencies": {
     "complexity-report": "~1.0.3",
