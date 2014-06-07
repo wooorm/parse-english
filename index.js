@@ -1043,8 +1043,9 @@
     function remove(items) {
         var iterator;
 
-        if (!items || !('length' in items)) {
-            throw new TypeError('Type Error');
+        if (!items || !('length' in items) ||
+            !(items instanceof TextOM.Node || items instanceof Array)) {
+                throw new TypeError('Type Error');
         }
 
         items = [].slice.call(items);
