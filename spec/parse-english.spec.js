@@ -1,7 +1,8 @@
 
-var converter = require('..'),
-    TextOM = converter.TextOM,
-    assert = require('assert');
+var parseEnglish = require('..'),
+    assert = require('assert'),
+    converter = parseEnglish(),
+    TextOM = converter.TextOM;
 
 describe('ParseEnglish()', function () {
     it('should be of type `function`', function () {
