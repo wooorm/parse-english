@@ -34,7 +34,7 @@
     "make": "npm run-script lint && npm run-script complexity && npm run-script coverage"
   },
   "testling": {
-    "files": "spec/textom.spec.js",
+    "files": "spec/parse-english.spec.js",
     "harness": "mocha",
     "browsers": [
       "iexplore/latest",
