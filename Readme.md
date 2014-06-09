@@ -21,7 +21,7 @@ $ component install wooorm/parse-english
 ## Usage
 
 ````js
-var parse = require('parse-english'),
+var parse = require('parse-english')(),
     rootNode;
 
 // Simple sentence:
@@ -39,7 +39,7 @@ rootNode = parse(require('fs').readFileSync('./document.txt', 'utf-8'));
 ### ParseEnglish(source?)
 
 ```js
-var parse = require('parse-english'),
+var parse = require('parse-english')(),
     rootNode = parse('A simple sentence.');
 
 rootNode; // RootNode
@@ -58,7 +58,7 @@ Parses a given (english) string into an object model.
 ### ParseEnglish.fromAST(ast)
 
 ```js
-var parse = require('parse-english');
+var parse = require('parse-english')();
 
 var rootNode = parse.fromAST({"type":"RootNode", "children":[
   {"type":"ParagraphNode", "children": [
@@ -86,7 +86,7 @@ Parse a JSON object or string—a (parsed?) result of [`Node#toAST()`](#textomno
 #### TextOM.Node#toAST(delimiter?)
 
 ```js
-var parse = require('parse-english'),
+var parse = require('parse-english')(),
     rootNode = parse('A simple sentence.');
 
 rootNode.toAST(); // '{"type":"RootNode","children":[{"type":"ParagraphNode","children":[{"type":"SentenceNode","children":[{"type":"WordNode","value":"A"},{"type":"WhiteSpaceNode","value":" "},{"type":"WordNode","value":"simple"},{"type":"WhiteSpaceNode","value":" "},{"type":"WordNode","value":"sentence"},{"type":"PunctuationNode","value":"."}]}]}]}'
@@ -99,7 +99,7 @@ Stringify an object model into a `JSON.stringify`d AST, can later be passed to [
 #### TextOM.Parent#prependContent(value)
 
 ```js
-var parse = require('parse-english'),
+var parse = require('parse-english')(),
     rootNode = parse('simple sentence.');
 
 rootNode.prependContent('A document including a ')
@@ -113,7 +113,7 @@ Inserts the parsed value at the beginning of the parent.
 #### TextOM.Parent#appendContent(value)
 
 ```js
-var parse = require('parse-english'),
+var parse = require('parse-english')(),
     rootNode = parse('A document');
 
 rootNode.appendContent(' including a simple sentence');
@@ -127,7 +127,7 @@ Inserts the parsed value at the end of the parent.
 #### TextOM.Parent#removeContent()
 
 ```js
-var parse = require('parse-english'),
+var parse = require('parse-english')(),
     rootNode = parse('A sentence. Another sentence.');
 
 rootNode.head.head.removeContent();
@@ -139,7 +139,7 @@ Removes the current content of the parent.
 #### TextOM.Parent#replaceContent(value?)
 
 ```js
-var parse = require('parse-english'),
+var parse = require('parse-english')(),
     rootNode = parse('A sentence');
 
 rootNode.replaceContent('One sentence. Two sentences.');
