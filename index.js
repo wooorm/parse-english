@@ -694,7 +694,6 @@ function tokenizeParagraph(paragraph, value) {
         start, sentence, match, submatch, pointer, $0, $4, length, end;
 
     /* Two or more occurrences of a letter followed by a full stop. */
-    /*jshint boss:true */
     while (submatch = EXPRESSION_INITIALISM.exec(value)) {
         pointer = submatch.index;
         $0 = submatch[0];
@@ -817,7 +816,6 @@ function tokenizeRoot(root, value) {
         match, breakpoint,
         paragraph, whiteSpace;
 
-    /*jshint boss:true */
     while (match = EXPRESSION_MULTILINEBREAK.exec(value)) {
         breakpoints.push([match.index, match.index + match[0].length]);
     }

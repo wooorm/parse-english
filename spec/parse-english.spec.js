@@ -270,7 +270,6 @@ describe('ParseEnglish.fromAST(ast)', function () {
 
         assert(converter.fromAST(ast).toAST() === ast);
 
-        /*jshint -W053 */
         /*eslint-disable no-new-wrappers */
         assert(converter.fromAST(new String(ast)).toAST() === ast);
         /*eslint-enable no-new-wrappers */
