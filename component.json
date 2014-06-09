@@ -2,7 +2,7 @@
   "name": "parse-english",
   "repository": "wooorm/parse-english",
   "description": "English (natural language) parser build on TextOM",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "keywords": [
     "english",
     "natural",
