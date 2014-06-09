@@ -1,3 +1,5 @@
+'use strict';
+
 var textom, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     GROUP_COMBINING_DIACRITICAL_MARK, GROUP_TERMINAL_MARKER,
     GROUP_CLOSING_PUNCTUATION, GROUP_FINAL_PUNCTUATION,
@@ -8,7 +10,7 @@ var textom, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     EXPRESSION_ABBREVIATION_AFFIX, EXPRESSION_INITIALISM,
     EXPRESSION_FULL_STOP, EXPRESSION_SENTENCE_END,
     EXPRESSION_SENTENCE_SPACE, EXPRESSION_WHITE_SPACE, EXPRESSION_ORDINAL,
-    GROUP_COMBINING_NONSPACING_MARK, constructors, types;
+    GROUP_COMBINING_NONSPACING_MARK, constructors;
 
 /**
  * Module dependencies.
@@ -375,7 +377,7 @@ EXPRESSION_ABBREVIATION_PREFIX = new RegExp(
      * December.
      */
     'sec|min|hr|mon|tue|tues|wed|thu|thurs|fri|sat|sun|jan|feb|mar',
-    'apr|jun|jul|aug|sep|sept|oct|nov|dec',
+    'apr|jun|jul|aug|sep|sept|oct|nov|dec'
     ].join(STRING_PIPE) + ')\\.',
 'gi');
 
@@ -587,45 +589,91 @@ function BREAKPOINT_SORT(a, b) {
     return a - b;
 }
 
+/*eslint-disable no-cond-assign */
+
 /**
- * `tokenizeRoot` tokenizes a document into `ParagraphNode`s and
- * `WhiteSpaceNode`s.
+ * `tokenizeSentence` tokenizes a sentence into `WordNode`s,
+ * `PunctuationNode`s, and `WhiteSpaceNode`s.
  *
- * @param {RootNode} root - The RootNode to append to.
- * @param {String} value - The paragraphs and white space to parse.
- * @return {RootNode} - The given RootNode.
+ * @param {SentenceNode} sentence - The SentenceNode to append to.
+ * @param {String} value - The words, punctuation, and white space to
+ *                         parse.
+ * @return {SentenceNode} - The given SentenceNode.
  * @global
  * @private
  */
-function tokenizeRoot(root, value) {
-    var iterator = -1,
-        start = 0,
-        breakpoints = [],
-        match, breakpoint,
-        paragraph, whiteSpace;
+function tokenizeSentence(sentence, value) {
+    var tokenBreakPoints = [],
+        tokens = [],
+        iterator = -1,
+        length = EXPRESSION_WORD_CONTRACTION.length,
+        expression, pointer, match, token, start, end;
 
-    /*jshint boss:true */
-    while (match = EXPRESSION_MULTILINEBREAK.exec(value)) {
-        breakpoints.push([match.index, match.index + match[0].length]);
+    /* Insert word-like break points.
+
+    /* Break between contractions consisting of two parts. */
+    while (++iterator < length) {
+        expression = EXPRESSION_WORD_CONTRACTION[iterator];
+
+        while (match = expression.exec(value)) {
+            tokenBreakPoints.push(match.index + match[1].length);
+        }
     }
 
-    breakpoints.push([value.length, value.length]);
-
-    while (breakpoint = breakpoints[++iterator]) {
-        if (paragraph = value.slice(start, breakpoint[0])) {
-            tokenizeParagraph(
-                root.append(new root.TextOM.ParagraphNode()), paragraph
-            );
-        }
-
-        if (whiteSpace = value.slice(breakpoint[0], breakpoint[1])) {
-            root.append(new root.TextOM.WhiteSpaceNode(whiteSpace));
-        }
-
-        start = breakpoint[1];
+    /*
+     * Break on general punctuation (One or more of the same
+     * non-letter or non-number character.
+     */
+    while (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(value)) {
+        pointer = match.index;
+        tokenBreakPoints.push(pointer);
+        tokenBreakPoints.push(pointer + match[0].length);
     }
 
-    return root;
+    /* Break on one or more digits followed by one or more letters. */
+    while (match = EXPRESSION_WORD_DIGIT_LETTER.exec(value)) {
+        if (!EXPRESSION_ORDINAL.test(match[2])) {
+            tokenBreakPoints.push(match.index + match[1].length);
+        }
+    }
+
+    tokenBreakPoints.sort(BREAKPOINT_SORT);
+
+    iterator = -1;
+    length = tokenBreakPoints.length + 1;
+    start = 0;
+
+    while (++iterator < length) {
+        end = tokenBreakPoints[iterator];
+
+        /* Skip if the previous end is the same. */
+        if (end === 0 || start === end) {
+            continue;
+        }
+
+        tokens.push(value.slice(start, end));
+
+        start = end;
+    }
+
+    /* Iterate over the non-empty tokens, detect type of token. */
+    iterator = -1;
+
+    while (token = tokens[++iterator]) {
+        /*
+         * Append a new item (glue or box) to the list, and pass it the
+         * string value and the item its in.
+         */
+        if (token.match(EXPRESSION_WHITE_SPACE)) {
+            sentence.append(new sentence.TextOM.WhiteSpaceNode(token));
+        } else if (token.match(EXPRESSION_WORD_MULTIPUNCTUATION)) {
+            sentence.append(new sentence.TextOM.PunctuationNode(token));
+        } else {
+            sentence.append(new sentence.TextOM.WordNode(token));
+        }
+    }
+
+    return sentence;
 }
 
 /**
@@ -753,90 +801,47 @@ function tokenizeParagraph(paragraph, value) {
 }
 
 /**
- * `tokenizeSentence` tokenizes a sentence into `WordNode`s,
- * `PunctuationNode`s, and `WhiteSpaceNode`s.
+ * `tokenizeRoot` tokenizes a document into `ParagraphNode`s and
+ * `WhiteSpaceNode`s.
  *
- * @param {SentenceNode} sentence - The SentenceNode to append to.
- * @param {String} value - The words, punctuation, and white space to
- *                         parse.
- * @return {SentenceNode} - The given SentenceNode.
+ * @param {RootNode} root - The RootNode to append to.
+ * @param {String} value - The paragraphs and white space to parse.
+ * @return {RootNode} - The given RootNode.
  * @global
  * @private
  */
-function tokenizeSentence(sentence, value) {
-    var tokenBreakPoints = [],
-        tokens = [],
-        iterator = -1,
-        length = EXPRESSION_WORD_CONTRACTION.length,
-        expression, pointer, match, token, start, end;
+function tokenizeRoot(root, value) {
+    var iterator = -1,
+        start = 0,
+        breakpoints = [],
+        match, breakpoint,
+        paragraph, whiteSpace;
 
-    /* Insert word-like break points.
-
-    /* Break between contractions consisting of two parts. */
-    while (++iterator < length) {
-        expression = EXPRESSION_WORD_CONTRACTION[iterator];
-
-        /*jshint boss:true */
-        while (match = expression.exec(value)) {
-            tokenBreakPoints.push(match.index + match[1].length);
-        }
+    /*jshint boss:true */
+    while (match = EXPRESSION_MULTILINEBREAK.exec(value)) {
+        breakpoints.push([match.index, match.index + match[0].length]);
     }
 
-    /*
-     * Break on general punctuation (One or more of the same
-     * non-letter or non-number character.
-     */
-    while (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(value)) {
-        pointer = match.index;
-        tokenBreakPoints.push(pointer);
-        tokenBreakPoints.push(pointer + match[0].length);
-    }
+    breakpoints.push([value.length, value.length]);
 
-    /* Break on one or more digits followed by one or more letters. */
-    while (match = EXPRESSION_WORD_DIGIT_LETTER.exec(value)) {
-        if (!EXPRESSION_ORDINAL.test(match[2])) {
-            tokenBreakPoints.push(match.index + match[1].length);
-        }
-    }
-
-    tokenBreakPoints.sort(BREAKPOINT_SORT);
-
-    iterator = -1;
-    length = tokenBreakPoints.length + 1;
-    start = 0;
-
-    while (++iterator < length) {
-        end = tokenBreakPoints[iterator];
-
-        /* Skip if the previous end is the same. */
-        if (end === 0 || start === end) {
-            continue;
+    while (breakpoint = breakpoints[++iterator]) {
+        if (paragraph = value.slice(start, breakpoint[0])) {
+            tokenizeParagraph(
+                root.append(new root.TextOM.ParagraphNode()), paragraph
+            );
         }
 
-        tokens.push(value.slice(start, end));
-
-        start = end;
-    }
-
-    /* Iterate over the non-empty tokens, detect type of token. */
-    iterator = -1;
-
-    while (token = tokens[++iterator]) {
-        /*
-         * Append a new item (glue or box) to the list, and pass it the
-         * string value and the item its in.
-         */
-        if (token.match(EXPRESSION_WHITE_SPACE)) {
-            sentence.append(new sentence.TextOM.WhiteSpaceNode(token));
-        } else if (token.match(EXPRESSION_WORD_MULTIPUNCTUATION)) {
-            sentence.append(new sentence.TextOM.PunctuationNode(token));
-        } else {
-            sentence.append(new sentence.TextOM.WordNode(token));
+        if (whiteSpace = value.slice(breakpoint[0], breakpoint[1])) {
+            root.append(new root.TextOM.WhiteSpaceNode(whiteSpace));
         }
+
+        start = breakpoint[1];
     }
 
-    return sentence;
+    return root;
 }
+
+/*eslint-enable no-cond-assign */
 
 /**
  * `toAST` converts the given node into a AST object.
@@ -893,7 +898,7 @@ function toAST (node) {
  * @api private
  */
 function insert(parent, item, source) {
-    var hierarchy, child, range, children, method, iterator;
+    var hierarchy, child, range, children, iterator;
 
     if (!parent || !parent.TextOM ||
         !(parent instanceof parent.TextOM.Parent ||
@@ -1019,13 +1024,14 @@ function removeContent() {
  */
 function replaceContent(source) {
     var self = this,
-        items = [].slice.call(self),
-        result;
+        items, result;
 
     if (!self || !self.TextOM || !(self instanceof self.TextOM.Parent ||
         self instanceof self.TextOM.Element)) {
             throw new TypeError('Type Error');
     }
+
+    items = [].slice.call(self);
 
     if (self.parser(source).length) {
         result = insert(self, null, source);

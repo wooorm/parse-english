@@ -1,8 +1,11 @@
+'use strict';
 
-var parseEnglish = require('..'),
-    assert = require('assert'),
-    converter = parseEnglish(),
-    TextOM = converter.TextOM;
+var parseEnglish, assert, converter, TextOM;
+
+parseEnglish = require('..');
+assert = require('assert');
+converter = parseEnglish();
+TextOM = converter.TextOM;
 
 describe('ParseEnglish()', function () {
     it('should be of type `function`', function () {
@@ -12,8 +15,9 @@ describe('ParseEnglish()', function () {
     it('should return a newly initialized `RootNode` object, when invoked ' +
         'with string literal or string object', function () {
             assert(converter('') instanceof TextOM.RootNode);
-            /*jshint -W053 */
+            /*eslint-disable no-new-wrappers */
             assert(converter(new String('')) instanceof TextOM.RootNode);
+            /*eslint-enable no-new-wrappers */
         }
     );
 
@@ -267,7 +271,9 @@ describe('ParseEnglish.fromAST(ast)', function () {
         assert(converter.fromAST(ast).toAST() === ast);
 
         /*jshint -W053 */
+        /*eslint-disable no-new-wrappers */
         assert(converter.fromAST(new String(ast)).toAST() === ast);
+        /*eslint-enable no-new-wrappers */
     });
 
     it('should convert an AST into an object model', function () {
@@ -15040,7 +15046,7 @@ describe('Terminal markers', function () {
                             'value' : '.'
                         }
                     ]
-                },
+                }
             ]
         }));
     });
