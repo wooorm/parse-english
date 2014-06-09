@@ -8,7 +8,7 @@ var textom, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     EXPRESSION_ABBREVIATION_PREFIX, EXPRESSION_WORD_CHARACTER,
     EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE,
     EXPRESSION_ABBREVIATION_AFFIX, EXPRESSION_INITIALISM,
-    EXPRESSION_FULL_STOP, EXPRESSION_SENTENCE_END,
+    EXPRESSION_FULL_STOP, EXPRESSION_SENTENCE_END, EXPRESSION_WORD_COMBINING,
     EXPRESSION_SENTENCE_SPACE, EXPRESSION_WHITE_SPACE, EXPRESSION_ORDINAL,
     GROUP_COMBINING_NONSPACING_MARK, constructors;
 
@@ -273,9 +273,21 @@ EXPRESSION_WORD_CONTRACTION = [
 EXPRESSION_WORD_MULTIPUNCTUATION = new RegExp(
     '([\\uD800-\\uDBFF][\\uDC00-\\uDFFF])+|[\\s\\S][' +
     GROUP_COMBINING_DIACRITICAL_MARK + GROUP_COMBINING_NONSPACING_MARK +
-    ']{2,}|([^' + GROUP_NUMERICAL + GROUP_ALPHABETIC +
+    ']{2,}|([^' + GROUP_NUMERICAL + GROUP_ALPHABETIC + '])\\2*', 'g'
+);
+
+/**
+ * `EXPRESSION_WORD_COMBINING` matches multiple combining mark
+ * characters.
+ *
+ * @global
+ * @private
+ * @constant
+ */
+EXPRESSION_WORD_COMBINING = new RegExp(
+    '^([' +
     GROUP_COMBINING_DIACRITICAL_MARK + GROUP_COMBINING_NONSPACING_MARK +
-    '])\\2*', 'g'
+    '])+$'
 );
 
 /**
@@ -625,6 +637,10 @@ function tokenizeSentence(sentence, value) {
      * non-letter or non-number character.
      */
     while (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(value)) {
+        if (EXPRESSION_WORD_COMBINING.test(match[0])) {
+            continue;
+        }
+
         pointer = match.index;
         tokenBreakPoints.push(pointer);
         tokenBreakPoints.push(pointer + match[0].length);
@@ -666,7 +682,10 @@ function tokenizeSentence(sentence, value) {
          */
         if (token.match(EXPRESSION_WHITE_SPACE)) {
             sentence.append(new sentence.TextOM.WhiteSpaceNode(token));
-        } else if (token.match(EXPRESSION_WORD_MULTIPUNCTUATION)) {
+        } else if (
+            (match = token.match(EXPRESSION_WORD_MULTIPUNCTUATION)) &&
+            !EXPRESSION_WORD_COMBINING.test(match[0])
+        ) {
             sentence.append(new sentence.TextOM.PunctuationNode(token));
         } else {
             sentence.append(new sentence.TextOM.WordNode(token));

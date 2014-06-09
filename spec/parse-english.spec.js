@@ -826,7 +826,6 @@ describe('ParseEnglish.TextOM.Parent#removeContent()', function () {
             ).head.head;
 
             sentence.removeContent();
-
             assert(sentence.length === 0);
             assert(sentence.toString() === '');
             assert(
@@ -1490,7 +1489,7 @@ describe('Two paragraphs', function () {
                     ]
                 }
             ]
-       }));
+        }));
     });
 });
 
