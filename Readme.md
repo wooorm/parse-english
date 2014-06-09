@@ -34,6 +34,8 @@ rootNode = parse('The \xC5 symbol invented by A. J. A\u030Angstro\u0308m (1814, 
 rootNode = parse(require('fs').readFileSync('./document.txt', 'utf-8'));
 ````
 
+Note that the exported object is a function, which in turn returns brand-new parser and TextOM objects. There’s whole slew of issues that can arise from extending prototypes like (DOM) Node, NodeList, or Array—this feature however allows for multiple sandboxed environments (i.e., prototypes) without those disadvantages.
+
 ## API
 
 ### ParseEnglish(source?)
