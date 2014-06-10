@@ -1074,7 +1074,7 @@ function parseEnglishConstructor() {
             prototype = Constructor && Constructor.prototype;
 
             if (prototype && 'type' in prototype) {
-                types[prototype.type] = Constructor.name;
+                types[prototype.type] = key;
             }
         }
     }
