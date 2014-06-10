@@ -2625,6 +2625,7 @@ describe('Sentence: Without alphabetic content', function () {
 describe('White space characters', function () {
     var sentenceStart = 'A',
         sentenceEnd = 'house.',
+        iterator = -1,
         whiteSpaceCharacters = [
             '\u0009', // CHARACTER TABULATION
             '\u000A', // LINE FEED (LF)
@@ -2652,9 +2653,12 @@ describe('White space characters', function () {
             '\u202F', // NARROW NO-BREAK SPACE
             '\u205F', // MEDIUM MATHEMATICAL SPACE
             '\u3000'  // IDEOGRAPHIC SPACE
-        ];
+        ],
+        character;
 
-    whiteSpaceCharacters.forEach(function (character) {
+    while (whiteSpaceCharacters[++iterator]) {
+        character = whiteSpaceCharacters[iterator];
+
         var source = sentenceStart + character + sentenceEnd;
 
         it('should equal the test AST when using `' + character + '`',
@@ -2684,7 +2688,7 @@ describe('White space characters', function () {
                 );
             }
         );
-    });
+    }
 });
 
 /*
@@ -2815,123 +2819,127 @@ describe('Double combining marks', function () {
 });
 
 var diacritics = [
-    '\u0300', // COMBINING GRAVE ACCENT (U+0300)
-    '\u0301', // COMBINING ACUTE ACCENT (U+0301)
-    '\u0302', // COMBINING CIRCUMFLEX ACCENT (U+0302)
-    '\u0303', // COMBINING TILDE (U+0303)
-    '\u0304', // COMBINING MACRON (U+0304)
-    '\u0305', // COMBINING OVERLINE (U+0305)
-    '\u0306', // COMBINING BREVE (U+0306)
-    '\u0307', // COMBINING DOT ABOVE (U+0307)
-    '\u0308', // COMBINING DIAERESIS (U+0308)
-    '\u0309', // COMBINING HOOK ABOVE (U+0309)
-    '\u030A', // COMBINING RING ABOVE (U+030A)
-    '\u030B', // COMBINING DOUBLE ACUTE ACCENT (U+030B)
-    '\u030C', // COMBINING CARON (U+030C)
-    '\u030D', // COMBINING VERTICAL LINE ABOVE (U+030D)
-    '\u030E', // COMBINING DOUBLE VERTICAL LINE ABOVE (U+030E)
-    '\u030F', // COMBINING DOUBLE GRAVE ACCENT (U+030F)
-    '\u0310', // COMBINING CANDRABINDU (U+0310)
-    '\u0311', // COMBINING INVERTED BREVE (U+0311)
-    '\u0312', // COMBINING TURNED COMMA ABOVE (U+0312)
-    '\u0313', // COMBINING COMMA ABOVE (U+0313)
-    '\u0314', // COMBINING REVERSED COMMA ABOVE (U+0314)
-    '\u0315', // COMBINING COMMA ABOVE RIGHT (U+0315)
-    '\u0316', // COMBINING GRAVE ACCENT BELOW (U+0316)
-    '\u0317', // COMBINING ACUTE ACCENT BELOW (U+0317)
-    '\u0318', // COMBINING LEFT TACK BELOW (U+0318)
-    '\u0319', // COMBINING RIGHT TACK BELOW (U+0319)
-    '\u031A', // COMBINING LEFT ANGLE ABOVE (U+031A)
-    '\u031B', // COMBINING HORN (U+031B)
-    '\u031C', // COMBINING LEFT HALF RING BELOW (U+031C)
-    '\u031D', // COMBINING UP TACK BELOW (U+031D)
-    '\u031E', // COMBINING DOWN TACK BELOW (U+031E)
-    '\u031F', // COMBINING PLUS SIGN BELOW (U+031F)
-    '\u0320', // COMBINING MINUS SIGN BELOW (U+0320)
-    '\u0321', // COMBINING PALATALIZED HOOK BELOW (U+0321)
-    '\u0322', // COMBINING RETROFLEX HOOK BELOW (U+0322)
-    '\u0323', // COMBINING DOT BELOW (U+0323)
-    '\u0324', // COMBINING DIAERESIS BELOW (U+0324)
-    '\u0325', // COMBINING RING BELOW (U+0325)
-    '\u0326', // COMBINING COMMA BELOW (U+0326)
-    '\u0327', // COMBINING CEDILLA (U+0327)
-    '\u0328', // COMBINING OGONEK (U+0328)
-    '\u0329', // COMBINING VERTICAL LINE BELOW (U+0329)
-    '\u032A', // COMBINING BRIDGE BELOW (U+032A)
-    '\u032B', // COMBINING INVERTED DOUBLE ARCH BELOW (U+032B)
-    '\u032C', // COMBINING CARON BELOW (U+032C)
-    '\u032D', // COMBINING CIRCUMFLEX ACCENT BELOW (U+032D)
-    '\u032E', // COMBINING BREVE BELOW (U+032E)
-    '\u032F', // COMBINING INVERTED BREVE BELOW (U+032F)
-    '\u0330', // COMBINING TILDE BELOW (U+0330)
-    '\u0331', // COMBINING MACRON BELOW (U+0331)
-    '\u0332', // COMBINING LOW LINE (U+0332)
-    '\u0333', // COMBINING DOUBLE LOW LINE (U+0333)
-    '\u0334', // COMBINING TILDE OVERLAY (U+0334)
-    '\u0335', // COMBINING SHORT STROKE OVERLAY (U+0335)
-    '\u0336', // COMBINING LONG STROKE OVERLAY (U+0336)
-    '\u0337', // COMBINING SHORT SOLIDUS OVERLAY (U+0337)
-    '\u0338', // COMBINING LONG SOLIDUS OVERLAY (U+0338)
-    '\u0339', // COMBINING RIGHT HALF RING BELOW (U+0339)
-    '\u033A', // COMBINING INVERTED BRIDGE BELOW (U+033A)
-    '\u033B', // COMBINING SQUARE BELOW (U+033B)
-    '\u033C', // COMBINING SEAGULL BELOW (U+033C)
-    '\u033D', // COMBINING X ABOVE (U+033D)
-    '\u033E', // COMBINING VERTICAL TILDE (U+033E)
-    '\u033F', // COMBINING DOUBLE OVERLINE (U+033F)
-    '\u0340', // COMBINING GRAVE TONE MARK (U+0340)
-    '\u0341', // COMBINING ACUTE TONE MARK (U+0341)
-    '\u0342', // COMBINING GREEK PERISPOMENI (U+0342)
-    '\u0343', // COMBINING GREEK KORONIS (U+0343)
-    '\u0344', // COMBINING GREEK DIALYTIKA TONOS (U+0344)
-    '\u0345', // COMBINING GREEK YPOGEGRAMMENI (U+0345)
-    '\u0346', // COMBINING BRIDGE ABOVE (U+0346)
-    '\u0347', // COMBINING EQUALS SIGN BELOW (U+0347)
-    '\u0348', // COMBINING DOUBLE VERTICAL LINE BELOW (U+0348)
-    '\u0349', // COMBINING LEFT ANGLE BELOW (U+0349)
-    '\u034A', // COMBINING NOT TILDE ABOVE (U+034A)
-    '\u034B', // COMBINING HOMOTHETIC ABOVE (U+034B)
-    '\u034C', // COMBINING ALMOST EQUAL TO ABOVE (U+034C)
-    '\u034D', // COMBINING LEFT RIGHT ARROW BELOW (U+034D)
-    '\u034E', // COMBINING UPWARDS ARROW BELOW (U+034E)
-    '\u034F', // COMBINING GRAPHEME JOINER (U+034F)
-    '\u0350', // COMBINING RIGHT ARROWHEAD ABOVE (U+0350)
-    '\u0351', // COMBINING LEFT HALF RING ABOVE (U+0351)
-    '\u0352', // COMBINING FERMATA (U+0352)
-    '\u0353', // COMBINING X BELOW (U+0353)
-    '\u0354', // COMBINING LEFT ARROWHEAD BELOW (U+0354)
-    '\u0355', // COMBINING RIGHT ARROWHEAD BELOW (U+0355)
-    '\u0356', // COMBINING RIGHT ARROWHEAD AND UP ARROWHEAD BELOW (U+0356)
-    '\u0357', // COMBINING RIGHT HALF RING ABOVE (U+0357)
-    '\u0358', // COMBINING DOT ABOVE RIGHT (U+0358)
-    '\u0359', // COMBINING ASTERISK BELOW (U+0359)
-    '\u035A', // COMBINING DOUBLE RING BELOW (U+035A)
-    '\u035B', // COMBINING ZIGZAG ABOVE (U+035B)
-    '\u035C', // COMBINING DOUBLE BREVE BELOW (U+035C)
-    '\u035D', // COMBINING DOUBLE BREVE (U+035D)
-    '\u035E', // COMBINING DOUBLE MACRON (U+035E)
-    '\u035F', // COMBINING DOUBLE MACRON BELOW (U+035F)
-    '\u0360', // COMBINING DOUBLE TILDE (U+0360)
-    '\u0361', // COMBINING DOUBLE INVERTED BREVE (U+0361)
-    '\u0362', // COMBINING DOUBLE RIGHTWARDS ARROW BELOW (U+0362)
-    '\u0363', // COMBINING LATIN SMALL LETTER A (U+0363)
-    '\u0364', // COMBINING LATIN SMALL LETTER E (U+0364)
-    '\u0365', // COMBINING LATIN SMALL LETTER I (U+0365)
-    '\u0366', // COMBINING LATIN SMALL LETTER O (U+0366)
-    '\u0367', // COMBINING LATIN SMALL LETTER U (U+0367)
-    '\u0368', // COMBINING LATIN SMALL LETTER C (U+0368)
-    '\u0369', // COMBINING LATIN SMALL LETTER D (U+0369)
-    '\u036A', // COMBINING LATIN SMALL LETTER H (U+036A)
-    '\u036B', // COMBINING LATIN SMALL LETTER M (U+036B)
-    '\u036C', // COMBINING LATIN SMALL LETTER R (U+036C)
-    '\u036D', // COMBINING LATIN SMALL LETTER T (U+036D)
-    '\u036E', // COMBINING LATIN SMALL LETTER V (U+036E)
-    '\u036F'  // COMBINING LATIN SMALL LETTER X (U+036F)
-];
+        '\u0300', // COMBINING GRAVE ACCENT (U+0300)
+        '\u0301', // COMBINING ACUTE ACCENT (U+0301)
+        '\u0302', // COMBINING CIRCUMFLEX ACCENT (U+0302)
+        '\u0303', // COMBINING TILDE (U+0303)
+        '\u0304', // COMBINING MACRON (U+0304)
+        '\u0305', // COMBINING OVERLINE (U+0305)
+        '\u0306', // COMBINING BREVE (U+0306)
+        '\u0307', // COMBINING DOT ABOVE (U+0307)
+        '\u0308', // COMBINING DIAERESIS (U+0308)
+        '\u0309', // COMBINING HOOK ABOVE (U+0309)
+        '\u030A', // COMBINING RING ABOVE (U+030A)
+        '\u030B', // COMBINING DOUBLE ACUTE ACCENT (U+030B)
+        '\u030C', // COMBINING CARON (U+030C)
+        '\u030D', // COMBINING VERTICAL LINE ABOVE (U+030D)
+        '\u030E', // COMBINING DOUBLE VERTICAL LINE ABOVE (U+030E)
+        '\u030F', // COMBINING DOUBLE GRAVE ACCENT (U+030F)
+        '\u0310', // COMBINING CANDRABINDU (U+0310)
+        '\u0311', // COMBINING INVERTED BREVE (U+0311)
+        '\u0312', // COMBINING TURNED COMMA ABOVE (U+0312)
+        '\u0313', // COMBINING COMMA ABOVE (U+0313)
+        '\u0314', // COMBINING REVERSED COMMA ABOVE (U+0314)
+        '\u0315', // COMBINING COMMA ABOVE RIGHT (U+0315)
+        '\u0316', // COMBINING GRAVE ACCENT BELOW (U+0316)
+        '\u0317', // COMBINING ACUTE ACCENT BELOW (U+0317)
+        '\u0318', // COMBINING LEFT TACK BELOW (U+0318)
+        '\u0319', // COMBINING RIGHT TACK BELOW (U+0319)
+        '\u031A', // COMBINING LEFT ANGLE ABOVE (U+031A)
+        '\u031B', // COMBINING HORN (U+031B)
+        '\u031C', // COMBINING LEFT HALF RING BELOW (U+031C)
+        '\u031D', // COMBINING UP TACK BELOW (U+031D)
+        '\u031E', // COMBINING DOWN TACK BELOW (U+031E)
+        '\u031F', // COMBINING PLUS SIGN BELOW (U+031F)
+        '\u0320', // COMBINING MINUS SIGN BELOW (U+0320)
+        '\u0321', // COMBINING PALATALIZED HOOK BELOW (U+0321)
+        '\u0322', // COMBINING RETROFLEX HOOK BELOW (U+0322)
+        '\u0323', // COMBINING DOT BELOW (U+0323)
+        '\u0324', // COMBINING DIAERESIS BELOW (U+0324)
+        '\u0325', // COMBINING RING BELOW (U+0325)
+        '\u0326', // COMBINING COMMA BELOW (U+0326)
+        '\u0327', // COMBINING CEDILLA (U+0327)
+        '\u0328', // COMBINING OGONEK (U+0328)
+        '\u0329', // COMBINING VERTICAL LINE BELOW (U+0329)
+        '\u032A', // COMBINING BRIDGE BELOW (U+032A)
+        '\u032B', // COMBINING INVERTED DOUBLE ARCH BELOW (U+032B)
+        '\u032C', // COMBINING CARON BELOW (U+032C)
+        '\u032D', // COMBINING CIRCUMFLEX ACCENT BELOW (U+032D)
+        '\u032E', // COMBINING BREVE BELOW (U+032E)
+        '\u032F', // COMBINING INVERTED BREVE BELOW (U+032F)
+        '\u0330', // COMBINING TILDE BELOW (U+0330)
+        '\u0331', // COMBINING MACRON BELOW (U+0331)
+        '\u0332', // COMBINING LOW LINE (U+0332)
+        '\u0333', // COMBINING DOUBLE LOW LINE (U+0333)
+        '\u0334', // COMBINING TILDE OVERLAY (U+0334)
+        '\u0335', // COMBINING SHORT STROKE OVERLAY (U+0335)
+        '\u0336', // COMBINING LONG STROKE OVERLAY (U+0336)
+        '\u0337', // COMBINING SHORT SOLIDUS OVERLAY (U+0337)
+        '\u0338', // COMBINING LONG SOLIDUS OVERLAY (U+0338)
+        '\u0339', // COMBINING RIGHT HALF RING BELOW (U+0339)
+        '\u033A', // COMBINING INVERTED BRIDGE BELOW (U+033A)
+        '\u033B', // COMBINING SQUARE BELOW (U+033B)
+        '\u033C', // COMBINING SEAGULL BELOW (U+033C)
+        '\u033D', // COMBINING X ABOVE (U+033D)
+        '\u033E', // COMBINING VERTICAL TILDE (U+033E)
+        '\u033F', // COMBINING DOUBLE OVERLINE (U+033F)
+        '\u0340', // COMBINING GRAVE TONE MARK (U+0340)
+        '\u0341', // COMBINING ACUTE TONE MARK (U+0341)
+        '\u0342', // COMBINING GREEK PERISPOMENI (U+0342)
+        '\u0343', // COMBINING GREEK KORONIS (U+0343)
+        '\u0344', // COMBINING GREEK DIALYTIKA TONOS (U+0344)
+        '\u0345', // COMBINING GREEK YPOGEGRAMMENI (U+0345)
+        '\u0346', // COMBINING BRIDGE ABOVE (U+0346)
+        '\u0347', // COMBINING EQUALS SIGN BELOW (U+0347)
+        '\u0348', // COMBINING DOUBLE VERTICAL LINE BELOW (U+0348)
+        '\u0349', // COMBINING LEFT ANGLE BELOW (U+0349)
+        '\u034A', // COMBINING NOT TILDE ABOVE (U+034A)
+        '\u034B', // COMBINING HOMOTHETIC ABOVE (U+034B)
+        '\u034C', // COMBINING ALMOST EQUAL TO ABOVE (U+034C)
+        '\u034D', // COMBINING LEFT RIGHT ARROW BELOW (U+034D)
+        '\u034E', // COMBINING UPWARDS ARROW BELOW (U+034E)
+        '\u034F', // COMBINING GRAPHEME JOINER (U+034F)
+        '\u0350', // COMBINING RIGHT ARROWHEAD ABOVE (U+0350)
+        '\u0351', // COMBINING LEFT HALF RING ABOVE (U+0351)
+        '\u0352', // COMBINING FERMATA (U+0352)
+        '\u0353', // COMBINING X BELOW (U+0353)
+        '\u0354', // COMBINING LEFT ARROWHEAD BELOW (U+0354)
+        '\u0355', // COMBINING RIGHT ARROWHEAD BELOW (U+0355)
+        '\u0356', // COMBINING RIGHT ARROWHEAD AND UP ARROWHEAD BELOW (U+0356)
+        '\u0357', // COMBINING RIGHT HALF RING ABOVE (U+0357)
+        '\u0358', // COMBINING DOT ABOVE RIGHT (U+0358)
+        '\u0359', // COMBINING ASTERISK BELOW (U+0359)
+        '\u035A', // COMBINING DOUBLE RING BELOW (U+035A)
+        '\u035B', // COMBINING ZIGZAG ABOVE (U+035B)
+        '\u035C', // COMBINING DOUBLE BREVE BELOW (U+035C)
+        '\u035D', // COMBINING DOUBLE BREVE (U+035D)
+        '\u035E', // COMBINING DOUBLE MACRON (U+035E)
+        '\u035F', // COMBINING DOUBLE MACRON BELOW (U+035F)
+        '\u0360', // COMBINING DOUBLE TILDE (U+0360)
+        '\u0361', // COMBINING DOUBLE INVERTED BREVE (U+0361)
+        '\u0362', // COMBINING DOUBLE RIGHTWARDS ARROW BELOW (U+0362)
+        '\u0363', // COMBINING LATIN SMALL LETTER A (U+0363)
+        '\u0364', // COMBINING LATIN SMALL LETTER E (U+0364)
+        '\u0365', // COMBINING LATIN SMALL LETTER I (U+0365)
+        '\u0366', // COMBINING LATIN SMALL LETTER O (U+0366)
+        '\u0367', // COMBINING LATIN SMALL LETTER U (U+0367)
+        '\u0368', // COMBINING LATIN SMALL LETTER C (U+0368)
+        '\u0369', // COMBINING LATIN SMALL LETTER D (U+0369)
+        '\u036A', // COMBINING LATIN SMALL LETTER H (U+036A)
+        '\u036B', // COMBINING LATIN SMALL LETTER M (U+036B)
+        '\u036C', // COMBINING LATIN SMALL LETTER R (U+036C)
+        '\u036D', // COMBINING LATIN SMALL LETTER T (U+036D)
+        '\u036E', // COMBINING LATIN SMALL LETTER V (U+036E)
+        '\u036F'  // COMBINING LATIN SMALL LETTER X (U+036F)
+    ],
+    iterator = -1,
+    diacritic;
 
 describe('A simple sentence testing for combining diacritical marks',
     function () {
-        diacritics.forEach(function (diacritic) {
+        while (diacritics[++iterator]) {
+            diacritic = diacritics[iterator];
+
             var source = 'This is a' + diacritic + ' house.';
             it('should equal the test AST when using \u25CC' + diacritic,
                 function () {
@@ -2977,7 +2985,7 @@ describe('A simple sentence testing for combining diacritical marks',
                     );
                 }
             );
-        });
+        }
     }
 );
 
@@ -4365,9 +4373,13 @@ describe('Unicode parsing', function () {
 describe('Abbreviations: Decimals (affixed by a full-stop)', function () {
     it('should *not* treat the dot-character succeeding decimals (e.g., ' +
         '`1`, `2`, &c.), as a terminal marker', function () {
-            var root;
+            var root,
+                digits = '0123456789'.split(''),
+                iterator = -1,
+                digit;
 
-            '0123456789'.split('').forEach(function (digit) {
+            while (digits[++iterator]) {
+                digit = digits[iterator];
                 root = converter('See § ' + digit + '. ¶ 2.');
                 assert(root.head.head.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
@@ -4418,7 +4430,7 @@ describe('Abbreviations: Decimals (affixed by a full-stop)', function () {
                         }
                     ]
                 }));
-            });
+            }
         }
     );
 });
@@ -6532,14 +6544,18 @@ describe('Abbreviations: Geographic', function () {
     it('should *not* treat the dot-character succeeding (American) ' +
         'states (e.g., `Ala`, `Ariz`, &c.), as a terminal marker',
         function () {
-            var root;
+            var states = (
+                    'Ala|Ariz|Ark|Cal|Calif|Col|Colo|Conn|Del|Fla|Ga|Ida|' +
+                    'Id|Ill|Ind|Ia|Kan|Kans|Ken|Ky|La|Me|Md|Mass|Mich|Minn|' +
+                    'Miss|Mo|Mont|Neb|Nebr|Nev|Mex|Dak|Okla|Ok|Ore|Penna|' +
+                    'Penn|Pa|Tenn|Tex|Ut|Vt|Va|Wash|Wis|Wisc|Wyo'
+                ).split('|'),
+                iterator = -1,
+                root, state;
 
-            (
-                'Ala|Ariz|Ark|Cal|Calif|Col|Colo|Conn|Del|Fla|Ga|Ida|' +
-                'Id|Ill|Ind|Ia|Kan|Kans|Ken|Ky|La|Me|Md|Mass|Mich|Minn|' +
-                'Miss|Mo|Mont|Neb|Nebr|Nev|Mex|Dak|Okla|Ok|Ore|Penna|Penn|' +
-                'Pa|Tenn|Tex|Ut|Vt|Va|Wash|Wis|Wisc|Wyo'
-            ).split('|').forEach(function (state) {
+            while (states[++iterator]) {
+                state = states[iterator];
+
                 root = converter(
                     'I live in Clinton, ' + state + '. on 2nd street.'
                 );
@@ -6621,17 +6637,20 @@ describe('Abbreviations: Geographic', function () {
                         }
                     ]
                 }));
-            });
+            }
         }
     );
 
     it('should *not* treat the dot-character succeeding (Canadian) ' +
         'states (e.g., `Alta`, `Man`, &c.), as a terminal marker',
         function () {
-            var states = 'Alta|Man|Ont|Qué|Que|Sask|Yuk',
-                root;
+            var states = 'Alta|Man|Ont|Qué|Que|Sask|Yuk'.split('|'),
+                iterator = -1,
+                state, root;
 
-            states.split('|').forEach(function (state) {
+            while (states[++iterator]) {
+                state = states[iterator];
+
                 root = converter(
                     'I\'m from Mount Pleasant, ' + state + '. in Canada.'
                 );
@@ -6713,22 +6732,26 @@ describe('Abbreviations: Geographic', function () {
                         }
                     ]
                 }));
-            });
+            }
         }
     );
 
     it('should *not* treat the dot-character succeeding (English) ' +
         'counties (e.g., `Beds`, `Berks`, &c.), as a terminal marker',
         function () {
-            var root;
+            var counties = ('Beds|Berks|Bucks|Cambs|Ches|Corn|Cumb|Derbys|' +
+                    'Derbs|Dev|Dor|Dur|Glos|Hants|Here|Heref|Herts|Hunts|' +
+                    'Lancs|Leics|Lincs|Mx|Middx|Mddx|Norf|Northants|' +
+                    'Northumb|Northd|Notts|Oxon|Rut|Shrops|Salop|Som|' +
+                    'Staffs|Staf|Suff|Sy|Sx|Ssx|Warks|War|Warw|Westm|Wilts|' +
+                    'Worcs|Yorks'
+                ).split('|'),
+                iterator = -1,
+                root, county;
 
-            (
-                'Beds|Berks|Bucks|Cambs|Ches|Corn|Cumb|Derbys|Derbs|Dev|' +
-                'Dor|Dur|Glos|Hants|Here|Heref|Herts|Hunts|Lancs|Leics|' +
-                'Lincs|Mx|Middx|Mddx|Norf|Northants|Northumb|Northd|Notts|' +
-                'Oxon|Rut|Shrops|Salop|Som|Staffs|Staf|Suff|Sy|Sx|Ssx|' +
-                'Warks|War|Warw|Westm|Wilts|Worcs|Yorks'
-            ).split('|').forEach(function (county) {
+            while (counties[++iterator]) {
+                county = counties[iterator];
+
                 root = converter(
                     'I\'m from Newton, ' + county + '. in England.'
                 );
@@ -6802,7 +6825,7 @@ describe('Abbreviations: Geographic', function () {
                         }
                     ]
                 }));
-            });
+            }
         }
     );
 });
@@ -6810,14 +6833,17 @@ describe('Abbreviations: Geographic', function () {
 describe('Abbreviations: Title abbreviations', function () {
     it('should *not* treat the dot-character succeeding titles (e.g., ' +
         '`Mr`, `Mrs`, &c.), as a terminal marker', function () {
-            var root;
+            var titles = ('Mr|Mrs|Miss|Ms|Mlle|Mme|M|Messrs|Mmes|Jr|Sr|' +
+                    'Snr|Dr|Mgr|Atty|Prof|Hon|Rev|Fr|Msgr|Sr|Br|St|Pres|' +
+                    'Supt|Rep|Sen|Gov|Amb|Treas|Sec|Amd|Brig|Gen|Cdr|Col|' +
+                    'Capt|Lt|Maj|Sgt|Po|Wo|Ph'
+                ).split('|'),
+                iterator = -1,
+                root, title;
 
-            (
-                'Mr|Mrs|Miss|Ms|Mlle|Mme|M|Messrs|Mmes|Jr|Sr|Snr|Dr|' +
-                'Mgr|Atty|Prof|Hon|Rev|Fr|Msgr|Sr|Br|St|Pres|Supt|Rep|Sen|' +
-                'Gov|Amb|Treas|Sec|Amd|Brig|Gen|Cdr|Col|Capt|Lt|Maj|Sgt|' +
-                'Po|Wo|Ph'
-            ).split('|').forEach(function (title) {
+            while (titles[++iterator]) {
+                title = titles[iterator];
+
                 root = converter(
                     'You should talk to ' + title +
                     '. Smith about these questions.'
@@ -6904,7 +6930,7 @@ describe('Abbreviations: Title abbreviations', function () {
                         }
                     ]
                 }));
-            });
+            }
         });
 });
 
@@ -6914,11 +6940,14 @@ describe('Abbreviations: Alphabetical', function () {
         '`Thomas A. Swift`, or in `e.` when abbreviating east)',
         function () {
             var alphabet = 'abcdefghijklmnopqrstuvwxyz',
-                root;
+                iterator = -1,
+                root, character;
 
             alphabet += alphabet.toUpperCase();
+            alphabet = alphabet.split('');
 
-            alphabet.split('').forEach(function (character) {
+            while (alphabet[++iterator]) {
+                character = alphabet[iterator];
                 root = converter('Thomas ' + character + '. Swift');
                 assert(root.head.head.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
@@ -6949,7 +6978,7 @@ describe('Abbreviations: Alphabetical', function () {
                         }
                     ]
                 }));
-            });
+            }
         }
     );
 });
@@ -12565,10 +12594,13 @@ describe('Abbreviations: Time references', function () {
 
     it('should *not* treat the dot-character succeeding days (e.g., ' +
         '`Mon`, `Tue`, &c.), as a terminal marker', function () {
-            var days = 'Mon|Tue|Tues|Wed|Thu|Thurs|Fri|Sat|Sun',
-                root;
+            var days = 'Mon|Tue|Tues|Wed|Thu|Thurs|Fri|Sat|Sun'.split('|'),
+                iterator = -1,
+                day, root;
 
-            days.split('|').forEach(function (day) {
+            while (days[++iterator]) {
+                day = days[iterator];
+
                 root = converter(
                     'Let\'s move the meeting to next ' + day + '. at 10:00.'
                 );
@@ -12670,19 +12702,25 @@ describe('Abbreviations: Time references', function () {
                         }
                     ]
                 }));
-            });
+            }
         }
     );
 
     it('should *not* treat the dot-character succeeding months (e.g., ' +
         '`Jan`, `Feb`, &c.), as a terminal marker', function () {
-            var months = 'Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec',
-                root;
+            var months = ('Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|' +
+                    'Nov|Dec'
+                ).split('|'),
+                iterator = -1,
+                month, root;
 
-            months.split('|').forEach(function (month) {
+            while (months[++iterator]) {
+                month = months[iterator];
+
                 root = converter(
                     'My birthday is in ' + month + ' on the 12th.'
                 );
+
                 assert(root.head.head.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
@@ -12752,7 +12790,7 @@ describe('Abbreviations: Time references', function () {
                         }
                     ]
                 }));
-            });
+            }
         }
     );
 });
@@ -12760,7 +12798,13 @@ describe('Abbreviations: Time references', function () {
 describe('Abbreviations: Decimals (prefixed by a full-stop)', function () {
     it('should *not* treat the dot-character preceding decimals (e.g., ' +
         '`1`, `2`, &c.), as a terminal marker', function () {
-            '0123456789'.split('').forEach(function (digit) {
+            var digits = '0123456789'.split(''),
+                iterator = -1,
+                digit;
+
+            while (digits[++iterator]) {
+                digit = digits[iterator];
+
                 var root = converter('See § .' + digit + ' ¶ 2.');
                 assert(root.head.head.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
@@ -12811,7 +12855,7 @@ describe('Abbreviations: Decimals (prefixed by a full-stop)', function () {
                         }
                     ]
                 }));
-            });
+            }
         }
     );
 });
@@ -12820,11 +12864,16 @@ describe('Abbreviations: TLD abbreviations', function () {
     it('should *not* treat the dot-character preceding top-level domains ' +
         '(e.g., `aero`, `asia`, `biz`, &c.), as a terminal marker',
         function () {
-            (
-                'aero|asia|biz|cat|com|coop|edu|gov|info|int|jobs|' +
-                'mil|mobi|museum|name|net|org|post|pro|tel|travel|xxx'
-            ).split('|').forEach(function (domain) {
-                var root = converter(
+            var tlds = ('aero|asia|biz|cat|com|coop|edu|gov|info|int|jobs|' +
+                    'mil|mobi|museum|name|net|org|post|pro|tel|travel|xxx'
+                ).split('|'),
+                iterator = -1,
+                root, domain;
+
+            while (tlds[++iterator]) {
+                domain = tlds[iterator];
+
+                root = converter(
                     'The domain .' + domain + ' is a top-level domain.'
                 );
 
@@ -12901,7 +12950,7 @@ describe('Abbreviations: TLD abbreviations', function () {
                         }
                     ]
                 }));
-            });
+            }
         }
     );
 });
