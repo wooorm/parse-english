@@ -621,11 +621,15 @@ function tokenizeSentence(sentence, value) {
         length = EXPRESSION_WORD_CONTRACTION.length,
         expression, pointer, match, token, start, end;
 
-    /* Insert word-like break points.
+    EXPRESSION_WORD_DIGIT_LETTER.lastIndex =
+        EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
+
+    /* Insert word-like break points. */
 
     /* Break between contractions consisting of two parts. */
     while (++iterator < length) {
         expression = EXPRESSION_WORD_CONTRACTION[iterator];
+        expression.lastIndex = 0;
 
         while (match = expression.exec(value)) {
             tokenBreakPoints.push(match.index + match[1].length);
@@ -674,16 +678,19 @@ function tokenizeSentence(sentence, value) {
 
     /* Iterate over the non-empty tokens, detect type of token. */
     iterator = -1;
+    EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
 
     while (token = tokens[++iterator]) {
+        EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
+
         /*
          * Append a new item (glue or box) to the list, and pass it the
          * string value and the item its in.
          */
-        if (token.match(EXPRESSION_WHITE_SPACE)) {
+        if (EXPRESSION_WHITE_SPACE.test(token)) {
             sentence.append(new sentence.TextOM.WhiteSpaceNode(token));
         } else if (
-            (match = token.match(EXPRESSION_WORD_MULTIPUNCTUATION)) &&
+            (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(token)) &&
             !EXPRESSION_WORD_COMBINING.test(match[0])
         ) {
             sentence.append(new sentence.TextOM.PunctuationNode(token));
@@ -712,10 +719,16 @@ function tokenizeParagraph(paragraph, value) {
         iterator = -1,
         start, sentence, match, submatch, pointer, $0, $4, length, end;
 
+    EXPRESSION_INITIALISM.lastIndex = EXPRESSION_SENTENCE_END.lastIndex =
+        EXPRESSION_ABBREVIATION_PREFIX.lastIndex =
+        EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE.lastIndex =
+        EXPRESSION_ABBREVIATION_AFFIX.lastIndex = 0;
+
     /* Two or more occurrences of a letter followed by a full stop. */
     while (submatch = EXPRESSION_INITIALISM.exec(value)) {
         pointer = submatch.index;
         $0 = submatch[0];
+        EXPRESSION_FULL_STOP.lastIndex = 0;
 
         while (match = EXPRESSION_FULL_STOP.exec($0)) {
             sentenceNoBreakPoints.push(pointer + match.index);
@@ -802,6 +815,7 @@ function tokenizeParagraph(paragraph, value) {
     iterator = -1;
 
     while (sentence = sentences[++iterator]) {
+        EXPRESSION_SENTENCE_SPACE.lastIndex = 0;
         sentence = EXPRESSION_SENTENCE_SPACE.exec(sentence);
 
         if (sentence[1]) {
@@ -834,6 +848,8 @@ function tokenizeRoot(root, value) {
         breakpoints = [],
         match, breakpoint,
         paragraph, whiteSpace;
+
+    EXPRESSION_MULTILINEBREAK.lastIndex = 0;
 
     while (match = EXPRESSION_MULTILINEBREAK.exec(value)) {
         breakpoints.push([match.index, match.index + match[0].length]);
