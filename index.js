@@ -671,7 +671,7 @@ function tokenizeSentence(sentence, value) {
             continue;
         }
 
-        tokens.push(value.slice(start, end));
+        tokens.push(value.slice(start, end || value.length));
 
         start = end;
     }
@@ -797,7 +797,7 @@ function tokenizeParagraph(paragraph, value) {
     while (++iterator < length) {
         end = sentenceBreakPoints[iterator];
 
-        sentence = value.slice(start, end);
+        sentence = value.slice(start, end || value.length);
 
         if (EXPRESSION_WORD_CHARACTER.test(sentence)) {
             sentences.push(sentence);
