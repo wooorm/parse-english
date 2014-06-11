@@ -8,6 +8,11 @@ See [Browser Support](#browser-support) for more information (a.k.a. don’t wor
 
 **parse-english** is an English language parser in JavaScript. Build on top of [TextOM](https://github.com/wooorm/textom/). NodeJS, and the browser. Lots of tests (330+), including 630+ assertions. 100% coverage.
 
+Note: This project is **not** an object model for natural languages, or an extensible system for analysing and manipulating natural language, its an algorithm that transforms plain-text natural language into an object model. If you need the above-mentioned functionalities, use the following projects.
+
+* For a pluggable system for analysing and manipulating, see [retext](https://github.com/wooorm/retext "Retext").
+* For the object model used in parse-english, see [TextOM](https://github.com/wooorm/textom/ "TextOM");
+
 ## Installation
 
 NPM:
