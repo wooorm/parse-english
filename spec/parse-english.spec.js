@@ -2603,6 +2603,60 @@ describe('Sentence: Starting with ellipsis without spaces', function () {
     });
 });
 
+describe('Sentence: With trailing white space', function () {
+    it('should equal the test AST', function () {
+        var source = 'A sentence. ';
+        assert(converter(source).head.head.toAST() === JSON.stringify({
+            'type' : 'SentenceNode',
+            'children' : [
+                {
+                    'type' : 'WordNode',
+                    'value' : 'A'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'sentence'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'value' : '.'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                }
+            ]
+        }));
+    });
+});
+
+describe('Sentence: Without terminal marker', function () {
+    it('should equal the test AST', function () {
+        var source = 'A sentence';
+        assert(converter(source).head.head.toAST() === JSON.stringify({
+            'type' : 'SentenceNode',
+            'children' : [
+                {
+                    'type' : 'WordNode',
+                    'value' : 'A'
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : ' '
+                },
+                {
+                    'type' : 'WordNode',
+                    'value' : 'sentence'
+                }
+            ]
+        }));
+    });
+});
+
 describe('Sentence: Without alphabetic content', function () {
     it('should equal the test AST', function () {
         var source = '\uD83D\uDC38.';
