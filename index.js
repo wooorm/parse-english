@@ -17,6 +17,11 @@ var textom, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
  */
 textom = require('textom');
 
+/* istanbul ignore if: User forgot a polyfill much? */
+if (!JSON) {
+    throw new Error('Missing JSON object for parseEnglish');
+}
+
 /**
  * Expose `expand`. Expands a list of Unicode code points and ranges to
  * be usable in a regex character class.
