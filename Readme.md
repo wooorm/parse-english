@@ -2,6 +2,8 @@
 
 [![browser support](https://ci.testling.com/wooorm/parse-english.png) ](https://ci.testling.com/wooorm/parse-english)
 
+See [Browser Support](#browser-support) for more information (a.k.a. don’t worry about those grey icons above).
+
 ---
 
 **parse-english** is an English language parser in JavaScript. Build on top of [TextOM](https://github.com/wooorm/textom/). NodeJS, and the browser. Lots of tests (330+), including 630+ assertions. 100% coverage.
@@ -151,6 +153,9 @@ rootNode.toString(); // 'One sentence. Two sentences.'
 Removes the current content of the parent, and replaces it with the parsed value.
 
 - `value` (`String`): The to-parse and insert inside content.
+
+## Browser Support
+Pretty much every browser (available through browserstack) runs all parse-english unit tests; just make sure `JSON` is [polyfill](https://github.com/douglascrockford/JSON-js)’d in browsers that need it.
 
 ## Related
 
