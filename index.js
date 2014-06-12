@@ -1,6 +1,6 @@
 'use strict';
 
-var textom, reparser, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
+var textom, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     GROUP_COMBINING_DIACRITICAL_MARK, GROUP_TERMINAL_MARKER,
     GROUP_CLOSING_PUNCTUATION, GROUP_FINAL_PUNCTUATION,
     EXPRESSION_WORD_CONTRACTION, EXPRESSION_WORD_MULTIPUNCTUATION,
@@ -17,10 +17,10 @@ var textom, reparser, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
  */
 textom = require('textom');
 
-/**
- * Module dependencies.
- */
-reparser = require('reparser');
+/* istanbul ignore if: User forgot a polyfill much? */
+if (!JSON) {
+    throw new Error('Missing JSON object for parseEnglish');
+}
 
 /**
  * Expose `expand`. Expands a list of Unicode code points and ranges to
@@ -882,6 +882,205 @@ function tokenizeRoot(root, value) {
 /*eslint-enable no-cond-assign */
 
 /**
+ * `toAST` converts the given node into a AST object.
+ *
+ * @param {Object} node - The node to convert.
+ * @return {Object} - A simple object containing the nodes type, and
+ *                    either a children attribute containing an array
+ *                    the result of `toAST` on each child, or a value
+ *                    attribute containing the nodes internal value.
+ * @global
+ * @private
+ */
+function toAST (node) {
+    var ast, result, item;
+
+    if (!node || !node.TextOM) {
+        throw new TypeError('Illegal invocation: \'' + node +
+            '\' is not a valid argument for \'toAST\'');
+    }
+
+    ast = {
+        'type' : node.TextOM.types[node.type]
+    };
+
+    if (!('length' in node)) {
+        ast.value = node.toString();
+    } else {
+        result = [];
+        item = node.head;
+
+        while (item) {
+            result.push(toAST(item));
+            item = item.next;
+        }
+
+        ast.children = result;
+    }
+
+    return ast;
+}
+
+/**
+ * `insert` inserts the given source after (when given), the `item`, and
+ * otherwise as the first item of the given parent. Tries to be smart
+ * about which nodes to add (i.e., nodes of the same or without
+ * hierarchy).
+ *
+ * @param {Object} parent - The node to insert into.
+ * @param {Object?} item - The node to insert after.
+ * @param {String} source - The source to parse and insert.
+ * @return {Range} - A range object with its startContainer set to the
+ *                   first inserted node, and endContainer set to to
+ *                   the last inserted node.
+ * @api private
+ */
+function insert(parent, item, source) {
+    var hierarchy, child, range, children, iterator;
+
+    if (!parent || !parent.TextOM ||
+        !(parent instanceof parent.TextOM.Parent ||
+        parent instanceof parent.TextOM.Element)) {
+            throw new TypeError('Type Error');
+    }
+
+    hierarchy = parent.hierarchy + 1;
+    child = parent.parser(source);
+
+    if (!child.length) {
+        throw new TypeError('Illegal invocation: \'' + source +
+            '\' is not a valid argument for \'insert\'');
+    }
+
+    while (child.hierarchy < hierarchy) {
+        /* WhiteSpace, and the like, or multiple children. */
+        if (child.length > 1) {
+            if (!('hierarchy' in child.head) ||
+                child.head.hierarchy === hierarchy) {
+                    children = [].slice.call(child);
+                    break;
+            } else {
+                throw new TypeError('Illegal invocation: Can\'t ' +
+                    'insert from multiple parents');
+            }
+        } else {
+            child = child.head;
+        }
+    }
+
+    if (!children) {
+        children = [child];
+    }
+
+    range = new parent.TextOM.Range();
+    range.setStart(children[0]);
+    range.setEnd(children[children.length - 1]);
+
+    iterator = children.length;
+
+    while (children[--iterator]) {
+        (item ? item.after : parent.prepend).call(
+            item || parent, children[iterator]
+        );
+    }
+
+    return range;
+}
+
+/**
+ * `remove` calls `remove` on each item in `items`.
+ *
+ * @param {Node|Node[]} items - The nodes to remove.
+ * @api private
+ */
+function remove(items) {
+    var iterator;
+
+    if (!items || !('length' in items) ||
+        !('TextOM' in items || items instanceof Array)) {
+            throw new TypeError('Type Error');
+    }
+
+    items = [].slice.call(items);
+    iterator = items.length;
+
+    while (items[--iterator]) {
+        items[iterator].remove();
+    }
+}
+
+/**
+ * `prependContent` inserts the parsed `source` at the start of the
+ * operated on node.
+ *
+ * @param {String} source - The source to parse and insert.
+ * @return {Range} - A range object with its startContainer set to the
+ *                   first prepended node, and endContainer set to to
+ *                   the last prepended node.
+ * @global
+ * @private
+ */
+function prependContent(source) {
+    return insert(this, null, source);
+}
+
+/**
+ * `appendContent` inserts the parsed `source` at the end of the operated
+ * on node.
+ *
+ * @param {String} source - The source to parse and insert.
+ * @return {Range} - A range object with its startContainer set to the
+ *                   first appended node, and endContainer set to to the
+ *                   last appended node.
+ * @global
+ * @private
+ */
+function appendContent(source) {
+    return insert(this, this && (this.tail || this.head), source);
+}
+
+/**
+ * `removeContent` removes the content of the operated on node.
+ *
+ * @global
+ * @private
+ */
+function removeContent() {
+    remove(this);
+}
+
+/**
+ * `replaceContent` inserts the parsed `source` at the end of the operated
+ * on node, and removes its previous children.
+ *
+ * @param {String} source - The source to parse and insert.
+ * @return {Range} - A range object with its startContainer set to the
+ *                   first appended node, and endContainer set to to the
+ *                   last appended node.
+ * @global
+ * @private
+ */
+function replaceContent(source) {
+    var self = this,
+        items, result;
+
+    if (!self || !self.TextOM || !(self instanceof self.TextOM.Parent ||
+        self instanceof self.TextOM.Element)) {
+            throw new TypeError('Type Error');
+    }
+
+    items = [].slice.call(self);
+
+    if (self.parser(source).length) {
+        result = insert(self, null, source);
+    }
+
+    remove(items);
+
+    return result;
+}
+
+/**
  * Expose `parseEnglishConstructor`. Used to construct a new parser.
  */
 function parseEnglishConstructor() {
@@ -900,6 +1099,75 @@ function parseEnglishConstructor() {
             }
         }
     }
+
+    /**
+     * `Node.prototype.toAST` converts the operated on node into an AST
+     * object.
+     *
+     * @param {?(String|Number)} delimiter - When given, pretty prints the
+     *                                       stringified object—indenting
+     *                                       each level either with the given
+     *                                       string or with the given number
+     *                                       of spaces.
+     * @return {String} - The `JSON.stringify`d result of the simple object
+     *                    representation of the operated on node.
+     * @api public
+     * @memberof Node.prototype
+     */
+    TextOM.Node.prototype.toAST = function (delimiter) {
+        return JSON.stringify(toAST(this), null, delimiter);
+    };
+
+    /**
+     * `prependContent` inserts the parsed `source` at the start of the
+     * operated on parent.
+     *
+     * @param {String} source - The source to parse and insert.
+     * @return {Range} - A range object with its startContainer set to the
+     *                   first prepended node, and endContainer set to to
+     *                   the last prepended node.
+     * @api public
+     * @memberof TextOM.Parent.prototype
+     */
+    TextOM.Element.prototype.prependContent =
+        TextOM.Parent.prototype.prependContent = prependContent;
+
+    /**
+     * `appendContent` inserts the parsed `source` at the end of the operated
+     * on parent.
+     *
+     * @param {String} source - The source to parse and insert.
+     * @return {Range} - A range object with its startContainer set to the
+     *                   first appended node, and endContainer set to to the
+     *                   last appended node.
+     * @api public
+     * @memberof TextOM.Parent.prototype
+     */
+    TextOM.Element.prototype.appendContent =
+        TextOM.Parent.prototype.appendContent = appendContent;
+
+    /**
+     * `removeContent` removes the content of the operated on parent.
+     *
+     * @api public
+     * @memberof TextOM.Parent.prototype
+     */
+    TextOM.Element.prototype.removeContent =
+        TextOM.Parent.prototype.removeContent = removeContent;
+
+    /**
+     * `replaceContent` inserts the parsed `source` at the end of the operated
+     * on parent, and removes its previous children.
+     *
+     * @param {String} source - The source to parse and insert.
+     * @return {Range} - A range object with its startContainer set to the
+     *                   first appended node, and endContainer set to to the
+     *                   last appended node.
+     * @api public
+     * @memberof TextOM.Parent.prototype
+     */
+    TextOM.Element.prototype.replaceContent =
+        TextOM.Parent.prototype.replaceContent = replaceContent;
 
     /**
      * `parser` parsed a given english (or latin) document into root,
@@ -927,6 +1195,52 @@ function parseEnglishConstructor() {
     }
 
     /**
+     * `fromAST` converts a given (stringified?) AST into a node.
+     *
+     * @param {Object|String} ast - The AST to convert.
+     * @return {Object} - The parsed node.
+     * @global
+     * @private
+     */
+    function fromAST(ast) {
+        var iterator = -1,
+            children, node;
+
+        if (ast instanceof String) {
+            ast = ast.toString();
+        }
+
+        if (typeof ast === 'string') {
+            ast = JSON.parse(ast);
+        } else if ({}.toString.call(ast) !== '[object Object]') {
+            throw new TypeError('Illegal invocation: \'' + ast +
+                '\' is not a valid argument for \'fromAST\'');
+        }
+
+        if (!('type' in ast && ('value' in ast || 'children' in ast))) {
+            throw new TypeError('Illegal invocation: \'' + ast +
+                '\' is not a valid argument for \'fromAST\' (it\'s ' +
+                'missing the `type`, and either `value` or `children` ' +
+                'attributes)');
+        }
+
+        node = new TextOM[ast.type]();
+
+        if ('children' in ast) {
+            iterator = -1;
+            children = ast.children;
+
+            while (children[++iterator]) {
+                node.append(fromAST(children[iterator]));
+            }
+        } else {
+            node.fromString(ast.value);
+        }
+
+        return node;
+    }
+
+    /**
      * Expose `TextOM`.
      *
      * @api public
@@ -936,14 +1250,20 @@ function parseEnglishConstructor() {
     parser.TextOM = TextOM;
 
     /**
+     * Expose `fromAST`.
+     *
+     * @api public
+     * @memberof parser
+     */
+    parser.fromAST = fromAST;
+
+    /**
      * Expose `parser` on every node.
      *
      * @api public
      * @memberof TextOM.Node.prototype
      */
     TextOM.Node.prototype.parser = parser;
-
-    reparser(parser);
 
     return parser;
 }
