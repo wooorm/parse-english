@@ -12,7 +12,8 @@
   "author": "Titus Wormer <tituswormer@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "textom": "~0.0.17"
+    "textom": "~0.0.17",
+    "reparser": "~0.0.1"
   },
   "devDependencies": {
     "complexity-report": "~1.0.3",
