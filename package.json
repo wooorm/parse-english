@@ -13,7 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "textom": "~0.0.17",
-    "reparser": "~0.0.1"
+    "reparser": "~0.0.2"
   },
   "devDependencies": {
     "complexity-report": "~1.0.3",
