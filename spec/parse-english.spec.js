@@ -1,11 +1,15 @@
 'use strict';
 
-var parseEnglish, assert, converter, TextOM;
+var parseEnglish, retextAST, assert, converter, TextOM;
 
 parseEnglish = require('..');
+retextAST = require('retext-ast');
 assert = require('assert');
 converter = parseEnglish();
 TextOM = converter.TextOM;
+
+converter.TextOM.Node.prototype.toAST = retextAST.toAST;
+converter.TextOM.Node.prototype.toJSON = retextAST.toJSON;
 
 describe('ParseEnglish()', function () {
     it('should be of type `function`', function () {
