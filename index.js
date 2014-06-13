@@ -1,6 +1,6 @@
 'use strict';
 
-var textom, reparser, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
+var textom, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     GROUP_COMBINING_DIACRITICAL_MARK, GROUP_TERMINAL_MARKER,
     GROUP_CLOSING_PUNCTUATION, GROUP_FINAL_PUNCTUATION,
     EXPRESSION_WORD_CONTRACTION, EXPRESSION_WORD_MULTIPUNCTUATION,
@@ -16,11 +16,6 @@ var textom, reparser, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
  * Module dependencies.
  */
 textom = require('textom');
-
-/**
- * Module dependencies.
- */
-reparser = require('reparser');
 
 /**
  * Expose `expand`. Expands a list of Unicode code points and ranges to
@@ -942,8 +937,6 @@ function parseEnglishConstructor() {
      * @memberof TextOM.Node.prototype
      */
     TextOM.Node.prototype.parser = parser;
-
-    reparser(parser);
 
     return parser;
 }
