@@ -65,7 +65,7 @@ Parses a given (english) string into an object model.
 - `source` (`null`, `undefined`, or `String`): The english source to parse.
 
 ## Browser Support
-Pretty much every browser (available through browserstack) runs all parse-english unit tests; just make sure `JSON` is [polyfill](https://github.com/douglascrockford/JSON-js)’d in browsers that need it.
+Pretty much every browser (available through browserstack) runs all parse-english unit tests.
 
 ## Related
 
