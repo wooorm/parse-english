@@ -1,6 +1,6 @@
 {
   "name": "parse-english",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "English (natural language) parser build on TextOM",
   "keywords": [
     "english",
@@ -12,7 +12,7 @@
   "author": "Titus Wormer <tituswormer@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "textom": "~0.0.17"
+    "textom": "~0.0.18"
   },
   "devDependencies": {
     "retext-ast": "~0.0.2",
