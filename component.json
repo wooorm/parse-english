@@ -11,7 +11,7 @@
     "textom"
   ],
   "dependencies": {
-    "wooorm/textom": "^0.0.19"
+    "wooorm/textom": "^0.0.20"
   },
   "scripts" : [
     "index.js"
