@@ -12,14 +12,14 @@
   "author": "Titus Wormer <tituswormer@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "textom": "~0.0.19"
+    "textom": "~0.0.20"
   },
   "devDependencies": {
-    "retext-ast": "~0.0.2",
+    "retext-ast": "~0.0.3",
     "complexity-report": "~1.0.3",
     "eslint": "^0.6.2",
     "istanbul": "~0.2.11",
-    "jscs": "^1.5.1",
+    "jscs": "^1.5.3",
     "mocha": "~1.20.1"
   },
   "repository": {
