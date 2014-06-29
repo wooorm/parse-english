@@ -1,7 +1,15 @@
 
-n.n.n / 2014-06-29
+0.0.24 / 2014-06-29
 ==================
 
+ * Removed redundant contractions
+ * Removed complexity-report from dependencies
+ * Added a unit test for white space only documents
+ * Refactored code to work faster and be more readable
+ * Added benchmarks
+ * Fixed newline
+ * Fixed newline
+ * Added History.md
  * Fixed an ungrammatical sentence
  * Updated dependencies
 
