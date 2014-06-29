@@ -244,16 +244,9 @@ GROUP_FINAL_PUNCTUATION = expand(
  * @constant
  */
 EXPRESSION_WORD_CONTRACTION = [
-    /* e.g., (I)('(ll)), the(y)('(re)) */
-    /([\s\S])(['’](ll|re|ve|s|m|d|em))\b/ig,
-    /* e.g., c(a)(n't) */
     /([\s\S])(n['’]t)\b/ig,
-    /* e.g., (o')(c)lock, (y')(a)ll */
-    /\b([oy]['’])([\s\S])\b/ig,
-    /* ('T)(w)as */
-    /(['’]t)([\s\S])/ig,
+    /(['’]t)/ig,
     /\b(can)(not)\b/ig,
-    /\b(d)(['’]ye)\b/ig,
     /\b(gim)(me)\b/ig,
     /\b(lem)(me)\b/ig,
     /\b(could|must|should|would|kind|sort|ought)(a)\b/ig,
