@@ -718,6 +718,20 @@ describe('Two paragraphs', function () {
     });
 });
 
+describe('A whitespace only document', function () {
+    it('should equal the test AST', function () {
+        assert(converter('\n\n').toAST() === JSON.stringify({
+            'type' : 'RootNode',
+            'children' : [
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'value' : '\n\n'
+                }
+            ]
+        }));
+    });
+});
+
 /*
  * Summarised from the first paragraph of: http://en.wikipedia.org/wiki/Ms.
 */
