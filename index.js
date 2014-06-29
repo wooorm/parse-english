@@ -6,11 +6,10 @@ var textom, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     EXPRESSION_WORD_CONTRACTION, EXPRESSION_WORD_MULTIPUNCTUATION,
     EXPRESSION_WORD_DIGIT_LETTER, EXPRESSION_MULTILINEBREAK, STRING_PIPE,
     EXPRESSION_ABBREVIATION_PREFIX, EXPRESSION_WORD_CHARACTER,
-    EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE,
-    EXPRESSION_ABBREVIATION_AFFIX, EXPRESSION_INITIALISM,
-    EXPRESSION_FULL_STOP, EXPRESSION_SENTENCE_END, EXPRESSION_WORD_COMBINING,
-    EXPRESSION_SENTENCE_SPACE, EXPRESSION_WHITE_SPACE, EXPRESSION_ORDINAL,
-    GROUP_COMBINING_NONSPACING_MARK, constructors;
+    EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE, EXPRESSION_ABBREVIATION_AFFIX,
+    EXPRESSION_SENTENCE_END, EXPRESSION_WORD_COMBINING, EXPRESSION_ORDINAL,
+    EXPRESSION_INITIAL_WHITE_SPACE, EXPRESSION_WHITE_SPACE,
+    GROUP_COMBINING_NONSPACING_MARK;
 
 /**
  * Module dependencies.
@@ -313,16 +312,14 @@ EXPRESSION_WORD_DIGIT_LETTER = new RegExp('([' + GROUP_NUMERICAL +
 EXPRESSION_ORDINAL = /^(th|st|nd|rd)$/i;
 
 /**
- * `EXPRESSION_MULTILINEBREAK` finds between-paragraph white space. Also
- * matches initial and final white space.
+ * `EXPRESSION_MULTILINEBREAK` matches initial, internal, and final white
+ *  space.
  *
  * @global
  * @private
  * @constant
  */
-EXPRESSION_MULTILINEBREAK = new RegExp(
-    '(\\r?\\n|\\r)+$|^(\\r?\\n|\\r)+|(\\r?\\n|\\r){2,}', 'g'
-);
+EXPRESSION_MULTILINEBREAK = /(\r?\n|\r)*$|^(\r?\n|\r)+|(\r?\n|\r){2,}/g;
 
 /**
  * `STRING_PIPE` holds a pipe (`|`) character.
@@ -347,8 +344,8 @@ STRING_PIPE = '|';
  */
 EXPRESSION_ABBREVIATION_PREFIX = new RegExp(
     '\\b(' + [
-    /* *Alphabet*: Both upper- and lowercase. */
-    'a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z',
+    /* *Alphabet*. */
+    '[a-z]',
 
     /*
      * Common Latin Abbreviations:
@@ -409,7 +406,7 @@ EXPRESSION_ABBREVIATION_PREFIX = new RegExp(
 EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE = new RegExp(
     '\\b(' + [
     /* Decimals */
-    '0|1|2|3|4|5|6|7|8|9',
+    '[0-9]',
 
     /* Social:
      * Mister, Mistress, Mistress, woman, Mademoiselle, Madame, Monsieur,
@@ -517,27 +514,6 @@ EXPRESSION_ABBREVIATION_AFFIX = new RegExp(
 'g');
 
 /**
- * `EXPRESSION_INITIALISM` finds initialisms, an abbreviation from
- * initials, with full stops after each initial.
- *
- * @global
- * @private
- * @constant
- */
-EXPRESSION_INITIALISM = new RegExp(
-    '([' + GROUP_ALPHABETIC + ']+\\.){2,}', 'g'
-);
-
-/**
- * `EXPRESSION_FULL_STOP` finds full stop characters, globally.
- *
- * @global
- * @private
- * @constant
- */
-EXPRESSION_FULL_STOP = /\./g;
-
-/**
  * `EXPRESSION_WORD_CHARACTER` finds a word character.
  *
  * @global
@@ -563,19 +539,19 @@ EXPRESSION_SENTENCE_END = new RegExp(
     '(\\.|[' + GROUP_TERMINAL_MARKER + ']+)' +
     '([' + GROUP_CLOSING_PUNCTUATION + GROUP_FINAL_PUNCTUATION + '])?' +
     '([,\\.' + GROUP_NUMERICAL + '])?' +
-    '(\\ +[\\.' + GROUP_ALPHABETIC + '])?',
+    '(?:(\\ +)([\\.' + GROUP_ALPHABETIC + ']))?|$',
 'g');
 
 /**
- * `EXPRESSION_SENTENCE_SPACE` matches optional white space at the start
+ * `EXPRESSION_INITIAL_WHITE_SPACE` matches optional white space at the start
  * of a string, followed by any other characters.
  *
  * @global
  * @private
  * @constant
  */
-EXPRESSION_SENTENCE_SPACE = new RegExp(
-    '^([' + GROUP_WHITE_SPACE + ']+)?([\\s\\S]+)$'
+EXPRESSION_INITIAL_WHITE_SPACE = new RegExp(
+    '^([' + GROUP_WHITE_SPACE + ']+)?'
 );
 
 /**
@@ -671,7 +647,7 @@ function tokenizeSentence(sentence, value) {
             continue;
         }
 
-        tokens.push(value.slice(start, end || value.length));
+        tokens.push(value.substring(start, end || value.length));
 
         start = end;
     }
@@ -714,41 +690,32 @@ function tokenizeSentence(sentence, value) {
  */
 function tokenizeParagraph(paragraph, value) {
     var sentences = [],
-        sentenceBreakPoints = [],
-        sentenceNoBreakPoints = [],
+        blacklist = {},
         iterator = -1,
-        start, sentence, match, submatch, pointer, $0, $4, length, end;
+        TextOM = paragraph.TextOM,
+        start, sentence, match, $5, end, whiteSpace;
 
-    EXPRESSION_INITIALISM.lastIndex = EXPRESSION_SENTENCE_END.lastIndex =
+    EXPRESSION_SENTENCE_END.lastIndex =
         EXPRESSION_ABBREVIATION_PREFIX.lastIndex =
         EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE.lastIndex =
         EXPRESSION_ABBREVIATION_AFFIX.lastIndex = 0;
 
-    /* Two or more occurrences of a letter followed by a full stop. */
-    while (submatch = EXPRESSION_INITIALISM.exec(value)) {
-        pointer = submatch.index;
-        $0 = submatch[0];
-        EXPRESSION_FULL_STOP.lastIndex = 0;
-
-        while (match = EXPRESSION_FULL_STOP.exec($0)) {
-            sentenceNoBreakPoints.push(pointer + match.index);
-        }
-    }
-
-    /* A space followd by a common abbr., followed by a full stop. */
+    /* A (case insensitive) common abbreviation, followed by a full stop. */
     while (match = EXPRESSION_ABBREVIATION_PREFIX.exec(value)) {
-        sentenceNoBreakPoints.push(match.index + match[1].length);
+        blacklist[match.index + match[1].length] = true;
     }
 
-    /* A common abbreviation, followed by a full stop. */
+    /* A (case sensitive) common abbreviation, followed by a full stop. */
     while (match = EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE.exec(value)) {
-        sentenceNoBreakPoints.push(match.index + match[1].length);
+        blacklist[match.index + match[1].length] = true;
     }
 
     /* A full stop, followed by a common abbreviation. */
     while (match = EXPRESSION_ABBREVIATION_AFFIX.exec(value)) {
-        sentenceNoBreakPoints.push(match.index);
+        blacklist[match.index] = true;
     }
+
+    start = 0;
 
     /*
      * A probable sentence end: A terminal marker (`?`, `!`, or `.`),
@@ -758,74 +725,87 @@ function tokenizeParagraph(paragraph, value) {
      * letter.
      */
     while (match = EXPRESSION_SENTENCE_END.exec(value)) {
-        pointer = match.index;
-        $4 = match[4];
-
-        if (sentenceNoBreakPoints.indexOf(pointer) === -1) {
-            /*
-             * If three was set, the delimiter is followed by a comma
-             * character, or a number, thus it's probably not a terminal
-             * marker.
-             */
-            if (match[3]) {
-                continue;
-            }
-
-            /*
-             * If four was set, the delimiter is followed by a space and a
-             * letter. If that letter is lowercase, its probably not a
-             * terminal marker.
-             */
-            if ($4 && $4.toString() === $4.toLowerCase()) {
-                continue;
-            }
-
-            pointer += match[1].length;
-
-            if (match[2]) {
-                pointer += match[2].length;
-            }
-
-            sentenceBreakPoints.push(pointer);
+        /*
+         * The probable sentence end is blacklisted, thus in an abbreviation.
+         */
+        if (match.index in blacklist) {
+            continue;
         }
-    }
 
-    sentenceBreakPoints.sort(BREAKPOINT_SORT);
-    length = sentenceBreakPoints.length + 1;
-    start = 0;
+        /*
+         * If three was set, the delimiter is followed by a comma character,
+         * or a number, thus it's probably not a terminal
+         * marker.
+         */
+        if (match[3]) {
+            continue;
+        }
 
-    while (++iterator < length) {
-        end = sentenceBreakPoints[iterator];
+        $5 = match[5];
 
-        sentence = value.slice(start, end || value.length);
+        /*
+         * If four was set, the delimiter is followed by a space and a letter.
+         * If that letter is lowercase, its probably not a terminal marker.
+         */
+        if ($5 && $5 === $5.toLowerCase()) {
+            continue;
+        }
 
+        end = match.index + (match[1] || '').length + (match[2] || '').length;
+
+        sentence = value.substring(start, end);
+
+        /*
+         * If the sentence contains an alphabetic character...
+         * This prevents ellipses joined by spaces from classifying as a
+         * sentence.
+         */
         if (EXPRESSION_WORD_CHARACTER.test(sentence)) {
             sentences.push(sentence);
+        /*
+         * Otherwise, if a previous sentence already exists, append the
+         * invalid “sentence” to the previous sentence.
+         */
         } else if (sentences.length) {
             sentences[sentences.length - 1] += sentence;
-        } else if (iterator === length - 1) {
+        /*
+         * Otherwise, if this is the only content in the paragraph,
+         * classify it as a sentence nonetheless.
+         */
+        } else if (end === value.length) {
             sentences.push(sentence);
+        /* Otherwise, prepend the content to the next sentence. */
         } else {
             end -= sentence.length;
+        }
+
+        /*
+         * The expression also matches $ (end-of-string), which keeps on
+         * matching in global state, thus we detect it here and exit the loop.
+         */
+        if (EXPRESSION_SENTENCE_END.lastIndex === value.length) {
+            break;
         }
 
         start = end;
     }
 
-    iterator = -1;
-
+    /*
+     * Walk over the previously sentences, break of their white space, and
+     * transform them into the object model.
+     */
     while (sentence = sentences[++iterator]) {
-        EXPRESSION_SENTENCE_SPACE.lastIndex = 0;
-        sentence = EXPRESSION_SENTENCE_SPACE.exec(sentence);
+        match = EXPRESSION_INITIAL_WHITE_SPACE.exec(sentence);
+        whiteSpace = match[0];
 
-        if (sentence[1]) {
+        if (whiteSpace) {
             paragraph.append(
-                new paragraph.TextOM.WhiteSpaceNode(sentence[1])
+                new TextOM.WhiteSpaceNode(whiteSpace)
             );
         }
 
         tokenizeSentence(paragraph.append(
-            new paragraph.TextOM.SentenceNode()), sentence[2]
+            new TextOM.SentenceNode()), sentence.substring(whiteSpace.length)
         );
     }
 
@@ -843,32 +823,41 @@ function tokenizeParagraph(paragraph, value) {
  * @private
  */
 function tokenizeRoot(root, value) {
-    var iterator = -1,
-        start = 0,
-        breakpoints = [],
-        match, breakpoint,
-        paragraph, whiteSpace;
+    var start = 0,
+        TextOM = root.TextOM,
+        match, end, paragraph, whiteSpace;
+
+    if (!value) {
+        return root;
+    }
 
     EXPRESSION_MULTILINEBREAK.lastIndex = 0;
 
     while (match = EXPRESSION_MULTILINEBREAK.exec(value)) {
-        breakpoints.push([match.index, match.index + match[0].length]);
-    }
+        end = match.index + match[0].length;
 
-    breakpoints.push([value.length, value.length]);
+        paragraph = value.substring(start, match.index);
+        whiteSpace = value.substring(match.index, end);
 
-    while (breakpoint = breakpoints[++iterator]) {
-        if (paragraph = value.slice(start, breakpoint[0])) {
+        if (paragraph) {
             tokenizeParagraph(
-                root.append(new root.TextOM.ParagraphNode()), paragraph
+                root.append(new TextOM.ParagraphNode()), paragraph
             );
         }
 
-        if (whiteSpace = value.slice(breakpoint[0], breakpoint[1])) {
-            root.append(new root.TextOM.WhiteSpaceNode(whiteSpace));
+        if (whiteSpace) {
+            root.append(new TextOM.WhiteSpaceNode(whiteSpace));
         }
 
-        start = breakpoint[1];
+        /*
+         * The expression also matches $ (end-of-string), which keeps on
+         * matching in global state, thus we detect it here and exit the loop.
+         */
+        if (EXPRESSION_MULTILINEBREAK.lastIndex === value.length) {
+            break;
+        }
+
+        start = end;
     }
 
     return root;
