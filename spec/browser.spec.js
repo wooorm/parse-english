@@ -586,6 +586,18 @@ function validateInput(value) {
     return value;
 }
 
+/**
+ * `tokenizerFactory` validates the input for a tokenizer.
+ *
+ * @global
+ * @private
+ */
+function tokenizerFactory(tokenizer) {
+    return function (value) {
+        return tokenizer.call(this, validateInput(value));
+    };
+}
+
 /*eslint-disable no-cond-assign */
 
 /**
@@ -599,7 +611,7 @@ function validateInput(value) {
 function tokenizeWord(value) {
     return {
         'type' : 'WordNode',
-        'value' : validateInput(value)
+        'value' : value
     };
 }
 
@@ -614,7 +626,7 @@ function tokenizeWord(value) {
 function tokenizeWhiteSpace(value) {
     return {
         'type' : 'WhiteSpaceNode',
-        'value' : validateInput(value)
+        'value' : value
     };
 }
 
@@ -629,7 +641,7 @@ function tokenizeWhiteSpace(value) {
 function tokenizePunctuation(value) {
     return {
         'type' : 'PunctuationNode',
-        'value' : validateInput(value)
+        'value' : value
     };
 }
 
@@ -649,8 +661,6 @@ function tokenizeSentence(value) {
         iterator = -1,
         length = EXPRESSION_WORD_CONTRACTION.length,
         sentence, children, expression, pointer, match, token, start, end;
-
-    value = validateInput(value);
 
     sentence = {
         'type' : 'SentenceNode',
@@ -754,8 +764,6 @@ function tokenizeParagraph(value) {
         blacklist = {},
         iterator = -1,
         paragraph, children, start, sentence, match, $5, end, whiteSpace;
-
-    value = validateInput(value);
 
     paragraph = {
         'type' : 'ParagraphNode',
@@ -897,8 +905,6 @@ function tokenizeRoot(value) {
         'children' : []
     };
 
-    value = validateInput(value);
-
     if (!value) {
         return root;
     }
@@ -956,12 +962,12 @@ function Parser() {
 
 parserPrototype = Parser.prototype;
 
-parserPrototype.tokenizeRoot = tokenizeRoot;
-parserPrototype.tokenizeParagraph = tokenizeParagraph;
-parserPrototype.tokenizeSentence = tokenizeSentence;
-parserPrototype.tokenizePunctuation = tokenizePunctuation;
-parserPrototype.tokenizeWord = tokenizeWord;
-parserPrototype.tokenizeWhiteSpace = tokenizeWhiteSpace;
+parserPrototype.tokenizeRoot = tokenizerFactory(tokenizeRoot);
+parserPrototype.tokenizeParagraph = tokenizerFactory(tokenizeParagraph);
+parserPrototype.tokenizeSentence = tokenizerFactory(tokenizeSentence);
+parserPrototype.tokenizePunctuation = tokenizerFactory(tokenizePunctuation);
+parserPrototype.tokenizeWord = tokenizerFactory(tokenizeWord);
+parserPrototype.tokenizeWhiteSpace = tokenizerFactory(tokenizeWhiteSpace);
 
 module.exports = Parser;
 
