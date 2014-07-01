@@ -9,7 +9,7 @@ var textom, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE, EXPRESSION_ABBREVIATION_AFFIX,
     EXPRESSION_SENTENCE_END, EXPRESSION_WORD_COMBINING, EXPRESSION_ORDINAL,
     EXPRESSION_INITIAL_WHITE_SPACE, EXPRESSION_WHITE_SPACE,
-    GROUP_COMBINING_NONSPACING_MARK;
+    GROUP_COMBINING_NONSPACING_MARK, parserPrototype;
 
 /**
  * Module dependencies.
@@ -564,31 +564,92 @@ EXPRESSION_WHITE_SPACE = new RegExp(
  *
  * @global
  * @private
- * @constant
  */
 function BREAKPOINT_SORT(a, b) {
     return a - b;
 }
 
+/**
+ * `validateInput` validates the input for tokenize* methods.
+ *
+ * @global
+ * @private
+ */
+function validateInput(value) {
+    if (value === null || value === undefined) {
+        value = '';
+    } else if (
+        value instanceof String ||
+        (value.TextOM && value instanceof value.TextOM.Node)
+    ) {
+        value = value.toString();
+    }
+
+    if (typeof value !== 'string') {
+        throw new TypeError('Illegal invocation: \'' + value +
+            '\' is not a valid argument for \'ParseEnglish\'');
+    }
+
+    return value;
+}
+
 /*eslint-disable no-cond-assign */
+
+/**
+ * `tokenizeWord` tokenizes a word.
+ *
+ * @param {String} value - The word to parse.
+ * @return {WordNode} - The given WordNode.
+ * @global
+ * @private
+ */
+function tokenizeWord(value) {
+    return new this.TextOM.WordNode(validateInput(value));
+}
+
+/**
+ * `tokenizeWhiteSpace` tokenizes white space.
+ *
+ * @param {String} value - The white space to parse.
+ * @return {WhiteSpaceNode} - The given WhiteSpaceNode.
+ * @global
+ * @private
+ */
+function tokenizeWhiteSpace(value) {
+    return new this.TextOM.WhiteSpaceNode(validateInput(value));
+}
+
+/**
+ * `tokenizePunctuation` tokenizes punctuation.
+ *
+ * @param {String} value - The punctuation to parse.
+ * @return {PunctuationNode} - The given PunctuationNode.
+ * @global
+ * @private
+ */
+function tokenizePunctuation(value) {
+    return new this.TextOM.PunctuationNode(validateInput(value));
+}
 
 /**
  * `tokenizeSentence` tokenizes a sentence into `WordNode`s,
  * `PunctuationNode`s, and `WhiteSpaceNode`s.
  *
- * @param {SentenceNode} sentence - The SentenceNode to append to.
  * @param {String} value - The words, punctuation, and white space to
  *                         parse.
  * @return {SentenceNode} - The given SentenceNode.
  * @global
  * @private
  */
-function tokenizeSentence(sentence, value) {
-    var tokenBreakPoints = [],
+function tokenizeSentence(value) {
+    var sentence = new this.TextOM.SentenceNode(),
+        tokenBreakPoints = [],
         tokens = [],
         iterator = -1,
         length = EXPRESSION_WORD_CONTRACTION.length,
         expression, pointer, match, token, start, end;
+
+    value = validateInput(value);
 
     EXPRESSION_WORD_DIGIT_LETTER.lastIndex =
         EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
@@ -657,14 +718,14 @@ function tokenizeSentence(sentence, value) {
          * string value and the item its in.
          */
         if (EXPRESSION_WHITE_SPACE.test(token)) {
-            sentence.append(new sentence.TextOM.WhiteSpaceNode(token));
+            sentence.append(this.tokenizeWhiteSpace(token));
         } else if (
             (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(token)) &&
             !EXPRESSION_WORD_COMBINING.test(match[0])
         ) {
-            sentence.append(new sentence.TextOM.PunctuationNode(token));
+            sentence.append(this.tokenizePunctuation(token));
         } else {
-            sentence.append(new sentence.TextOM.WordNode(token));
+            sentence.append(this.tokenizeWord(token));
         }
     }
 
@@ -675,18 +736,19 @@ function tokenizeSentence(sentence, value) {
  * `tokenizeParagraph` tokenizes a paragraph into `SentenceNode`s and
  * `WhiteSpaceNode`s.
  *
- * @param {ParagraphNode} paragraph - The ParagraphNode to append to.
  * @param {String} value - The sentences and white space to parse.
  * @return {ParagraphNode} - The given ParagraphNode.
  * @global
  * @private
  */
-function tokenizeParagraph(paragraph, value) {
-    var sentences = [],
+function tokenizeParagraph(value) {
+    var paragraph = new this.TextOM.ParagraphNode(),
+        sentences = [],
         blacklist = {},
         iterator = -1,
-        TextOM = paragraph.TextOM,
         start, sentence, match, $5, end, whiteSpace;
+
+    value = validateInput(value);
 
     EXPRESSION_SENTENCE_END.lastIndex =
         EXPRESSION_ABBREVIATION_PREFIX.lastIndex =
@@ -792,13 +854,11 @@ function tokenizeParagraph(paragraph, value) {
         whiteSpace = match[0];
 
         if (whiteSpace) {
-            paragraph.append(
-                new TextOM.WhiteSpaceNode(whiteSpace)
-            );
+            paragraph.append(this.tokenizeWhiteSpace(whiteSpace));
         }
 
-        tokenizeSentence(paragraph.append(
-            new TextOM.SentenceNode()), sentence.substring(whiteSpace.length)
+        paragraph.append(this.tokenizeSentence(
+            sentence.substring(whiteSpace.length))
         );
     }
 
@@ -809,16 +869,17 @@ function tokenizeParagraph(paragraph, value) {
  * `tokenizeRoot` tokenizes a document into `ParagraphNode`s and
  * `WhiteSpaceNode`s.
  *
- * @param {RootNode} root - The RootNode to append to.
  * @param {String} value - The paragraphs and white space to parse.
  * @return {RootNode} - The given RootNode.
  * @global
  * @private
  */
-function tokenizeRoot(root, value) {
-    var start = 0,
-        TextOM = root.TextOM,
+function tokenizeRoot(value) {
+    var root = new this.TextOM.RootNode(),
+        start = 0,
         match, end, paragraph, whiteSpace;
+
+    value = validateInput(value);
 
     if (!value) {
         return root;
@@ -833,13 +894,11 @@ function tokenizeRoot(root, value) {
         whiteSpace = value.substring(match.index, end);
 
         if (paragraph) {
-            tokenizeParagraph(
-                root.append(new TextOM.ParagraphNode()), paragraph
-            );
+            root.append(this.tokenizeParagraph(paragraph));
         }
 
         if (whiteSpace) {
-            root.append(new TextOM.WhiteSpaceNode(whiteSpace));
+            root.append(this.tokenizeWhiteSpace(whiteSpace));
         }
 
         /*
@@ -859,11 +918,24 @@ function tokenizeRoot(root, value) {
 /*eslint-enable no-cond-assign */
 
 /**
- * Expose `parseEnglishConstructor`. Used to construct a new parser.
+ * `Parser` parses a given english (or latin) document into root,
+ * paragraphs, sentences, words, punctuation, and white space “nodes”.
+ * For more information about nodes see TextOM.
+ *
+ * @constructor
+ * @api public
  */
-function parseEnglishConstructor() {
+function Parser() {
+    /*
+     * TODO: This should later be removed (when this change bubbles
+     * through to dependants)
+     */
+    if (!(this instanceof Parser)) {
+        return new Parser();
+    }
+
     var TextOM = textom(),
-        types = TextOM.types = [],
+        types = [],
         key, Constructor, prototype;
 
     for (key in TextOM) {
@@ -879,29 +951,12 @@ function parseEnglishConstructor() {
     }
 
     /**
-     * `parser` parsed a given english (or latin) document into root,
-     * paragraphs, sentences, words, punctuation, and white space “nodes”.
-     * For more information about nodes see TextOM.
+     * Expose `parser` on every node.
      *
-     * @param {(String|Node)?} source - The source to convert.
-     * @return {Node} - A RootNode containing the tokenised source.
      * @api public
+     * @memberof TextOM.Node.prototype
      */
-    function parser(source) {
-        if (source === null || source === undefined) {
-            source = '';
-        } else if (source instanceof TextOM.Node ||
-            source instanceof String) {
-                source = source.toString();
-        }
-
-        if (typeof source !== 'string') {
-            throw new TypeError('Illegal invocation: \'' + source +
-                '\' is not a valid argument for \'ParseEnglish\'');
-        }
-
-        return tokenizeRoot(new TextOM.RootNode(), source);
-    }
+    TextOM.Node.prototype.parser = this;
 
     /**
      * Expose `TextOM`.
@@ -910,17 +965,25 @@ function parseEnglishConstructor() {
      * @memberof parser
      * @constructor
      */
-    parser.TextOM = TextOM;
+    this.TextOM = TextOM;
 
     /**
-     * Expose `parser` on every node.
+     * Expose `types`.
      *
      * @api public
-     * @memberof TextOM.Node.prototype
+     * @memberof TextOM
+     * @constructor
      */
-    TextOM.Node.prototype.parser = parser;
-
-    return parser;
+    TextOM.types = types;
 }
 
-module.exports = parseEnglishConstructor;
+parserPrototype = Parser.prototype;
+
+parserPrototype.tokenizeRoot = tokenizeRoot;
+parserPrototype.tokenizeParagraph = tokenizeParagraph;
+parserPrototype.tokenizeSentence = tokenizeSentence;
+parserPrototype.tokenizePunctuation = tokenizePunctuation;
+parserPrototype.tokenizeWord = tokenizeWord;
+parserPrototype.tokenizeWhiteSpace = tokenizeWhiteSpace;
+
+module.exports = Parser;

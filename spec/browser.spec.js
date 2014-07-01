@@ -10,7 +10,7 @@ var textom, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE, EXPRESSION_ABBREVIATION_AFFIX,
     EXPRESSION_SENTENCE_END, EXPRESSION_WORD_COMBINING, EXPRESSION_ORDINAL,
     EXPRESSION_INITIAL_WHITE_SPACE, EXPRESSION_WHITE_SPACE,
-    GROUP_COMBINING_NONSPACING_MARK;
+    GROUP_COMBINING_NONSPACING_MARK, parserPrototype;
 
 /**
  * Module dependencies.
@@ -565,31 +565,92 @@ EXPRESSION_WHITE_SPACE = new RegExp(
  *
  * @global
  * @private
- * @constant
  */
 function BREAKPOINT_SORT(a, b) {
     return a - b;
 }
 
+/**
+ * `validateInput` validates the input for tokenize* methods.
+ *
+ * @global
+ * @private
+ */
+function validateInput(value) {
+    if (value === null || value === undefined) {
+        value = '';
+    } else if (
+        value instanceof String ||
+        (value.TextOM && value instanceof value.TextOM.Node)
+    ) {
+        value = value.toString();
+    }
+
+    if (typeof value !== 'string') {
+        throw new TypeError('Illegal invocation: \'' + value +
+            '\' is not a valid argument for \'ParseEnglish\'');
+    }
+
+    return value;
+}
+
 /*eslint-disable no-cond-assign */
+
+/**
+ * `tokenizeWord` tokenizes a word.
+ *
+ * @param {String} value - The word to parse.
+ * @return {WordNode} - The given WordNode.
+ * @global
+ * @private
+ */
+function tokenizeWord(value) {
+    return new this.TextOM.WordNode(validateInput(value));
+}
+
+/**
+ * `tokenizeWhiteSpace` tokenizes white space.
+ *
+ * @param {String} value - The white space to parse.
+ * @return {WhiteSpaceNode} - The given WhiteSpaceNode.
+ * @global
+ * @private
+ */
+function tokenizeWhiteSpace(value) {
+    return new this.TextOM.WhiteSpaceNode(validateInput(value));
+}
+
+/**
+ * `tokenizePunctuation` tokenizes punctuation.
+ *
+ * @param {String} value - The punctuation to parse.
+ * @return {PunctuationNode} - The given PunctuationNode.
+ * @global
+ * @private
+ */
+function tokenizePunctuation(value) {
+    return new this.TextOM.PunctuationNode(validateInput(value));
+}
 
 /**
  * `tokenizeSentence` tokenizes a sentence into `WordNode`s,
  * `PunctuationNode`s, and `WhiteSpaceNode`s.
  *
- * @param {SentenceNode} sentence - The SentenceNode to append to.
  * @param {String} value - The words, punctuation, and white space to
  *                         parse.
  * @return {SentenceNode} - The given SentenceNode.
  * @global
  * @private
  */
-function tokenizeSentence(sentence, value) {
-    var tokenBreakPoints = [],
+function tokenizeSentence(value) {
+    var sentence = new this.TextOM.SentenceNode(),
+        tokenBreakPoints = [],
         tokens = [],
         iterator = -1,
         length = EXPRESSION_WORD_CONTRACTION.length,
         expression, pointer, match, token, start, end;
+
+    value = validateInput(value);
 
     EXPRESSION_WORD_DIGIT_LETTER.lastIndex =
         EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
@@ -658,14 +719,14 @@ function tokenizeSentence(sentence, value) {
          * string value and the item its in.
          */
         if (EXPRESSION_WHITE_SPACE.test(token)) {
-            sentence.append(new sentence.TextOM.WhiteSpaceNode(token));
+            sentence.append(this.tokenizeWhiteSpace(token));
         } else if (
             (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(token)) &&
             !EXPRESSION_WORD_COMBINING.test(match[0])
         ) {
-            sentence.append(new sentence.TextOM.PunctuationNode(token));
+            sentence.append(this.tokenizePunctuation(token));
         } else {
-            sentence.append(new sentence.TextOM.WordNode(token));
+            sentence.append(this.tokenizeWord(token));
         }
     }
 
@@ -676,18 +737,19 @@ function tokenizeSentence(sentence, value) {
  * `tokenizeParagraph` tokenizes a paragraph into `SentenceNode`s and
  * `WhiteSpaceNode`s.
  *
- * @param {ParagraphNode} paragraph - The ParagraphNode to append to.
  * @param {String} value - The sentences and white space to parse.
  * @return {ParagraphNode} - The given ParagraphNode.
  * @global
  * @private
  */
-function tokenizeParagraph(paragraph, value) {
-    var sentences = [],
+function tokenizeParagraph(value) {
+    var paragraph = new this.TextOM.ParagraphNode(),
+        sentences = [],
         blacklist = {},
         iterator = -1,
-        TextOM = paragraph.TextOM,
         start, sentence, match, $5, end, whiteSpace;
+
+    value = validateInput(value);
 
     EXPRESSION_SENTENCE_END.lastIndex =
         EXPRESSION_ABBREVIATION_PREFIX.lastIndex =
@@ -793,13 +855,11 @@ function tokenizeParagraph(paragraph, value) {
         whiteSpace = match[0];
 
         if (whiteSpace) {
-            paragraph.append(
-                new TextOM.WhiteSpaceNode(whiteSpace)
-            );
+            paragraph.append(this.tokenizeWhiteSpace(whiteSpace));
         }
 
-        tokenizeSentence(paragraph.append(
-            new TextOM.SentenceNode()), sentence.substring(whiteSpace.length)
+        paragraph.append(this.tokenizeSentence(
+            sentence.substring(whiteSpace.length))
         );
     }
 
@@ -810,16 +870,17 @@ function tokenizeParagraph(paragraph, value) {
  * `tokenizeRoot` tokenizes a document into `ParagraphNode`s and
  * `WhiteSpaceNode`s.
  *
- * @param {RootNode} root - The RootNode to append to.
  * @param {String} value - The paragraphs and white space to parse.
  * @return {RootNode} - The given RootNode.
  * @global
  * @private
  */
-function tokenizeRoot(root, value) {
-    var start = 0,
-        TextOM = root.TextOM,
+function tokenizeRoot(value) {
+    var root = new this.TextOM.RootNode(),
+        start = 0,
         match, end, paragraph, whiteSpace;
+
+    value = validateInput(value);
 
     if (!value) {
         return root;
@@ -834,13 +895,11 @@ function tokenizeRoot(root, value) {
         whiteSpace = value.substring(match.index, end);
 
         if (paragraph) {
-            tokenizeParagraph(
-                root.append(new TextOM.ParagraphNode()), paragraph
-            );
+            root.append(this.tokenizeParagraph(paragraph));
         }
 
         if (whiteSpace) {
-            root.append(new TextOM.WhiteSpaceNode(whiteSpace));
+            root.append(this.tokenizeWhiteSpace(whiteSpace));
         }
 
         /*
@@ -860,11 +919,24 @@ function tokenizeRoot(root, value) {
 /*eslint-enable no-cond-assign */
 
 /**
- * Expose `parseEnglishConstructor`. Used to construct a new parser.
+ * `Parser` parses a given english (or latin) document into root,
+ * paragraphs, sentences, words, punctuation, and white space “nodes”.
+ * For more information about nodes see TextOM.
+ *
+ * @constructor
+ * @api public
  */
-function parseEnglishConstructor() {
+function Parser() {
+    /*
+     * TODO: This should later be removed (when this change bubbles
+     * through to dependants)
+     */
+    if (!(this instanceof Parser)) {
+        return new Parser();
+    }
+
     var TextOM = textom(),
-        types = TextOM.types = [],
+        types = [],
         key, Constructor, prototype;
 
     for (key in TextOM) {
@@ -880,29 +952,12 @@ function parseEnglishConstructor() {
     }
 
     /**
-     * `parser` parsed a given english (or latin) document into root,
-     * paragraphs, sentences, words, punctuation, and white space “nodes”.
-     * For more information about nodes see TextOM.
+     * Expose `parser` on every node.
      *
-     * @param {(String|Node)?} source - The source to convert.
-     * @return {Node} - A RootNode containing the tokenised source.
      * @api public
+     * @memberof TextOM.Node.prototype
      */
-    function parser(source) {
-        if (source === null || source === undefined) {
-            source = '';
-        } else if (source instanceof TextOM.Node ||
-            source instanceof String) {
-                source = source.toString();
-        }
-
-        if (typeof source !== 'string') {
-            throw new TypeError('Illegal invocation: \'' + source +
-                '\' is not a valid argument for \'ParseEnglish\'');
-        }
-
-        return tokenizeRoot(new TextOM.RootNode(), source);
-    }
+    TextOM.Node.prototype.parser = this;
 
     /**
      * Expose `TextOM`.
@@ -911,20 +966,28 @@ function parseEnglishConstructor() {
      * @memberof parser
      * @constructor
      */
-    parser.TextOM = TextOM;
+    this.TextOM = TextOM;
 
     /**
-     * Expose `parser` on every node.
+     * Expose `types`.
      *
      * @api public
-     * @memberof TextOM.Node.prototype
+     * @memberof TextOM
+     * @constructor
      */
-    TextOM.Node.prototype.parser = parser;
-
-    return parser;
+    TextOM.types = types;
 }
 
-module.exports = parseEnglishConstructor;
+parserPrototype = Parser.prototype;
+
+parserPrototype.tokenizeRoot = tokenizeRoot;
+parserPrototype.tokenizeParagraph = tokenizeParagraph;
+parserPrototype.tokenizeSentence = tokenizeSentence;
+parserPrototype.tokenizePunctuation = tokenizePunctuation;
+parserPrototype.tokenizeWord = tokenizeWord;
+parserPrototype.tokenizeWhiteSpace = tokenizeWhiteSpace;
+
+module.exports = Parser;
 
 },{"textom":8}],2:[function(require,module,exports){
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
@@ -3175,69 +3238,71 @@ module.exports = TextOMConstructor;
 },{}],9:[function(require,module,exports){
 'use strict';
 
-var parseEnglish, retextAST, assert, converter, TextOM;
+var Parser, retextAST, assert, parser, TextOM;
 
-parseEnglish = require('..');
+Parser = require('..');
 retextAST = require('retext-ast');
 assert = require('assert');
-converter = parseEnglish();
-TextOM = converter.TextOM;
+parser = new Parser();
+TextOM = parser.TextOM;
 
-converter.TextOM.Node.prototype.toAST = retextAST.toAST;
-converter.TextOM.Node.prototype.toJSON = retextAST.toJSON;
+parser.TextOM.Node.prototype.toAST = retextAST.toAST;
+parser.TextOM.Node.prototype.toJSON = retextAST.toJSON;
 
-describe('ParseEnglish()', function () {
-    it('should be of type `function`', function () {
-        assert(typeof converter === 'function');
+describe('ParseEnglish', function () {
+    it('should be a function', function () {
+        assert(typeof Parser === 'function');
     });
 
-    it('should return a newly initialized `RootNode` object, when invoked ' +
-        'with string literal or string object', function () {
-            assert(converter('') instanceof TextOM.RootNode);
-            /*eslint-disable no-new-wrappers */
-            assert(converter(new String('')) instanceof TextOM.RootNode);
-            /*eslint-enable no-new-wrappers */
+    it('should return a newly initialized `Parser` object, when invoked',
+        function () {
+            assert(new Parser() instanceof Parser);
+            assert(Parser() instanceof Parser);
         }
     );
-
-    it('should return a newly initialized `RootNode` object, when invoked ' +
-        'with a nully value', function () {
-            assert(converter() instanceof TextOM.RootNode);
-            assert(converter(null) instanceof TextOM.RootNode);
-            assert(converter(undefined) instanceof TextOM.RootNode);
-        }
-    );
-
-    it('should return a newly initialized `RootNode` object, when invoked ' +
-        'with a `Node` object', function () {
-            assert(
-                converter(new TextOM.RootNode()) instanceof TextOM.RootNode
-            );
-        }
-    );
-
-    it('should throw, when something other than a string, null, undefined, ' +
-        'or node was given', function () {
-            assert.throws(function () {
-                converter(true);
-            }, /true/);
-            assert.throws(function () {
-                converter(1);
-            }, /1/);
-        }
-    );
-
-    it('should return a RootNode containing no paragraphNode, when an ' +
-        'empty source is given', function () {
-            assert(converter().length === 0);
-            assert(converter('').length === 0);
-            assert(converter(null).length === 0);
-            assert(converter(undefined).length === 0);
-            assert(converter(new TextOM.RootNode()).length === 0);
-        });
 });
 
-describe('Two paragraphs', function () {
+describe('new ParseEnglish()', function () {
+    it('should have a `tokenizeRoot` method', function () {
+        assert(typeof parser.tokenizeRoot === 'function');
+    });
+
+    it('should have a `tokenizeParagraph` method', function () {
+        assert(typeof parser.tokenizeParagraph === 'function');
+    });
+
+    it('should have a `tokenizeSentence` method', function () {
+        assert(typeof parser.tokenizeSentence === 'function');
+    });
+
+    it('should have a `tokenizeWord` method', function () {
+        assert(typeof parser.tokenizeWord === 'function');
+    });
+
+    it('should have a `tokenizePunctuation` method', function () {
+        assert(typeof parser.tokenizePunctuation === 'function');
+    });
+
+    it('should have a `tokenizeWhiteSpace` method', function () {
+        assert(typeof parser.tokenizeWhiteSpace === 'function');
+    });
+
+    it('should have a `TextOM` property', function () {
+        assert('TextOM' in parser);
+    });
+});
+
+describe('Root: Without a value', function () {
+    it('should return an empty RootNode when invoked wihtout value',
+        function () {
+            var root = parser.tokenizeRoot();
+            assert(root instanceof TextOM.RootNode);
+            assert(root.length === 0);
+        }
+    );
+});
+
+describe('Root: Given two paragraphs', function () {
     /*
      * Modified first paragraph, split into two, of:
      *    http://en.wikipedia.org/wiki/Paragraph
@@ -3251,7 +3316,7 @@ describe('Two paragraphs', function () {
         'of formal writing, used to organize longer prose.';
 
     it('should equal the test AST', function () {
-        assert(converter(source).toAST() === JSON.stringify({
+        assert(parser.tokenizeRoot(source).toAST() === JSON.stringify({
             'type' : 'RootNode',
             'children' : [
                 {
@@ -3893,9 +3958,43 @@ describe('Two paragraphs', function () {
     });
 });
 
+describe('Root: Given a String object', function () {
+    it('should tokenize the toString representation of the given object ' +
+        'when the given object is an instance of String', function () {
+            var source = 'Test.';
+            /*eslint-disable no-new-wrappers */
+            assert(
+                parser.tokenizeRoot(new String(source)).toAST() ===
+                parser.tokenizeRoot(source).toAST()
+            );
+            /*eslint-enable no-new-wrappers */
+        }
+    );
+});
+
+describe('Root: Given a TextOM Node', function () {
+    it('should tokenize the toString representation of the given object ' +
+        'when the given object is an instance of TextOM.Node', function () {
+            var source = 'Test.',
+                root = parser.tokenizeRoot(source);
+            assert(root.toAST() === parser.tokenizeRoot(root).toAST());
+        }
+    );
+});
+
+describe('Root: Given any other value', function () {
+    it('should throw when the object is neither null, undefined, string, ' +
+        'String, nor TextOM.Node', function () {
+            assert.throws(function () {
+                parser.tokenizeRoot({});
+            });
+        }
+    );
+});
+
 describe('A whitespace only document', function () {
     it('should equal the test AST', function () {
-        assert(converter('\n\n').toAST() === JSON.stringify({
+        assert(parser.tokenizeRoot('\n\n').toAST() === JSON.stringify({
             'type' : 'RootNode',
             'children' : [
                 {
@@ -3916,7 +4015,7 @@ describe('Sentence: Abbreviations followed by a full-stop', function () {
             'in English title once used for all women. Various plural ' +
             'forms used are Mss., Mses. and Mmes.';
 
-        assert(converter(source).head.toAST() === JSON.stringify({
+        assert(parser.tokenizeParagraph(source).toAST() === JSON.stringify({
             'type' : 'ParagraphNode',
             'children' : [
                 {
@@ -4181,10 +4280,10 @@ describe('Sentence: Abbreviations followed by a full-stop', function () {
 */
 describe('Sentence: Abbreviations with dot characters', function () {
     it('should equal the test AST', function () {
-        var source = 'Esperanto was selectively designed by L.L. Zamenhof ' +
-            'from natural languages.';
+        var root = parser.tokenizeParagraph('Esperanto was selectively ' +
+            'designed by L.L. Zamenhof from natural languages.');
 
-        assert(converter(source).head.head.toAST() === JSON.stringify({
+        assert(root.head.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -4289,10 +4388,10 @@ describe('Sentence: Abbreviations with dot characters', function () {
 */
 describe('Sentence: common abbreviations suffixed by a dot', function () {
     it('should equal the test AST', function () {
-        var source = 'Park Ave. was an indie pop band which started in ' +
-            'January 1996 in Nebr. (Omaha).';
+        var root = parser.tokenizeParagraph('Park Ave. was an indie pop ' +
+            'band which started in January 1996 in Nebr. (Omaha).');
 
-        assert(converter(source).head.head.toAST() === JSON.stringify({
+        assert(root.head.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -4441,11 +4540,11 @@ describe('Sentence: common abbreviations suffixed by a dot', function () {
 */
 describe('Sentence: common abbreviations preceded by a dot', function () {
     it('should equal the test AST', function () {
-        var source = 'However, eventually the distinction was lost ' +
-            'when .com, .org and .net were opened for unrestricted ' +
-            'registration.';
+        var root = parser.tokenizeParagraph('However, eventually the ' +
+            'distinction was lost when .com, .org and .net were opened ' +
+            'for unrestricted registration.');
 
-        assert(converter(source).head.head.toAST() === JSON.stringify({
+        assert(root.head.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -4610,165 +4709,167 @@ describe('Sentence: A terminal marker before a closing quote or parenthesis',
             var source = '“However,” says my Grade 8 teacher, “the ' +
                 'period goes inside quotes.” This is another sentence';
 
-            assert(converter(source).head.toAST() === JSON.stringify({
-                'type' : 'ParagraphNode',
-                'children' : [
-                    {
-                        'type' : 'SentenceNode',
-                        'children' : [
-                            {
-                                'type' : 'PunctuationNode',
-                                'value' : '“'
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'However'
-                            },
-                            {
-                                'type' : 'PunctuationNode',
-                                'value' : ','
-                            },
-                            {
-                                'type' : 'PunctuationNode',
-                                'value' : '”'
-                            },
-                            {
-                                'type' : 'WhiteSpaceNode',
-                                'value' : ' '
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'says'
-                            },
-                            {
-                                'type' : 'WhiteSpaceNode',
-                                'value' : ' '
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'my'
-                            },
-                            {
-                                'type' : 'WhiteSpaceNode',
-                                'value' : ' '
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'Grade'
-                            },
-                            {
-                                'type' : 'WhiteSpaceNode',
-                                'value' : ' '
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : '8'
-                            },
-                            {
-                                'type' : 'WhiteSpaceNode',
-                                'value' : ' '
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'teacher'
-                            },
-                            {
-                                'type' : 'PunctuationNode',
-                                'value' : ','
-                            },
-                            {
-                                'type' : 'WhiteSpaceNode',
-                                'value' : ' '
-                            },
-                            {
-                                'type' : 'PunctuationNode',
-                                'value' : '“'
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'the'
-                            },
-                            {
-                                'type' : 'WhiteSpaceNode',
-                                'value' : ' '
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'period'
-                            },
-                            {
-                                'type' : 'WhiteSpaceNode',
-                                'value' : ' '
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'goes'
-                            },
-                            {
-                                'type' : 'WhiteSpaceNode',
-                                'value' : ' '
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'inside'
-                            },
-                            {
-                                'type' : 'WhiteSpaceNode',
-                                'value' : ' '
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'quotes'
-                            },
-                            {
-                                'type' : 'PunctuationNode',
-                                'value' : '.'
-                            },
-                            {
-                                'type' : 'PunctuationNode',
-                                'value' : '”'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'SentenceNode',
-                        'children' : [
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'This'
-                            },
-                            {
-                                'type' : 'WhiteSpaceNode',
-                                'value' : ' '
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'is'
-                            },
-                            {
-                                'type' : 'WhiteSpaceNode',
-                                'value' : ' '
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'another'
-                            },
-                            {
-                                'type' : 'WhiteSpaceNode',
-                                'value' : ' '
-                            },
-                            {
-                                'type' : 'WordNode',
-                                'value' : 'sentence'
-                            }
-                        ]
-                    }
-                ]
-            }));
+            assert(parser.tokenizeParagraph(source).toAST() ===
+                JSON.stringify({
+                    'type' : 'ParagraphNode',
+                    'children' : [
+                        {
+                            'type' : 'SentenceNode',
+                            'children' : [
+                                {
+                                    'type' : 'PunctuationNode',
+                                    'value' : '“'
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'However'
+                                },
+                                {
+                                    'type' : 'PunctuationNode',
+                                    'value' : ','
+                                },
+                                {
+                                    'type' : 'PunctuationNode',
+                                    'value' : '”'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'says'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'my'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'Grade'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : '8'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'teacher'
+                                },
+                                {
+                                    'type' : 'PunctuationNode',
+                                    'value' : ','
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'PunctuationNode',
+                                    'value' : '“'
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'the'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'period'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'goes'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'inside'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'quotes'
+                                },
+                                {
+                                    'type' : 'PunctuationNode',
+                                    'value' : '.'
+                                },
+                                {
+                                    'type' : 'PunctuationNode',
+                                    'value' : '”'
+                                }
+                            ]
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'SentenceNode',
+                            'children' : [
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'This'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'is'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'another'
+                                },
+                                {
+                                    'type' : 'WhiteSpaceNode',
+                                    'value' : ' '
+                                },
+                                {
+                                    'type' : 'WordNode',
+                                    'value' : 'sentence'
+                                }
+                            ]
+                        }
+                    ]
+                })
+            );
         });
     }
 );
@@ -4782,147 +4883,149 @@ describe('Sentence: Abbreviations followed by a dot, optional white ' +
             var source = 'Wikipedia® is a registered trademark of the ' +
                 'Wikimedia Foundation, Inc., a non-profit organization.';
 
-            assert(converter(source).head.head.toAST() === JSON.stringify({
-                'type' : 'SentenceNode',
-                'children' : [
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'Wikipedia'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '®'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'is'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'a'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'registered'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'trademark'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'of'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'the'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'Wikimedia'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'Foundation'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : ','
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'Inc'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : ','
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'a'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'non'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '-'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'profit'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'organization'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    }
-                ]
-            }));
+            assert(parser.tokenizeParagraph(source).head.toAST() ===
+                JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'Wikipedia'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '®'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'is'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'a'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'registered'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'trademark'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'of'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'the'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'Wikimedia'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'Foundation'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : ','
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'Inc'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : ','
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'a'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'non'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '-'
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'profit'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'organization'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        }
+                    ]
+                })
+            );
         });
     }
 );
 
 describe('Sentence: Starting with ellipsis containing spaces', function () {
     it('should equal the test AST', function () {
-        var source = '. . . to be continued.';
-        assert(converter(source).head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeParagraph('. . . to be continued.');
+        assert(root.head.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -4980,8 +5083,8 @@ describe('Sentence: Starting with ellipsis containing spaces', function () {
 
 describe('Sentence: Starting with ellipsis without spaces', function () {
     it('should equal the test AST', function () {
-        var source = '...To be continued.';
-        assert(converter(source).head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeParagraph('...To be continued.');
+        assert(root.head.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -5019,8 +5122,8 @@ describe('Sentence: Starting with ellipsis without spaces', function () {
 
 describe('Sentence: With trailing white space', function () {
     it('should equal the test AST', function () {
-        var source = 'A sentence. ';
-        assert(converter(source).head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeParagraph('A sentence. ');
+        assert(root.head.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -5050,8 +5153,8 @@ describe('Sentence: With trailing white space', function () {
 
 describe('Sentence: Without terminal marker', function () {
     it('should equal the test AST', function () {
-        var source = 'A sentence';
-        assert(converter(source).head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeParagraph('A sentence');
+        assert(root.head.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -5073,8 +5176,8 @@ describe('Sentence: Without terminal marker', function () {
 
 describe('Sentence: Without alphabetic content', function () {
     it('should equal the test AST', function () {
-        var source = '\uD83D\uDC38.';
-        assert(converter(source).head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeParagraph('\uD83D\uDC38.');
+        assert(root.head.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -5132,7 +5235,8 @@ describe('White space characters', function () {
         it('should equal the test AST when using `' + character + '`',
             function () {
                 assert(
-                    converter(source).head.head.toAST() === JSON.stringify({
+                    parser.tokenizeSentence(source).toAST() ===
+                    JSON.stringify({
                         'type' : 'SentenceNode',
                         'children' : [
                             {
@@ -5166,75 +5270,77 @@ describe('A simple sentence testing for astral-plane characters',
     function () {
         var source = 'The unicode character \uD83D\uDCA9 is pile of poo.';
         it('should equal the test AST', function () {
-            assert(converter(source).head.head.toAST() === JSON.stringify({
-                'type' : 'SentenceNode',
-                'children' : [
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'The'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'unicode'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'character'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '\uD83D\uDCA9'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'is'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'pile'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'of'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'poo'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    }
-                ]
-            }));
+            assert(parser.tokenizeSentence(source).toAST() ===
+                JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'The'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'unicode'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'character'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '\uD83D\uDCA9'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'is'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'pile'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'of'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'poo'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        }
+                    ]
+                })
+            );
         });
     }
 );
@@ -5246,7 +5352,7 @@ describe('A simple sentence testing for astral-plane characters',
 describe('Double combining marks', function () {
     var source = 'He scored 0\uFE0F\u20E3 points.';
     it('should equal the test AST', function () {
-        assert(converter(source).head.head.toAST() === JSON.stringify({
+        assert(parser.tokenizeSentence(source).toAST() === JSON.stringify({
         'type' : 'SentenceNode',
         'children' : [
             {
@@ -5412,7 +5518,7 @@ describe('A simple sentence testing for combining diacritical marks',
             it('should equal the test AST when using \u25CC' + diacritic,
                 function () {
                     assert(
-                        converter(source).head.head.toAST() ===
+                        parser.tokenizeSentence(source).toAST() ===
                         JSON.stringify({
                             'type' : 'SentenceNode',
                             'children' : [
@@ -5465,7 +5571,7 @@ describe('A simple sentence testing for common contractions', function () {
         'let\'s, I\'m, we\'re, what\'s, where\'d, and I\'ll.';
 
     it('should equal the test AST', function () {
-        assert(converter(source).head.head.toAST() === JSON.stringify({
+        assert(parser.tokenizeSentence(source).toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -5672,71 +5778,73 @@ describe('Simple sentences testing for tie characters', function () {
     it('should equal the test AST, when using the combinding double ' +
         'breve \u25CC\u035D\u25CC', function () {
             var source = 'e.g. the combining double breve o\u035Do.';
-            assert(converter(source)[0][0].toAST() === JSON.stringify({
-                'type' : 'SentenceNode',
-                'children' : [
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'e'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'g'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'the'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'combining'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'double'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'breve'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'o\u035Do'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    }
-                ]
-            }));
+            assert(parser.tokenizeSentence(source).toAST() ===
+                JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'e'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'g'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'the'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'combining'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'double'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'breve'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'o\u035Do'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        }
+                    ]
+                })
+            );
         }
     );
 
@@ -5745,367 +5853,377 @@ describe('Simple sentences testing for tie characters', function () {
             var source =
                 'e.g. the combining double inverted breve /k\u0361p/';
 
-            assert(converter(source)[0][0].toAST() === JSON.stringify({
-                'type' : 'SentenceNode',
-                'children' : [
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'e'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'g'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'the'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'combining'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'double'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'inverted'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'breve'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '/'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'k\u0361p'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '/'
-                    }
-                ]
-            }));
+            assert(parser.tokenizeSentence(source).toAST() ===
+                JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'e'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'g'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'the'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'combining'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'double'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'inverted'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'breve'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '/'
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'k\u0361p'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '/'
+                        }
+                    ]
+                })
+            );
         }
     );
 
     it('should equal the test AST, when using the combinding double breve ' +
         'below \u25CC\u035C\u25CC', function () {
             var source = 'e.g. the combining double breve below /k\u035Cp/';
-            assert(converter(source)[0][0].toAST() === JSON.stringify({
-                'type' : 'SentenceNode',
-                'children' : [
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'e'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'g'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'the'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'combining'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'double'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'breve'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'below'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '/'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'k\u035Cp'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '/'
-                    }
-                ]
-            }));
+            assert(parser.tokenizeSentence(source).toAST() ===
+                JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'e'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'g'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'the'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'combining'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'double'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'breve'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'below'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '/'
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'k\u035Cp'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '/'
+                        }
+                    ]
+                })
+            );
         }
     );
 
     it('should equal the test AST, when using the undertie \u203F',
         function () {
             var source = 'e.g. the undertie /vuz\u203Fave/';
-            assert(converter(source)[0][0].toAST() === JSON.stringify({
-                'type' : 'SentenceNode',
-                'children' : [
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'e'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'g'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'the'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'undertie'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '/'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'vuz'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '\u203F'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'ave'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '/'
-                    }
-                ]
-            }));
+            assert(parser.tokenizeSentence(source).toAST() ===
+                JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'e'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'g'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'the'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'undertie'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '/'
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'vuz'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '\u203F'
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'ave'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '/'
+                        }
+                    ]
+                })
+            );
         }
     );
 
     it('should equal the test AST, when using the character tie \u2040',
         function () {
             var source = 'e.g. the character tie s\u2040t';
-            assert(converter(source)[0][0].toAST() === JSON.stringify({
-                'type' : 'SentenceNode',
-                'children' : [
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'e'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'g'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'the'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'character'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'tie'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 's'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '\u2040'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 't'
-                    }
-                ]
-            }));
+            assert(parser.tokenizeSentence(source).toAST() ===
+                JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'e'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'g'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'the'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'character'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'tie'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 's'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '\u2040'
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 't'
+                        }
+                    ]
+                })
+            );
         }
     );
 
     it('should equal the test AST, when using the inverted undertie \u2054',
         function () {
             var source = 'e.g. the inverted undertie o\u2054o';
-            assert(converter(source)[0][0].toAST() === JSON.stringify({
-                'type' : 'SentenceNode',
-                'children' : [
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'e'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'g'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'the'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'inverted'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'undertie'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'o'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '\u2054'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'o'
-                    }
-                ]
-            }));
+            assert(parser.tokenizeSentence(source).toAST() ===
+                JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'e'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'g'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'the'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'inverted'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'undertie'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'o'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '\u2054'
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'o'
+                        }
+                    ]
+                })
+            );
         }
     );
 });
@@ -6114,269 +6232,279 @@ describe('Intelectual property marks', function () {
     it('should equal the test AST, when using the copyright symbol \u00A9',
         function () {
             var source = '\u00A9 2011 John Smith';
-            assert(converter(source)[0][0].toAST() === JSON.stringify({
-                'type' : 'SentenceNode',
-                'children' : [
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '\u00A9'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : '2011'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'John'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'Smith'
-                    }
-                ]
-            }));
+            assert(parser.tokenizeSentence(source).toAST() ===
+                JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '\u00A9'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : '2011'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'John'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'Smith'
+                        }
+                    ]
+                })
+            );
         }
     );
 
     it('should equal the test AST, when using the sound recording ' +
         'copyright symbol \u2117', function () {
-            var source =
-                'Designated by \u2117, the sound recording copyright symbol.';
+            var source = 'Designated by \u2117, the sound recording ' +
+                'copyright symbol.';
 
-            assert(converter(source)[0][0].toAST() === JSON.stringify({
-                'type' : 'SentenceNode',
-                'children' : [
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'Designated'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'by'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '\u2117'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : ','
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'the'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'sound'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'recording'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'copyright'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'symbol'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    }
-                ]
-            }));
+            assert(parser.tokenizeSentence(source).toAST() ===
+                JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'Designated'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'by'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '\u2117'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : ','
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'the'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'sound'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'recording'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'copyright'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'symbol'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        }
+                    ]
+                })
+            );
         }
     );
 
     it('should equal the test AST, when using the registered trademark ' +
         'symbol \u00AE', function () {
             var source = 'Wikipedia\u00AE is a registered trademark.';
-            assert(converter(source)[0][0].toAST() === JSON.stringify({
-                'type' : 'SentenceNode',
-                'children' : [
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'Wikipedia'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '\u00AE'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'is'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'a'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'registered'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'trademark'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    }
-                ]
-            }));
+            assert(parser.tokenizeSentence(source).toAST() ===
+                JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'Wikipedia'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '\u00AE'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'is'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'a'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'registered'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'trademark'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        }
+                    ]
+                })
+            );
         }
     );
 
     it('should equal the test AST, when using the service mark symbol \u2120',
         function () {
             var source = 'ABC Law\u2120 legal services.';
-            assert(converter(source)[0][0].toAST() === JSON.stringify({
-                'type' : 'SentenceNode',
-                'children' : [
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'ABC'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'Law'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '\u2120'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'legal'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'services'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    }
-                ]
-            }));
+            assert(parser.tokenizeSentence(source).toAST() ===
+                JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'ABC'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'Law'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '\u2120'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'legal'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'services'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        }
+                    ]
+                })
+            );
         }
     );
 
     it('should equal the test AST, when using the trademark symbol \u2122',
         function () {
             var source = 'Mytrademark\u2122 is a trademark.';
-            assert(converter(source)[0][0].toAST() === JSON.stringify({
-                'type' : 'SentenceNode',
-                'children' : [
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'Mytrademark'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '\u2122'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'is'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'a'
-                    },
-                    {
-                        'type' : 'WhiteSpaceNode',
-                        'value' : ' '
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'trademark'
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'value' : '.'
-                    }
-                ]
-            }));
+            assert(
+                parser.tokenizeSentence(source).toAST() === JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'Mytrademark'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '\u2122'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'is'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'a'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'trademark'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        }
+                    ]
+                })
+            );
         }
     );
 });
@@ -6387,7 +6515,7 @@ describe('Intelectual property marks', function () {
 describe('A simple sentence testing for digit-letters', function () {
     var source = 'iPhone 5S is a high-end smartphone developed by Apple.';
     it('should equal the test AST', function () {
-        assert(converter(source).head.head.toAST() === JSON.stringify({
+        assert(parser.tokenizeSentence(source).toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -6489,7 +6617,7 @@ describe('A simple sentence testing for grapheme clusters', function () {
         'symbols.';
 
     it('should equal the test AST', function () {
-        assert(converter(source).head.head.toAST() === JSON.stringify({
+        assert(parser.tokenizeSentence(source).toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -6655,7 +6783,7 @@ describe('Unicode parsing', function () {
         '10\u207B\xB9\u2070 m.';
 
     it('should equal the test AST', function () {
-        assert(converter(source).head.head.toAST() === JSON.stringify({
+        assert(parser.tokenizeSentence(source).toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -6848,8 +6976,8 @@ describe('Abbreviations: Decimals (affixed by a full-stop)', function () {
 
             while (digits[++iterator]) {
                 digit = digits[iterator];
-                root = converter('See § ' + digit + '. ¶ 2.');
-                assert(root.head.head.toAST() === JSON.stringify({
+                root = parser.tokenizeSentence('See § ' + digit + '. ¶ 2.');
+                assert(root.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -6906,11 +7034,11 @@ describe('Abbreviations: Decimals (affixed by a full-stop)', function () {
 describe('Abbreviations: Geographic', function () {
     it('should *not* treat the dot-character succeeding `Ave` ' +
         '(abbreviation for `Avenue`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Survey Reaffirms 5th Ave. at Top of the Retail Rent Heap'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7008,8 +7136,11 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Blvd` ' +
         '(abbreviation for `Boulevard`), as a terminal marker', function () {
-            var root = converter('A café located on the blvd. of Kusadasi');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                'A café located on the blvd. of Kusadasi'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7083,11 +7214,11 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Mt` ' +
         '(abbreviation for `Mountain`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Like all mountains, Mt. Gay is a large large mass of rock.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7201,8 +7332,11 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Rd` ' +
         '(abbreviation for `Road`), as a terminal marker', function () {
-            var root = converter('In law, Rd. is an abbreviation of road.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                'In law, Rd. is an abbreviation of road.'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7284,11 +7418,11 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Bldg` ' +
         '(abbreviation for `Building`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'The many fine Victorian buildings in Wolverhampton.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7355,8 +7489,11 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Nat` ' +
         '(abbreviation for `National`), as a terminal marker', function () {
-            var root = converter('The Teide Nat. Park in Tenerife, Spain.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                'The Teide Nat. Park in Tenerife, Spain.'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7430,8 +7567,11 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Natl` ' +
         '(abbreviation for `National`), as a terminal marker', function () {
-            var root = converter('The Teide Natl. Park in Tenerife, Spain.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                'The Teide Natl. Park in Tenerife, Spain.'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7505,11 +7645,11 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Rt` ' +
         '(abbreviation for `Route`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'U.S. Rt. 66, a historic highway in America.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7603,11 +7743,11 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Rte` ' +
         '(abbreviation for `Route`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'U.S. Rte. 66, a historic highway in America.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7701,12 +7841,12 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Co` ' +
         '(abbreviation for `County`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Leicestershire Co. is a landlocked county in the ' +
                 'English Midlands.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7800,8 +7940,11 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Pk` ' +
         '(abbreviation for `Park`), as a terminal marker', function () {
-            var root = converter('St. James\'s Pk. covers 34 ha.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                'St. James\'s Pk. covers 34 ha.'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7875,11 +8018,11 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Sq` ' +
         '(abbreviation for `Square`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'See the attachment for potential Times Sq. sites.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7957,11 +8100,11 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Dr` ' +
         '(abbreviation for `Drive`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Continue on Pershing Dr. before turning right.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8032,12 +8175,12 @@ describe('Abbreviations: Geographic', function () {
     it('should *not* treat the dot-character succeeding `Pt` ' +
         '(abbreviation for `Point` or `Port`), as a terminal marker',
         function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'The Pt. of L.A. is also called Los Angeles Harbor ' +
                 'Department.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8152,8 +8295,11 @@ describe('Abbreviations: Geographic', function () {
     it('should *not* treat the dot-character succeeding `St` ' +
         '(abbreviation for `Street` or `State`), as a terminal marker',
         function () {
-            var root = converter('I used to live on 2nd St. in Clinton.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                'I used to live on 2nd St. in Clinton.'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8239,12 +8385,12 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Ft` ' +
         '(abbreviation for `Fort`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'As Ft. Knox is no longer “The Home of Armor”, ' +
                 'the Patton Museum has also been relocated.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8406,12 +8552,12 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Pen` ' +
         '(abbreviation for `Peninsula`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Huon Pen. is a large rugged peninsula on the island of ' +
                 'New Guinea.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8529,12 +8675,12 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Terr` ' +
         '(abbreviation for `Territory`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Yukon, formerly Yukon Territory (Yuk. Terr.), is an ' +
                 'area of rugged mountains and high plateaus.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8688,11 +8834,11 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Hwy` ' +
         '(abbreviation for `Highway`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'The Atlantic Hwy. was the direct predecessor to US 1.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8786,11 +8932,11 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Fwy` ' +
         '(abbreviation for `Freeway`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'The San Diego Fwy. is most commonly called “The 405”.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8892,12 +9038,12 @@ describe('Abbreviations: Geographic', function () {
 
     it('should *not* treat the dot-character succeeding `Pkwy` ' +
         '(abbreviation for `Parkway`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Blue Ridge Pkwy. is a National Parkway, noted for ' +
                 'its scenic beauty.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -9024,11 +9170,11 @@ describe('Abbreviations: Geographic', function () {
             while (states[++iterator]) {
                 state = states[iterator];
 
-                root = converter(
+                root = parser.tokenizeSentence(
                     'I live in Clinton, ' + state + '. on 2nd street.'
                 );
 
-                assert(root.head.head.toAST() === JSON.stringify({
+                assert(root.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -9119,11 +9265,11 @@ describe('Abbreviations: Geographic', function () {
             while (states[++iterator]) {
                 state = states[iterator];
 
-                root = converter(
+                root = parser.tokenizeSentence(
                     'I\'m from Mount Pleasant, ' + state + '. in Canada.'
                 );
 
-                assert(root.head.head.toAST() === JSON.stringify({
+                assert(root.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -9220,11 +9366,11 @@ describe('Abbreviations: Geographic', function () {
             while (counties[++iterator]) {
                 county = counties[iterator];
 
-                root = converter(
+                root = parser.tokenizeSentence(
                     'I\'m from Newton, ' + county + '. in England.'
                 );
 
-                assert(root.head.head.toAST() === JSON.stringify({
+                assert(root.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -9312,12 +9458,12 @@ describe('Abbreviations: Title abbreviations', function () {
             while (titles[++iterator]) {
                 title = titles[iterator];
 
-                root = converter(
+                root = parser.tokenizeSentence(
                     'You should talk to ' + title +
                     '. Smith about these questions.'
                 );
 
-                assert(root.head.head.toAST() === JSON.stringify({
+                assert(root.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -9416,8 +9562,11 @@ describe('Abbreviations: Alphabetical', function () {
 
             while (alphabet[++iterator]) {
                 character = alphabet[iterator];
-                root = converter('Thomas ' + character + '. Swift');
-                assert(root.head.head.toAST() === JSON.stringify({
+                root = parser.tokenizeSentence(
+                    'Thomas ' + character + '. Swift'
+                );
+
+                assert(root.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -9455,12 +9604,12 @@ describe('Abbreviations: Business', function () {
     it('should *not* treat the dot-character succeeding `Inc` ' +
         '(abbreviation for `Incorporation`), as a terminal marker',
         function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Today, ABC Company, Inc. announced an increase of 100 ' +
                 'percent in the last two years.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -9602,11 +9751,11 @@ describe('Abbreviations: Business', function () {
 
     it('should *not* treat the dot-character succeeding `Ltd` ' +
         '(abbreviation for `Limited`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'XYZ Associates Ltd. is a member of the confederation.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -9694,11 +9843,11 @@ describe('Abbreviations: Business', function () {
 describe('Abbreviations: Latin', function () {
     it('should *not* treat the dot-character succeeding `ca` (abbreviation ' +
         'for `circa`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'The antique clock is from ca. 1900.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -9768,11 +9917,11 @@ describe('Abbreviations: Latin', function () {
 
     it('should *not* treat the dot-character succeeding `cap` ' +
         '(abbreviation for `chapter`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Electronic Transactions Ordinance (Cap. 553)'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -9830,12 +9979,12 @@ describe('Abbreviations: Latin', function () {
 
     it('should *not* treat the dot-character succeeding `cf` (abbreviation ' +
         'for `bring together`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'These results were similar to those obtained using ' +
                 'different techniques (cf. Wilson, 1999 and Ansmann, 1992)'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -9989,12 +10138,12 @@ describe('Abbreviations: Latin', function () {
 
     it('should *not* treat the dot-character succeeding `cp` (abbreviation ' +
         'for `compare`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'These results were similar to those obtained using ' +
                 'different techniques (cf. Wilson, 1999 and Ansmann, 1992).'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -10153,12 +10302,12 @@ describe('Abbreviations: Latin', function () {
     it('should *not* treat the dot-character succeeding `cwt` ' +
         '(abbreviation for `centum weight`), as a terminal marker',
         function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Hundredweight is abbreviated as cwt. because \'C\' is ' +
                 'the Roman symbol for 100.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -10284,12 +10433,12 @@ describe('Abbreviations: Latin', function () {
 
     it('should *not* treat the dot-character succeeding `ead` ' +
         '(abbreviation for `eadem`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'When quoting a female author, use the feminine form ' +
                 'of idem, ead. (eadem).'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -10423,12 +10572,12 @@ describe('Abbreviations: Latin', function () {
 
     it('should *not* treat the dot-character succeeding `al` ' +
         '(abbreviation for `(et) alii`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'These results agree with the ones published by ' +
                 'Pelon et al. (2002).'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -10546,13 +10695,13 @@ describe('Abbreviations: Latin', function () {
 
     it('should *not* treat the dot-character succeeding `etc` ' +
         '(abbreviation for `et cetera`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Et cetera (abbreviated as etc. or &c.) is a Latin ' +
                 'expression that means “and other things”, or “and so ' +
                 'forth.”'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -10762,12 +10911,12 @@ describe('Abbreviations: Latin', function () {
 
     it('should *not* treat the dot-character succeeding `fl` (abbreviation ' +
         'for `floruit`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'The great author Joseph Someone (fl. 2050-75) was ' +
                 'renowned for his erudition.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -10893,13 +11042,13 @@ describe('Abbreviations: Latin', function () {
 
     it('should *not* treat the dot-character succeeding `ff` ' +
         '(abbreviation for `foliis`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'As such, Hornblower 258f. would refer to pages 258–259 ' +
                 'while 258ff. would refer to an undetermined number of ' +
                 'pages following page 258.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -11113,14 +11262,14 @@ describe('Abbreviations: Latin', function () {
 
     it('should *not* treat the dot-character succeeding `ibid` ' +
         '(abbreviation for `ibidem`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Ibid. (Latin, short for ibidem, meaning “in the same ' +
                 'place”) is the term used to provide an endnote or ' +
                 'footnote citation or reference for a source that was ' +
                 'cited in the preceding endnote or footnote.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -11438,11 +11587,11 @@ describe('Abbreviations: Latin', function () {
 
     it('should *not* treat the dot-character succeeding `id` (abbreviation ' +
         'for `idem`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Id. is particularly used in legal citations.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -11513,13 +11662,13 @@ describe('Abbreviations: Latin', function () {
     it('should *not* treat the dot-character succeeding `nem` and `con` ' +
         '(in `nem. con.`, abbreviation for `nemine contradicente`), as a ' +
         'terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'The meaning of nemine contradicente is distinct from ' +
                 '“unanimously”; nem. con. simply means that nobody voted ' +
                 'against.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -11686,12 +11835,12 @@ describe('Abbreviations: Latin', function () {
     it('should *not* treat the dot-character succeeding `op` and `cit` ' +
         '(in `op. cit.`, abbreviation for `opere (citato)`), as a terminal ' +
         'marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'As usual with foreign words and phrases, op. cit. is ' +
                 'typically given in italics.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -11825,11 +11974,12 @@ describe('Abbreviations: Latin', function () {
 
     it('should *not* treat the dot-character succeeding `cent` ' +
         '(abbreviation for `(per) cent`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'The form per cent. is still in use as a part of highly ' +
                 'formal language.'
             );
-            assert(root.head.head.toAST() === JSON.stringify({
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -11964,12 +12114,12 @@ describe('Abbreviations: Latin', function () {
     it('should *not* treat the dot-character succeeding `pro` ' +
         '(abbreviation for `(per) procurationem`), as a terminal marker',
         function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Procuration (per procurationem), or shortly per pro., ' +
                 'or simply p.p.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12088,12 +12238,12 @@ describe('Abbreviations: Latin', function () {
     it('should *not* treat the dot-character succeeding `tem` ' +
         '(abbreviation for `(pro) tempore`), as a terminal marker',
         function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Legislative bodies can have one or more pro tem. for ' +
                 'the presiding officer.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12212,12 +12362,12 @@ describe('Abbreviations: Latin', function () {
     it('should *not* treat the dot-character succeeding `sic` ' +
         '(abbreviation for `sic erat scriptum`), as a terminal marker',
         function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Sic., or sic erat scriptum, is Latin for “Thus it ' +
                 'was written.”'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12344,13 +12494,13 @@ describe('Abbreviations: Latin', function () {
     it('should *not* treat the dot-character succeeding `seq` ' +
         '(abbreviation for `(et) sequentia`), as a terminal marker',
         function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'The phrase et seq. is used to indicate that ' +
                 'the information is continued on the denoted ' +
                 'pages or sections.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12516,8 +12666,11 @@ describe('Abbreviations: Latin', function () {
 
     it('should *not* treat the dot-character succeeding `stat` ' +
         '(abbreviation for `statim`), as a terminal marker', function () {
-            var root = converter('That patient needs attention, stat.!');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                'That patient needs attention, stat.!'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12575,13 +12728,13 @@ describe('Abbreviations: Latin', function () {
 
     it('should *not* treat the dot-character succeeding `viz` ' +
         '(abbreviation for `videlicet`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'The noble gases, viz. helium, neon, argon, xenon, ' +
                 'krypton and radon, show a non-expected behaviour when ' +
                 'exposed to this new element.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12797,11 +12950,11 @@ describe('Abbreviations: Latin', function () {
 describe('Abbreviations: English unit abbreviations', function () {
     it('should *not* treat the dot-character succeeding `bbl` ' +
         '(abbreviation for `barrel`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'The price for 15 bbls. is unknown to me.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12887,10 +13040,10 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `cu` ' +
         '(abbreviation for `cubic`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 '12 cu. in. could also be written as 12inch^3.'
             );
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12992,8 +13145,11 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `doz` ' +
         '(abbreviation for `dozen`), as a terminal marker', function () {
-            var root = converter('Could you get 2 doz. of eggs?');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                'Could you get 2 doz. of eggs?'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13064,8 +13220,11 @@ describe('Abbreviations: English unit abbreviations', function () {
     it('should *not* treat the dot-character succeeding `fl` ' +
         '(as in `fl. oz.`, abbreviation for `fluid (ounce)`), ' +
         'as a terminal marker', function () {
-            var root = converter('1 fl. oz. equals about 28 ml.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                '1 fl. oz. equals about 28 ml.'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13139,8 +13298,11 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `oz` (abbreviation ' +
         'for `fluid ounce`), as a terminal marker', function () {
-            var root = converter('2 oz. equals about 56–57 gr.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                '2 oz. equals about 56–57 gr.'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13210,8 +13372,11 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `ft` (abbreviation ' +
         'for `foot`), as a terminal marker', function () {
-            var root = converter('2 ft. equals exactly 60.96 centimeters.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                '2 ft. equals exactly 60.96 centimeters.'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13281,8 +13446,11 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `gal` ' +
         '(abbreviation for `gallon`), as a terminal marker', function () {
-            var root = converter('1 gal. equals 8 pints.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                '1 gal. equals 8 pints.'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13336,12 +13504,12 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `gr` (abbreviation ' +
         'for `grain`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 '5 gr. bottle indicates on the back that the ' +
                 'dosage is “325 mg.”'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13467,11 +13635,11 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `gro` ' +
         '(abbreviation for `gross`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 '1 Gro. (a gross) refers to a group of 144 items.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13581,8 +13749,11 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `in` (abbreviation ' +
         'for `inch`), as a terminal marker', function () {
-            var root = converter('There are 12 in. in a foot.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                'There are 12 in. in a foot.'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13652,11 +13823,11 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `kt` (abbreviation ' +
         'for `karat or knot`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Items 10-karat or greater are to be stamped with ' +
                 'either Kt. or K.'
             );
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13782,11 +13953,11 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `lb` (abbreviation ' +
         'for `pound`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'In the imperial systems of measurement, 1 lb. equals ' +
                 '0.45359237 kilograms'
             );
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13896,12 +14067,12 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `mi` ' +
         '(abbreviation for `mile`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'A mile, known as 1 mi. also, is a unit of length most ' +
                 'commonly equivalent to 5,280 feet.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14075,12 +14246,12 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `oz` ' +
         '(abbreviation for `ounce`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'In the imperial systems of measurement, 1 oz. equals ' +
                 'one sixteenth of a pound.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14210,12 +14381,12 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `pt` (abbreviation ' +
         'for `pint`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'In the imperial systems of measurement, 1 pt. equals ' +
                 'one eighth of a gallon.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14345,12 +14516,12 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `qt` ' +
         '(abbreviation for `quart`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'In the imperial systems of measurement, 1 qt. ' +
                 'equals one fourth of a gallon.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14480,11 +14651,11 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `sq` ' +
         '(abbreviation for `square`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'The large house boasts 29 sq. ft. of living space.'
             );
 
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14582,8 +14753,11 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `tbsp` ' +
         '(abbreviation for `tablespoon`), as a terminal marker', function () {
-            var root = converter('Add 3 tbsp. sea salt flakes.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                'Add 3 tbsp. sea salt flakes.'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14644,8 +14818,8 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `tsp` ' +
         '(abbreviation for `teaspoon`), as a terminal marker', function () {
-            var root = converter('Add 1 tsp. mustard powder.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence('Add 1 tsp. mustard powder.');
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14699,8 +14873,8 @@ describe('Abbreviations: English unit abbreviations', function () {
 
     it('should *not* treat the dot-character succeeding `yd` ' +
         '(abbreviation for `yard`), as a terminal marker', function () {
-            var root = converter('2 yd. is a fanthom.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence('2 yd. is a fanthom.');
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14756,10 +14930,10 @@ describe('Abbreviations: English unit abbreviations', function () {
 describe('Abbreviations: Time references', function () {
     it('should *not* treat the dot-character succeeding `sec` ' +
         '(abbreviation for `seconds`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Sprint for 90 sec. more, before you do some stretches.'
             );
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14857,11 +15031,11 @@ describe('Abbreviations: Time references', function () {
 
     it('should *not* treat the dot-character succeeding `min` ' +
         '(abbreviation for `minutes`), as a terminal marker', function () {
-            var root = converter(
+            var root = parser.tokenizeSentence(
                 'Continue down the road 8 more min. before turning left ' +
                 'at the crossroads.'
             );
-            assert(root.head.head.toAST() === JSON.stringify({
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14979,8 +15153,11 @@ describe('Abbreviations: Time references', function () {
 
     it('should *not* treat the dot-character succeeding `hr` (abbreviation ' +
         'for `hours`), as a terminal marker', function () {
-            var root = converter('We\'ll be there in 1 hr. I think');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                'We\'ll be there in 1 hr. I think'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -15069,11 +15246,11 @@ describe('Abbreviations: Time references', function () {
             while (days[++iterator]) {
                 day = days[iterator];
 
-                root = converter(
+                root = parser.tokenizeSentence(
                     'Let\'s move the meeting to next ' + day + '. at 10:00.'
                 );
 
-                assert(root.head.head.toAST() === JSON.stringify({
+                assert(root.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -15185,11 +15362,11 @@ describe('Abbreviations: Time references', function () {
             while (months[++iterator]) {
                 month = months[iterator];
 
-                root = converter(
+                root = parser.tokenizeSentence(
                     'My birthday is in ' + month + ' on the 12th.'
                 );
 
-                assert(root.head.head.toAST() === JSON.stringify({
+                assert(root.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -15273,8 +15450,11 @@ describe('Abbreviations: Decimals (prefixed by a full-stop)', function () {
             while (digits[++iterator]) {
                 digit = digits[iterator];
 
-                var root = converter('See § .' + digit + ' ¶ 2.');
-                assert(root.head.head.toAST() === JSON.stringify({
+                var root = parser.tokenizeSentence(
+                    'See § .' + digit + ' ¶ 2.'
+                );
+
+                assert(root.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -15341,11 +15521,11 @@ describe('Abbreviations: TLD abbreviations', function () {
             while (tlds[++iterator]) {
                 domain = tlds[iterator];
 
-                root = converter(
+                root = parser.tokenizeSentence(
                     'The domain .' + domain + ' is a top-level domain.'
                 );
 
-                assert(root.head.head.toAST() === JSON.stringify({
+                assert(root.toAST() === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -15425,8 +15605,8 @@ describe('Abbreviations: TLD abbreviations', function () {
 
 describe('Contractions', function () {
     it('should break contractions of `‘ll` (from `will`)', function () {
-        var root = converter('She\'ll be at the meeting');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('She\'ll be at the meeting');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15478,8 +15658,8 @@ describe('Contractions', function () {
     });
 
     it('should break contractions of `‘re` (from `are`)', function () {
-        var root = converter('You\'re finished');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('You\'re finished');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15507,8 +15687,8 @@ describe('Contractions', function () {
     });
 
     it('should break contractions of `‘ve` (from `have`)', function () {
-        var root = converter('Do you\'ve any tips');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('Do you\'ve any tips');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15552,8 +15732,8 @@ describe('Contractions', function () {
     });
 
     it('should break contractions of `n‘t` (from `not`)', function () {
-        var root = converter('Ain\'t nobody');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('Ain\'t nobody');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15586,8 +15766,8 @@ describe('Contractions', function () {
 
     it('should break contractions of `‘s` (from `us`, `is`, `does`, ' +
         'and `has`)', function () {
-            var root = converter('It\'s backed up');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence('It\'s backed up');
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -15624,8 +15804,8 @@ describe('Contractions', function () {
     );
 
     it('should break contractions of `‘m` (from `am`)', function () {
-        var root = converter('I\'m on a boat');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('I\'m on a boat');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15670,8 +15850,8 @@ describe('Contractions', function () {
 
     it('should break contractions of `‘d` (from `had`, `did`, and `would`)',
         function () {
-            var root = converter('Where\'d he go');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence('Where\'d he go');
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -15708,8 +15888,8 @@ describe('Contractions', function () {
     );
 
     it('should break contractions of `cannot`', function () {
-        var root = converter('They cannot fly');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('They cannot fly');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15741,8 +15921,8 @@ describe('Contractions', function () {
     });
 
     it('should break contractions of `d\'ye` (from `do you`)', function () {
-        var root = converter('What d\'ye need?');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('What d\'ye need?');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15782,8 +15962,8 @@ describe('Contractions', function () {
     });
 
     it('should break contractions of `gimme` (`from give me`)', function () {
-        var root = converter('Gimme more');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('Gimme more');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15807,8 +15987,8 @@ describe('Contractions', function () {
     });
 
     it('should break contractions of `lemme` (from `let me`)', function () {
-        var root = converter('Lemme go!');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('Lemme go!');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15836,8 +16016,8 @@ describe('Contractions', function () {
     });
 
     it('should break contractions of `‘em` (from `them`)', function () {
-        var root = converter('Have you seen \'em?');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('Have you seen \'em?');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15882,8 +16062,8 @@ describe('Contractions', function () {
 
     it('should break contractions of `o‘` (from `of (the)`, as in `o‘clock`)',
         function () {
-            var root = converter('See you at ten o\'clock.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence('See you at ten o\'clock.');
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -15941,8 +16121,8 @@ describe('Contractions', function () {
 
     it('should break contractions of `y‘` (from `you`, as in `y‘all`)',
         function () {
-            var root = converter('Hold on, y\'all!');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence('Hold on, y\'all!');
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -15988,8 +16168,11 @@ describe('Contractions', function () {
 
     it('should break contractions of `‘t` (from `it`, as in `‘twas`)',
         function () {
-            var root = converter('\'Twas the night before Christmas.');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence(
+                '\'Twas the night before Christmas.'
+            );
+
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16047,8 +16230,8 @@ describe('Contractions', function () {
 
     it('should break contractions of `coulda` (from `could have`)',
         function () {
-            var root = converter('You coulda told him');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence('You coulda told him');
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16090,8 +16273,8 @@ describe('Contractions', function () {
 
     it('should break contractions of `musta` (from `must have`)',
         function () {
-            var root = converter('He musta guessed');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence('He musta guessed');
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16125,8 +16308,8 @@ describe('Contractions', function () {
 
     it('should break contractions of `shoulda` (from `should have`)',
         function () {
-            var root = converter('You shoulda told me');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence('You shoulda told me');
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16168,8 +16351,8 @@ describe('Contractions', function () {
 
     it('should break contractions of `woulda` (from `would have`)',
         function () {
-            var root = converter('You woulda told him');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence('You woulda told him');
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16210,8 +16393,8 @@ describe('Contractions', function () {
     );
 
     it('should break contractions of `kinda` (from `kind of`)', function () {
-        var root = converter('That\'s kinda funny');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('That\'s kinda funny');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16251,8 +16434,8 @@ describe('Contractions', function () {
     });
 
     it('should break contractions of `sorta` (from `sort of`)', function () {
-        var root = converter('That\'s sorta funny');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('That\'s sorta funny');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16293,8 +16476,8 @@ describe('Contractions', function () {
 
     it('should break contractions of `oughta` (from `ought of`)',
         function () {
-            var root = converter('I oughta go');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence('I oughta go');
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16328,8 +16511,8 @@ describe('Contractions', function () {
 
     it('should break contractions of `wanna` (from `want a` or `want to`)',
         function () {
-            var root = converter('I wanna puppy');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence('I wanna puppy');
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16362,8 +16545,8 @@ describe('Contractions', function () {
     );
 
     it('should break contractions of `gonna` (from `going to`)', function () {
-        var root = converter('I’m gonna go');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('I’m gonna go');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16404,8 +16587,8 @@ describe('Contractions', function () {
 
     it('should break contractions of `doncha` (from `don‘t you`)',
         function () {
-            var root = converter('Doncha wanna?');
-            assert(root.head.head.toAST() === JSON.stringify({
+            var root = parser.tokenizeSentence('Doncha wanna?');
+            assert(root.toAST() === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16438,8 +16621,8 @@ describe('Contractions', function () {
     );
 
     it('should break contractions of `gotcha` (from `got you`)', function () {
-        var root = converter('I gotcha now!');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('I gotcha now!');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16475,8 +16658,8 @@ describe('Contractions', function () {
     });
 
     it('should break contractions of `getcha` (from `get you`)', function () {
-        var root = converter('Gonna getcha!');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('Gonna getcha!');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16508,8 +16691,8 @@ describe('Contractions', function () {
     });
 
     it('should break contractions of `outta` (from `out of`)', function () {
-        var root = converter('I\'m outta here');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('I\'m outta here');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16549,8 +16732,8 @@ describe('Contractions', function () {
     });
 
     it('should break contractions of `lotta` (from `lot of`)', function () {
-        var root = converter('A whole lotta people');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('A whole lotta people');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16590,8 +16773,8 @@ describe('Contractions', function () {
     });
 
     it('should break contractions of `hafta` (from `have to`)', function () {
-        var root = converter('I hafta fill in my tax return');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('I hafta fill in my tax return');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16655,8 +16838,8 @@ describe('Contractions', function () {
     });
 
     it('should break contractions of `gotta` (from `got to`)', function () {
-        var root = converter('I gotta learn');
-        assert(root.head.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence('I gotta learn');
+        assert(root.toAST() === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16690,12 +16873,13 @@ describe('Contractions', function () {
 
 describe('Terminal markers', function () {
     it('should break sentences ending in a full stop/period', function () {
-        var root = converter(
+        var root = parser.tokenizeParagraph(
             'Like Miss and Mrs. the term Ms. has its origins in English ' +
             'title once used for all women. Various plural forms used ' +
             'are Mss., Mses. and Mmes.'
         );
-        assert(root.head.toAST() === JSON.stringify({
+
+        assert(root.toAST() === JSON.stringify({
             'type' : 'ParagraphNode',
             'children' : [
                 {
@@ -16953,11 +17137,11 @@ describe('Terminal markers', function () {
     });
 
     it('should break sentences ending in a question mark', function () {
-        var root = converter(
+        var root = parser.tokenizeParagraph(
             'Is it good in form? style? meaning? He responded with yes.'
         );
 
-        assert(root.head.toAST() === JSON.stringify({
+        assert(root.toAST() === JSON.stringify({
             'type' : 'ParagraphNode',
             'children' : [
                 {
@@ -17075,12 +17259,12 @@ describe('Terminal markers', function () {
     });
 
     it('should break sentences ending in an exclamation mark', function () {
-        var root = converter(
+        var root = parser.tokenizeParagraph(
             '“No!” he yelled. “Buy it now!” They have some really(!) ' +
             'low-priced rugs on sale this week.'
         );
 
-        assert(root.head.toAST() === JSON.stringify({
+        assert(root.toAST() === JSON.stringify({
             'type' : 'ParagraphNode',
             'children' : [
                 {
@@ -17279,8 +17463,11 @@ describe('Terminal markers', function () {
     });
 
     it('should break sentences ending in an interrobang', function () {
-        var root = converter('Say what‽ She\'s pregnant?! Realy!? Wow.');
-        assert(root.head.toAST() === JSON.stringify({
+        var root = parser.tokenizeParagraph(
+            'Say what‽ She\'s pregnant?! Realy!? Wow.'
+        );
+
+        assert(root.toAST() === JSON.stringify({
             'type' : 'ParagraphNode',
             'children' : [
                 {
@@ -17384,7 +17571,7 @@ describe('Terminal markers', function () {
     });
 
     it('should break sentences ending in an ellipsis', function () {
-        var root = converter(
+        var root = parser.tokenizeRoot(
             'This is rather straightforward... most of the time... ' +
             'She said that you should end a sentence with an ellipsis.'
         );
