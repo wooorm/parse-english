@@ -6,12 +6,12 @@ See [Browser Support](#browser-support) for more information (a.k.a. don’t wor
 
 ---
 
-**parse-english** is an English language parser in JavaScript. Build on top of [TextOM](https://github.com/wooorm/textom/). NodeJS, and the browser. Lots of tests (330+), including 630+ assertions. 100% coverage.
+**parse-english** is an English language parser in JavaScript. NodeJS, and the browser. Lots of tests (330+), including 630+ assertions. 100% coverage.
 
-Note: This project is **not** an object model for natural languages, or an extensible system for analysing and manipulating natural language, its an algorithm that transforms plain-text natural language into an object model. If you need the above-mentioned functionalities, use the following projects.
+Note: This project is **not** an object model for natural languages, or an extensible system for analysing and manipulating natural language, its an algorithm that transforms plain-text natural language into an AST. If you need the above-mentioned functionalities, use the following projects.
 
 * For a pluggable system for analysing and manipulating natural language, see [retext](https://github.com/wooorm/retext "Retext").
-* For the object model used in parse-english, see [TextOM](https://github.com/wooorm/textom/ "TextOM");
+* For an object model, see [TextOM](https://github.com/wooorm/textom "TextOM").
 
 ## Installation
 
@@ -28,41 +28,110 @@ $ component install wooorm/parse-english
 ## Usage
 
 ````js
-var parse = require('parse-english')(),
-    rootNode;
+var Parser = require('parse-english'),
+    parser = new Parser(),
+    root;
 
-// Simple sentence:
-rootNode = parse('A simple, english sentence.');
+/* Simple sentence: */
+parser.tokenizeRoot('A simple, english sentence.');
+/*
+ * ˅ Object
+ *    ˃ children: Array[1]
+ *      type: "RootNode"
+ *    ˃ __proto__: Object
+ */
 
-// Unicode filled sentence:
-rootNode = parse('The \xC5 symbol invented by A. J. A\u030Angstro\u0308m (1814, Lo\u0308gdo\u0308, \u2013 1874) denotes the length 10\u207B\xB9\u2070 m.');
-
-// A (plain-text) file:
-rootNode = parse(require('fs').readFileSync('./document.txt', 'utf-8'));
+/* Unicode filled sentence: */
+parser.tokenizeRoot('The \xC5 symbol invented by A. J. A\u030Angstro\u0308m (1814, Lo\u0308gdo\u0308, \u2013 1874) denotes the length 10\u207B\xB9\u2070 m.');
+/*
+ * ˅ Object
+ *    ˃ children: Array[1]
+ *      type: "RootNode"
+ *    ˃ __proto__: Object
+ */
 ````
-
-Note that the exported object is a function, which in turn returns brand-new parser and TextOM objects. There’s whole slew of issues that can arise from extending prototypes like (DOM) Node, NodeList, or Array—this feature however allows for multiple sandboxed environments (i.e., prototypes) without those disadvantages.
 
 ## API
 
-### ParseEnglish(source?)
+### parseEnglish.tokenizeRoot(source?)
 
 ```js
-var parse = require('parse-english')(),
-    rootNode = parse('A simple sentence.');
+var Parser = require('parse-english');
 
-rootNode; // RootNode
-rootNode.head; // ParagraphNode
-rootNode.head.head; // SentenceNode
-rootNode.head.head.head; // WordNode
-rootNode.head.head.head.toString(); // "A"
-rootNode.head.head.tail; // PunctuationNode
-rootNode.head.head.tail.toString(); // "."
+new Parser().tokenizeRoot('A simple sentence.');
+/*
+ * Object
+ * ├─ type: "RootNode"
+ * └─ children: Array[1]
+ *    └─ 0: Object
+ *          ├─ type: "ParagraphNode"
+ *          └─ children: Array[1]
+ *             └─ 0: Object
+ *                   ├─ type: "SentenceNode"
+ *                   └─ children: Array[6]
+ *                      | ...
+ */
 ```
 
-Parses a given (english) string into an object model.
+Tokenize a given document into paragraphs, sentences, words, white space, and punctionation.
 
-- `source` (`null`, `undefined`, or `String`): The english source to parse.
+- `source` (`null`, `undefined`, or `String`): The english document to parse.
+
+### parseEnglish.tokenizeParagraph(source?)
+
+```js
+var Parser = require('parse-english');
+
+new Parser().tokenizeParagraph('A simple sentence.');
+/*
+ * Object
+ * ├─ type: "ParagraphNode"
+ * └─ children: Array[1]
+ *    └─ 0: Object
+ *          ├─ type: "SentenceNode"
+ *          └─ children: Array[6]
+ *             | ...
+ */
+```
+
+Tokenize a given paragraph into sentences, words, white space, and punctionation.
+
+- `source` (`null`, `undefined`, or `String`): The english paragraph to parse.
+
+### parseEnglish.tokenizeSentence(source?)
+
+```js
+var Parser = require('parse-english');
+
+new Parser().tokenizeSentence('A simple sentence.');
+/*
+ * Object
+ * ├─ type: "SentenceNode"
+ * └─ children: Array[6]
+ *    ├─ 0: Object
+ *    |     ├─ type: "WordNode"
+ *    |     └─ value: "A"
+ *    ├─ 1: Object
+ *    |     ├─ type: "WhiteSpaceNode"
+ *    |     └─ value: " "
+ *    ├─ 2: Object
+ *    |     ├─ type: "WordNode"
+ *    |     └─ value: "simple"
+ *    ├─ 3: Object
+ *    |     ├─ type: "WhiteSpaceNode"
+ *    |     └─ value: " "
+ *    ├─ 4: Object
+ *    |     ├─ type: "WordNode"
+ *    |     └─ value: "sentence"
+ *    └─ 5: Object
+ *          ├─ type: "PunctuationNode"
+ *          └─ value: "."
+ */
+```
+
+Tokenize a given sentence into words, white space, and punctionation.
+
+- `source` (`null`, `undefined`, or `String`): The english sentence to parse.
 
 ## Browser Support
 Pretty much every browser (available through browserstack) runs all parse-english unit tests.
