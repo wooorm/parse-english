@@ -11,7 +11,6 @@
   "author": "Titus Wormer <tituswormer@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "browserify": "^4.2.0",
     "eslint": "^0.6.2",
     "istanbul": "~0.2.13",
     "jscs": "^1.5.7",
@@ -30,11 +29,11 @@
     "lint-test": "node_modules/.bin/eslint spec/parse-english.spec.js --env node --env mocha --rule 'quotes: [2, single], no-loop-func: false'",
     "lint-benchmark": "node_modules/.bin/eslint benchmark/index.js --env node --global suite,set,bench --rule 'quotes: [2, single]'",
     "lint-style": "node_modules/.bin/jscs index.js spec/parse-english.spec.js --reporter=inline",
-    "prepublish": "npm run-script build-browser",
-    "build-browser": "node_modules/.bin/browserify spec/parse-english.spec.js -o spec/browser.spec.js",
+    "install-browser-test": "npm install browserify",
+    "build-browser-test": "node_modules/.bin/browserify spec/parse-english.spec.js -o spec/browser.spec.js",
     "coverage": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- -- spec/parse-english.spec.js",
     "benchmark" : "node_modules/.bin/matcha",
-    "make": "npm run-script build-browser && npm run-script lint && npm run-script coverage"
+    "make": "npm run-script lint && npm run-script coverage"
   },
   "testling": {
     "files": "spec/parse-english.spec.js",
