@@ -524,10 +524,10 @@ EXPRESSION_WORD_CHARACTER = new RegExp('[' + GROUP_ALPHABETIC + ']');
  * @constant
  */
 EXPRESSION_SENTENCE_END = new RegExp(
-    '(\\.|[' + GROUP_TERMINAL_MARKER + ']+)' +
+    '$|(\\.|[' + GROUP_TERMINAL_MARKER + ']+)' +
     '([' + GROUP_CLOSING_PUNCTUATION + GROUP_FINAL_PUNCTUATION + '])?' +
     '([,\\.' + GROUP_NUMERICAL + '])?' +
-    '(?:(\\ +)([\\.' + GROUP_ALPHABETIC + ']))?|$',
+    '(?:(\\ +)([\\.' + GROUP_ALPHABETIC + ']))?',
 'g');
 
 /**
@@ -557,6 +557,9 @@ EXPRESSION_WHITE_SPACE = new RegExp(
  * `BREAKPOINT_SORT` sorts breakpoints (an array of integers): Small to
  * large.
  *
+ * @param {Number} a - the first integer.
+ * @param {Number} b - the second integer.
+ * @return {Number} - the result of substracting b from a.
  * @global
  * @private
  */
@@ -567,6 +570,8 @@ function BREAKPOINT_SORT(a, b) {
 /**
  * `validateInput` validates the input for tokenize* methods.
  *
+ * @param {String?} value - The value to validate / convert to a string.
+ * @return {String} - the converted string.
  * @global
  * @private
  */
@@ -586,8 +591,10 @@ function validateInput(value) {
 }
 
 /**
- * `tokenizerFactory` validates the input for a tokenizer.
+ * `tokenizerFactory` validates the input, before passing it to a tokenizer.
  *
+ * @param {Function} tokenizer - The tokenizer to wrap.
+ * @return {Object} - An AST object returned by the tokenizer.
  * @global
  * @private
  */
@@ -600,10 +607,10 @@ function tokenizerFactory(tokenizer) {
 /*eslint-disable no-cond-assign */
 
 /**
- * `tokenizeWord` tokenizes a word.
+ * `tokenizeWord` tokenizes a word token.
  *
  * @param {String} value - The word to parse.
- * @return {WordNode} - The given WordNode.
+ * @return {Object} - An AST object representing the given word.
  * @global
  * @private
  */
@@ -615,10 +622,10 @@ function tokenizeWord(value) {
 }
 
 /**
- * `tokenizeWhiteSpace` tokenizes white space.
+ * `tokenizeWhiteSpace` tokenizes a white space token.
  *
  * @param {String} value - The white space to parse.
- * @return {WhiteSpaceNode} - The given WhiteSpaceNode.
+ * @return {Object} - An AST object representing the given white space.
  * @global
  * @private
  */
@@ -630,10 +637,10 @@ function tokenizeWhiteSpace(value) {
 }
 
 /**
- * `tokenizePunctuation` tokenizes punctuation.
+ * `tokenizePunctuation` tokenizes a punctuation token.
  *
  * @param {String} value - The punctuation to parse.
- * @return {PunctuationNode} - The given PunctuationNode.
+ * @return {Object} - An AST object representing the given punctuation.
  * @global
  * @private
  */
@@ -645,22 +652,22 @@ function tokenizePunctuation(value) {
 }
 
 /**
- * `tokenizeSentence` tokenizes a sentence into `WordNode`s,
- * `PunctuationNode`s, and `WhiteSpaceNode`s.
+ * `tokenizeSentence` tokenizes a sentence into words, punctuation, and white
+ * space (which in turn all get tokenized).
  *
- * @param {String} value - The words, punctuation, and white space to
- *                         parse.
- * @return {SentenceNode} - The given SentenceNode.
+ * @param {String} value - The sentence to parse.
+ * @return {Object} - An AST object representing the given sentence.
  * @global
  * @private
  */
 function tokenizeSentence(value) {
-    var tokenBreakPoints = [],
+    var breakpoints = [],
         tokens = [],
         iterator = -1,
         length = EXPRESSION_WORD_CONTRACTION.length,
         sentence, children, expression, pointer, match, token, start, end;
 
+    /* Construct an AST object for the sentence. */
     sentence = {
         'type' : 'SentenceNode',
         'children' : []
@@ -668,93 +675,110 @@ function tokenizeSentence(value) {
 
     children = sentence.children;
 
+    /* Reset indexes on expressions. */
     EXPRESSION_WORD_DIGIT_LETTER.lastIndex =
         EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
 
-    /* Insert word-like break points. */
-
-    /* Break between contractions consisting of two parts. */
+    /* Insert breakpoints between contractions. */
     while (++iterator < length) {
         expression = EXPRESSION_WORD_CONTRACTION[iterator];
+
+        /* Reset index on the expression. */
         expression.lastIndex = 0;
 
+        /*
+         * Iterate over all contractions in the given source, and insert a
+         * breakpoint after the first match.
+         */
         while (match = expression.exec(value)) {
-            tokenBreakPoints.push(match.index + match[1].length);
+            breakpoints.push(match.index + match[1].length);
         }
     }
 
     /*
-     * Break on general punctuation (One or more of the same
-     * non-letter or non-number character.
+     * Inser breakpoints before and after general punctuation (One or more
+     * of the same non-letter or non-number character), unless the
+     * punctuation consists solely of combining diacritics.
      */
     while (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(value)) {
-        if (EXPRESSION_WORD_COMBINING.test(match[0])) {
-            continue;
+        if (!EXPRESSION_WORD_COMBINING.test(match[0])) {
+            breakpoints.push(match.index, match.index + match[0].length);
         }
-
-        pointer = match.index;
-        tokenBreakPoints.push(pointer);
-        tokenBreakPoints.push(pointer + match[0].length);
     }
 
-    /* Break on one or more digits followed by one or more letters. */
+    /*
+     * Break on one or more digits followed by one or more letters, unless
+     * those letters are an ordinal suffix
+     */
     while (match = EXPRESSION_WORD_DIGIT_LETTER.exec(value)) {
         if (!EXPRESSION_ORDINAL.test(match[2])) {
-            tokenBreakPoints.push(match.index + match[1].length);
+            breakpoints.push(match.index + match[1].length);
         }
     }
 
-    tokenBreakPoints.sort(BREAKPOINT_SORT);
+    /* Sort the breakpoints from small to large. */
+    breakpoints.sort(BREAKPOINT_SORT);
 
     iterator = -1;
-    length = tokenBreakPoints.length + 1;
+    length = breakpoints.length + 1;
     start = 0;
 
     while (++iterator < length) {
-        end = tokenBreakPoints[iterator];
+        end = breakpoints[iterator];
 
         /* Skip if the previous end is the same. */
         if (end === 0 || start === end) {
             continue;
         }
 
-        tokens.push(value.substring(start, end || value.length));
+        token = value.substring(start, end || value.length);
 
-        start = end;
-    }
+        if (!token) {
+            continue;
+        }
 
-    /* Iterate over the non-empty tokens, detect type of token. */
-    iterator = -1;
-    EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
-
-    while (token = tokens[++iterator]) {
         EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
 
         /*
-         * Append a new item (glue or box) to the list, and pass it the
-         * string value and the item its in.
+         * If the token consists solely of white space, tokenize it as white
+         * space and add it to the sentences children.
          */
         if (EXPRESSION_WHITE_SPACE.test(token)) {
             children.push(this.tokenizeWhiteSpace(token));
+        /*
+         * If the token contains a punctuation mark, and if that mark is not
+         * a combining diacritical mark, tokenize it as punctuation and add
+         * it to the sentences children.
+         */
         } else if (
             (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(token)) &&
             !EXPRESSION_WORD_COMBINING.test(match[0])
         ) {
             children.push(this.tokenizePunctuation(token));
+        /*
+         * Otherwise, tokenize it as a word, and add it to the sentences
+         * children.
+         */
         } else {
             children.push(this.tokenizeWord(token));
         }
+
+        /*
+         * Continue on with the next iteration, starting at the current end.
+         */
+        start = end;
     }
 
+    /* Return the AST object (now with children) of the sentence. */
     return sentence;
 }
 
 /**
- * `tokenizeParagraph` tokenizes a paragraph into `SentenceNode`s and
- * `WhiteSpaceNode`s.
+ * `tokenizeParagraph` tokenizes a paragraph into sentences and white
+ * space (which in turn all get tokenized).
  *
- * @param {String} value - The sentences and white space to parse.
- * @return {ParagraphNode} - The given ParagraphNode.
+ * @param {String} value - The paragraph to parse.
+ * @return {Object} - An AST object representing the given paragraph.
  * @global
  * @private
  */
@@ -762,8 +786,10 @@ function tokenizeParagraph(value) {
     var sentences = [],
         blacklist = {},
         iterator = -1,
-        paragraph, children, start, sentence, match, $5, end, whiteSpace;
+        start = 0,
+        paragraph, children, sentence, whiteSpace, end, match, $5;
 
+    /* Construct an AST object for the paragraph. */
     paragraph = {
         'type' : 'ParagraphNode',
         'children' : []
@@ -771,6 +797,7 @@ function tokenizeParagraph(value) {
 
     children = paragraph.children;
 
+    /* Reset indexes on expressions. */
     EXPRESSION_SENTENCE_END.lastIndex =
         EXPRESSION_ABBREVIATION_PREFIX.lastIndex =
         EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE.lastIndex =
@@ -791,36 +818,33 @@ function tokenizeParagraph(value) {
         blacklist[match.index] = true;
     }
 
-    start = 0;
-
     /*
-     * A probable sentence end: A terminal marker (`?`, `!`, or `.`),
-     * followed by an optional closing punctuation (e.g., `)` or `”`),
-     * followed by an optional comma or full stop, followed by an optional
-     * comma or dot, optionally followed by one or more spaces and a
-     * letter.
+     * A probable sentence end, either $ (end of value), or:
+     *   - A terminal marker (a full-stop, or multiple `?`, `!`, or `‽`
+     *     characters).
+     *   - Optionally followed by a closing or final punctuation (e.g., `)` or
+     *     `”`).
+     *   - Optionally followed by a comma, full stop, or number.
+     *   - Optionally followed by a comma, full stop, or number.
+     *   - Optionally followed by both:
+     *      - One or more spaces.
+     *      - A full-stop or a letter.
      */
     while (match = EXPRESSION_SENTENCE_END.exec(value)) {
         /*
-         * The probable sentence end is blacklisted, thus in an abbreviation.
-         */
-        if (match.index in blacklist) {
-            continue;
-        }
-
-        /*
+         * If the index is is blacklisted, thus in an abbreviation, continue.
+         *
          * If three was set, the delimiter is followed by a comma character,
-         * or a number, thus it's probably not a terminal
-         * marker.
+         * or a number, thus it's probably not a terminal marker.
          */
-        if (match[3]) {
+        if (match.index in blacklist || match[3]) {
             continue;
         }
 
         $5 = match[5];
 
         /*
-         * If four was set, the delimiter is followed by a space and a letter.
+         * If five was set, the delimiter is followed by a space and a letter.
          * If that letter is lowercase, its probably not a terminal marker.
          */
         if ($5 && $5 === $5.toLowerCase()) {
@@ -859,45 +883,56 @@ function tokenizeParagraph(value) {
          * The expression also matches $ (end-of-string), which keeps on
          * matching in global state, thus we detect it here and exit the loop.
          */
-        if (EXPRESSION_SENTENCE_END.lastIndex === value.length) {
+        if (end === value.length) {
             break;
         }
 
+        /*
+         * Continue on with the next iteration, starting at the current end.
+         */
         start = end;
     }
 
     /*
-     * Walk over the previously sentences, break of their white space, and
-     * transform them into the object model.
+     * Walk over the previously defined sentences, break off their initial
+     * white space, and transform them into an AST.
      */
     while (sentence = sentences[++iterator]) {
-        match = EXPRESSION_INITIAL_WHITE_SPACE.exec(sentence);
-        whiteSpace = match[0];
+        whiteSpace = EXPRESSION_INITIAL_WHITE_SPACE.exec(sentence)[0];
 
+        /*
+         * If the sentence contains initial white space, break it off and
+         * add it to paragraphs children.
+         */
         if (whiteSpace) {
             children.push(this.tokenizeWhiteSpace(whiteSpace));
         }
 
+        /*
+         * Add the rest of the sentence (the actual sentence) to paragraphs
+         * children.
+         */
         children.push(this.tokenizeSentence(
             sentence.substring(whiteSpace.length))
         );
     }
 
+    /* Return the AST object (now with children) of the paragraph. */
     return paragraph;
 }
 
 /**
- * `tokenizeRoot` tokenizes a document into `ParagraphNode`s and
- * `WhiteSpaceNode`s.
+ * `tokenizeRoot` tokenizes a document into paragraphs and white space (which
+ * in turn all get tokenized).
  *
  * @param {String} value - The paragraphs and white space to parse.
- * @return {RootNode} - The given RootNode.
+ * @return {Object} - An AST object representing the given document.
  * @global
  * @private
  */
 function tokenizeRoot(value) {
     var start = 0,
-        root, match, end, children, paragraph, whiteSpace;
+        root, children, match, end, paragraph, whiteSpace;
 
     root = {
         'type' : 'RootNode',
@@ -930,21 +965,25 @@ function tokenizeRoot(value) {
          * The expression also matches $ (end-of-string), which keeps on
          * matching in global state, thus we detect it here and exit the loop.
          */
-        if (EXPRESSION_MULTILINEBREAK.lastIndex === value.length) {
+        if (end === value.length) {
             break;
         }
 
+        /*
+         * Continue on with the next iteration, starting at the current end.
+         */
         start = end;
     }
 
+    /* Return the AST object (now with children) of the document. */
     return root;
 }
 
 /*eslint-enable no-cond-assign */
 
 /**
- * `Parser` parses a given english (or latin) document into root,
- * paragraphs, sentences, words, punctuation, and white space AST “nodes”.
+ * `Parser` contains the functions needed to tokenize english natural
+ * language into an AST.
  *
  * @constructor
  * @api public
