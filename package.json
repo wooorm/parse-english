@@ -1,27 +1,22 @@
 {
   "name": "parse-english",
   "version": "0.0.24",
-  "description": "English (natural language) parser build on TextOM",
+  "description": "English (natural language) parser",
   "keywords": [
     "english",
     "natural",
     "language",
-    "parser",
-    "textom"
+    "parser"
   ],
   "author": "Titus Wormer <tituswormer@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "textom": "~0.0.20"
-  },
   "devDependencies": {
     "browserify": "^4.2.0",
     "eslint": "^0.6.2",
     "istanbul": "~0.2.13",
     "jscs": "^1.5.7",
     "matcha": "^0.5.0",
-    "mocha": "~1.20.1",
-    "retext-ast": "~0.0.4"
+    "mocha": "~1.20.1"
   },
   "repository": {
     "type": "git",

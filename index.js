@@ -1,6 +1,6 @@
 'use strict';
 
-var textom, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
+var GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     GROUP_COMBINING_DIACRITICAL_MARK, GROUP_TERMINAL_MARKER,
     GROUP_CLOSING_PUNCTUATION, GROUP_FINAL_PUNCTUATION,
     EXPRESSION_WORD_CONTRACTION, EXPRESSION_WORD_MULTIPUNCTUATION,
@@ -10,11 +10,6 @@ var textom, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     EXPRESSION_SENTENCE_END, EXPRESSION_WORD_COMBINING, EXPRESSION_ORDINAL,
     EXPRESSION_INITIAL_WHITE_SPACE, EXPRESSION_WHITE_SPACE,
     GROUP_COMBINING_NONSPACING_MARK, parserPrototype;
-
-/**
- * Module dependencies.
- */
-textom = require('textom');
 
 /**
  * Expose `expand`. Expands a list of Unicode code points and ranges to
@@ -578,10 +573,7 @@ function BREAKPOINT_SORT(a, b) {
 function validateInput(value) {
     if (value === null || value === undefined) {
         value = '';
-    } else if (
-        value instanceof String ||
-        (value.TextOM && value instanceof value.TextOM.Node)
-    ) {
+    } else if (value instanceof String) {
         value = value.toString();
     }
 
@@ -604,7 +596,10 @@ function validateInput(value) {
  * @private
  */
 function tokenizeWord(value) {
-    return new this.TextOM.WordNode(validateInput(value));
+    return {
+        'type' : 'WordNode',
+        'value' : validateInput(value)
+    };
 }
 
 /**
@@ -616,7 +611,10 @@ function tokenizeWord(value) {
  * @private
  */
 function tokenizeWhiteSpace(value) {
-    return new this.TextOM.WhiteSpaceNode(validateInput(value));
+    return {
+        'type' : 'WhiteSpaceNode',
+        'value' : validateInput(value)
+    };
 }
 
 /**
@@ -628,7 +626,10 @@ function tokenizeWhiteSpace(value) {
  * @private
  */
 function tokenizePunctuation(value) {
-    return new this.TextOM.PunctuationNode(validateInput(value));
+    return {
+        'type' : 'PunctuationNode',
+        'value' : validateInput(value)
+    };
 }
 
 /**
@@ -642,14 +643,20 @@ function tokenizePunctuation(value) {
  * @private
  */
 function tokenizeSentence(value) {
-    var sentence = new this.TextOM.SentenceNode(),
-        tokenBreakPoints = [],
+    var tokenBreakPoints = [],
         tokens = [],
         iterator = -1,
         length = EXPRESSION_WORD_CONTRACTION.length,
-        expression, pointer, match, token, start, end;
+        sentence, children, expression, pointer, match, token, start, end;
 
     value = validateInput(value);
+
+    sentence = {
+        'type' : 'SentenceNode',
+        'children' : []
+    };
+
+    children = sentence.children;
 
     EXPRESSION_WORD_DIGIT_LETTER.lastIndex =
         EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
@@ -718,14 +725,14 @@ function tokenizeSentence(value) {
          * string value and the item its in.
          */
         if (EXPRESSION_WHITE_SPACE.test(token)) {
-            sentence.append(this.tokenizeWhiteSpace(token));
+            children.push(this.tokenizeWhiteSpace(token));
         } else if (
             (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(token)) &&
             !EXPRESSION_WORD_COMBINING.test(match[0])
         ) {
-            sentence.append(this.tokenizePunctuation(token));
+            children.push(this.tokenizePunctuation(token));
         } else {
-            sentence.append(this.tokenizeWord(token));
+            children.push(this.tokenizeWord(token));
         }
     }
 
@@ -742,13 +749,19 @@ function tokenizeSentence(value) {
  * @private
  */
 function tokenizeParagraph(value) {
-    var paragraph = new this.TextOM.ParagraphNode(),
-        sentences = [],
+    var sentences = [],
         blacklist = {},
         iterator = -1,
-        start, sentence, match, $5, end, whiteSpace;
+        paragraph, children, start, sentence, match, $5, end, whiteSpace;
 
     value = validateInput(value);
+
+    paragraph = {
+        'type' : 'ParagraphNode',
+        'children' : []
+    };
+
+    children = paragraph.children;
 
     EXPRESSION_SENTENCE_END.lastIndex =
         EXPRESSION_ABBREVIATION_PREFIX.lastIndex =
@@ -854,10 +867,10 @@ function tokenizeParagraph(value) {
         whiteSpace = match[0];
 
         if (whiteSpace) {
-            paragraph.append(this.tokenizeWhiteSpace(whiteSpace));
+            children.push(this.tokenizeWhiteSpace(whiteSpace));
         }
 
-        paragraph.append(this.tokenizeSentence(
+        children.push(this.tokenizeSentence(
             sentence.substring(whiteSpace.length))
         );
     }
@@ -875,15 +888,21 @@ function tokenizeParagraph(value) {
  * @private
  */
 function tokenizeRoot(value) {
-    var root = new this.TextOM.RootNode(),
-        start = 0,
-        match, end, paragraph, whiteSpace;
+    var start = 0,
+        root, match, end, children, paragraph, whiteSpace;
+
+    root = {
+        'type' : 'RootNode',
+        'children' : []
+    };
 
     value = validateInput(value);
 
     if (!value) {
         return root;
     }
+
+    children = root.children;
 
     EXPRESSION_MULTILINEBREAK.lastIndex = 0;
 
@@ -894,11 +913,11 @@ function tokenizeRoot(value) {
         whiteSpace = value.substring(match.index, end);
 
         if (paragraph) {
-            root.append(this.tokenizeParagraph(paragraph));
+            children.push(this.tokenizeParagraph(paragraph));
         }
 
         if (whiteSpace) {
-            root.append(this.tokenizeWhiteSpace(whiteSpace));
+            children.push(this.tokenizeWhiteSpace(whiteSpace));
         }
 
         /*
@@ -919,8 +938,7 @@ function tokenizeRoot(value) {
 
 /**
  * `Parser` parses a given english (or latin) document into root,
- * paragraphs, sentences, words, punctuation, and white space “nodes”.
- * For more information about nodes see TextOM.
+ * paragraphs, sentences, words, punctuation, and white space AST “nodes”.
  *
  * @constructor
  * @api public
@@ -933,48 +951,6 @@ function Parser() {
     if (!(this instanceof Parser)) {
         return new Parser();
     }
-
-    var TextOM = textom(),
-        types = [],
-        key, Constructor, prototype;
-
-    for (key in TextOM) {
-        /* istanbul ignore else */
-        if (TextOM.hasOwnProperty(key)) {
-            Constructor = TextOM[key];
-            prototype = Constructor && Constructor.prototype;
-
-            if (prototype && 'type' in prototype) {
-                types[prototype.type] = key;
-            }
-        }
-    }
-
-    /**
-     * Expose `parser` on every node.
-     *
-     * @api public
-     * @memberof TextOM.Node.prototype
-     */
-    TextOM.Node.prototype.parser = this;
-
-    /**
-     * Expose `TextOM`.
-     *
-     * @api public
-     * @memberof parser
-     * @constructor
-     */
-    this.TextOM = TextOM;
-
-    /**
-     * Expose `types`.
-     *
-     * @api public
-     * @memberof TextOM
-     * @constructor
-     */
-    TextOM.types = types;
 }
 
 parserPrototype = Parser.prototype;

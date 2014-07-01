@@ -1,7 +1,7 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-var textom, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
+var GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     GROUP_COMBINING_DIACRITICAL_MARK, GROUP_TERMINAL_MARKER,
     GROUP_CLOSING_PUNCTUATION, GROUP_FINAL_PUNCTUATION,
     EXPRESSION_WORD_CONTRACTION, EXPRESSION_WORD_MULTIPUNCTUATION,
@@ -11,11 +11,6 @@ var textom, GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     EXPRESSION_SENTENCE_END, EXPRESSION_WORD_COMBINING, EXPRESSION_ORDINAL,
     EXPRESSION_INITIAL_WHITE_SPACE, EXPRESSION_WHITE_SPACE,
     GROUP_COMBINING_NONSPACING_MARK, parserPrototype;
-
-/**
- * Module dependencies.
- */
-textom = require('textom');
 
 /**
  * Expose `expand`. Expands a list of Unicode code points and ranges to
@@ -579,10 +574,7 @@ function BREAKPOINT_SORT(a, b) {
 function validateInput(value) {
     if (value === null || value === undefined) {
         value = '';
-    } else if (
-        value instanceof String ||
-        (value.TextOM && value instanceof value.TextOM.Node)
-    ) {
+    } else if (value instanceof String) {
         value = value.toString();
     }
 
@@ -605,7 +597,10 @@ function validateInput(value) {
  * @private
  */
 function tokenizeWord(value) {
-    return new this.TextOM.WordNode(validateInput(value));
+    return {
+        'type' : 'WordNode',
+        'value' : validateInput(value)
+    };
 }
 
 /**
@@ -617,7 +612,10 @@ function tokenizeWord(value) {
  * @private
  */
 function tokenizeWhiteSpace(value) {
-    return new this.TextOM.WhiteSpaceNode(validateInput(value));
+    return {
+        'type' : 'WhiteSpaceNode',
+        'value' : validateInput(value)
+    };
 }
 
 /**
@@ -629,7 +627,10 @@ function tokenizeWhiteSpace(value) {
  * @private
  */
 function tokenizePunctuation(value) {
-    return new this.TextOM.PunctuationNode(validateInput(value));
+    return {
+        'type' : 'PunctuationNode',
+        'value' : validateInput(value)
+    };
 }
 
 /**
@@ -643,14 +644,20 @@ function tokenizePunctuation(value) {
  * @private
  */
 function tokenizeSentence(value) {
-    var sentence = new this.TextOM.SentenceNode(),
-        tokenBreakPoints = [],
+    var tokenBreakPoints = [],
         tokens = [],
         iterator = -1,
         length = EXPRESSION_WORD_CONTRACTION.length,
-        expression, pointer, match, token, start, end;
+        sentence, children, expression, pointer, match, token, start, end;
 
     value = validateInput(value);
+
+    sentence = {
+        'type' : 'SentenceNode',
+        'children' : []
+    };
+
+    children = sentence.children;
 
     EXPRESSION_WORD_DIGIT_LETTER.lastIndex =
         EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
@@ -719,14 +726,14 @@ function tokenizeSentence(value) {
          * string value and the item its in.
          */
         if (EXPRESSION_WHITE_SPACE.test(token)) {
-            sentence.append(this.tokenizeWhiteSpace(token));
+            children.push(this.tokenizeWhiteSpace(token));
         } else if (
             (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(token)) &&
             !EXPRESSION_WORD_COMBINING.test(match[0])
         ) {
-            sentence.append(this.tokenizePunctuation(token));
+            children.push(this.tokenizePunctuation(token));
         } else {
-            sentence.append(this.tokenizeWord(token));
+            children.push(this.tokenizeWord(token));
         }
     }
 
@@ -743,13 +750,19 @@ function tokenizeSentence(value) {
  * @private
  */
 function tokenizeParagraph(value) {
-    var paragraph = new this.TextOM.ParagraphNode(),
-        sentences = [],
+    var sentences = [],
         blacklist = {},
         iterator = -1,
-        start, sentence, match, $5, end, whiteSpace;
+        paragraph, children, start, sentence, match, $5, end, whiteSpace;
 
     value = validateInput(value);
+
+    paragraph = {
+        'type' : 'ParagraphNode',
+        'children' : []
+    };
+
+    children = paragraph.children;
 
     EXPRESSION_SENTENCE_END.lastIndex =
         EXPRESSION_ABBREVIATION_PREFIX.lastIndex =
@@ -855,10 +868,10 @@ function tokenizeParagraph(value) {
         whiteSpace = match[0];
 
         if (whiteSpace) {
-            paragraph.append(this.tokenizeWhiteSpace(whiteSpace));
+            children.push(this.tokenizeWhiteSpace(whiteSpace));
         }
 
-        paragraph.append(this.tokenizeSentence(
+        children.push(this.tokenizeSentence(
             sentence.substring(whiteSpace.length))
         );
     }
@@ -876,15 +889,21 @@ function tokenizeParagraph(value) {
  * @private
  */
 function tokenizeRoot(value) {
-    var root = new this.TextOM.RootNode(),
-        start = 0,
-        match, end, paragraph, whiteSpace;
+    var start = 0,
+        root, match, end, children, paragraph, whiteSpace;
+
+    root = {
+        'type' : 'RootNode',
+        'children' : []
+    };
 
     value = validateInput(value);
 
     if (!value) {
         return root;
     }
+
+    children = root.children;
 
     EXPRESSION_MULTILINEBREAK.lastIndex = 0;
 
@@ -895,11 +914,11 @@ function tokenizeRoot(value) {
         whiteSpace = value.substring(match.index, end);
 
         if (paragraph) {
-            root.append(this.tokenizeParagraph(paragraph));
+            children.push(this.tokenizeParagraph(paragraph));
         }
 
         if (whiteSpace) {
-            root.append(this.tokenizeWhiteSpace(whiteSpace));
+            children.push(this.tokenizeWhiteSpace(whiteSpace));
         }
 
         /*
@@ -920,8 +939,7 @@ function tokenizeRoot(value) {
 
 /**
  * `Parser` parses a given english (or latin) document into root,
- * paragraphs, sentences, words, punctuation, and white space “nodes”.
- * For more information about nodes see TextOM.
+ * paragraphs, sentences, words, punctuation, and white space AST “nodes”.
  *
  * @constructor
  * @api public
@@ -934,48 +952,6 @@ function Parser() {
     if (!(this instanceof Parser)) {
         return new Parser();
     }
-
-    var TextOM = textom(),
-        types = [],
-        key, Constructor, prototype;
-
-    for (key in TextOM) {
-        /* istanbul ignore else */
-        if (TextOM.hasOwnProperty(key)) {
-            Constructor = TextOM[key];
-            prototype = Constructor && Constructor.prototype;
-
-            if (prototype && 'type' in prototype) {
-                types[prototype.type] = key;
-            }
-        }
-    }
-
-    /**
-     * Expose `parser` on every node.
-     *
-     * @api public
-     * @memberof TextOM.Node.prototype
-     */
-    TextOM.Node.prototype.parser = this;
-
-    /**
-     * Expose `TextOM`.
-     *
-     * @api public
-     * @memberof parser
-     * @constructor
-     */
-    this.TextOM = TextOM;
-
-    /**
-     * Expose `types`.
-     *
-     * @api public
-     * @memberof TextOM
-     * @constructor
-     */
-    TextOM.types = types;
 }
 
 parserPrototype = Parser.prototype;
@@ -989,7 +965,7 @@ parserPrototype.tokenizeWhiteSpace = tokenizeWhiteSpace;
 
 module.exports = Parser;
 
-},{"textom":8}],2:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
 //
 // THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
@@ -2041,1213 +2017,11 @@ process.chdir = function (dir) {
 },{}],7:[function(require,module,exports){
 'use strict';
 
-exports = module.exports = function () {};
-
-/* istanbul ignore if: User forgot a polyfill much? */
-if (!JSON) {
-    throw new Error('Missing JSON object for reparser');
-}
-
-/**
- * `fromJSON` converts a given (stringified?) JSON AST into a node.
- *
- * @param {Object} TextOM - The TextOM to get nodes from.
- * @param {Object|String} ast - The AST to convert.
- * @return {Object} - The parsed node.
- * @global
- * @private
- */
-function fromJSON(TextOM, ast) {
-    var iterator = -1,
-        children, node;
-
-    if (ast instanceof String) {
-        ast = ast.toString();
-    }
-
-    if (typeof ast === 'string') {
-        ast = JSON.parse(ast);
-    } else if ({}.toString.call(ast) !== '[object Object]') {
-        throw new TypeError('Illegal invocation: \'' + ast +
-            '\' is not a valid argument for \'fromAST\'');
-    }
-
-    if (!('type' in ast && ('value' in ast || 'children' in ast))) {
-        throw new TypeError('Illegal invocation: \'' + ast +
-            '\' is not a valid argument for \'fromAST\' (it\'s ' +
-            'missing the `type`, and either `value` or `children` ' +
-            'attributes)');
-    }
-
-    node = new TextOM[ast.type]();
-
-    if ('children' in ast) {
-        iterator = -1;
-        children = ast.children;
-
-        while (children[++iterator]) {
-            node.append(fromJSON(TextOM, children[iterator]));
-        }
-    } else {
-        node.fromString(ast.value);
-    }
-
-    return node;
-}
-
-/**
- * `fromAST` converts a given (stringified?) AST into a node.
- *
- * @param {Object|String} ast - The AST to convert.
- * @return {Object} - The parsed node.
- * @global
- * @private
- */
-function fromAST(ast) {
-    return this.parse(fromJSON(this.parser.TextOM, ast));
-}
-
-/**
- * `toJSON` converts the given node to a JSON object.
- *
- * @return {Object} - A simple object containing the nodes type, and
- *                    either a children attribute containing an array
- *                    the result of `toJSON` on each child, or a value
- *                    attribute containing the nodes internal value.
- * @global
- * @private
- */
-function toJSON() {
-    var self = this,
-        ast, result, item;
-
-    if (!self || !self.TextOM) {
-        throw new TypeError('Illegal invocation: \'' + self +
-            '\' is not a valid argument for \'toJSON\'');
-    }
-
-    ast = {
-        'type' : self.TextOM.types[self.type]
-    };
-
-    if (!('length' in self)) {
-        ast.value = self.toString();
-    } else {
-        result = [];
-        item = self.head;
-
-        while (item) {
-            result.push(item.toJSON());
-            item = item.next;
-        }
-
-        ast.children = result;
-    }
-
-    return ast;
-}
-
-/**
- * `toAST` converts the operated on node into an stringified JSON object.
- *
- * @param {?(String|Number)} delimiter - When given, pretty prints the
- *                                       stringified object—indenting
- *                                       each level either with the given
- *                                       string or with the given number
- *                                       of spaces.
- * @return {String} - The `JSON.stringify`d result of the simple object
- *                    representation of the operated on node.
- * @global
- * @private
- */
-function toAST(delimiter) {
-    return JSON.stringify(this, null, delimiter);
-}
-
-function attach(retext) {
-    var parser = retext.parser,
-        nodePrototype = parser.TextOM.Node.prototype;
-
-    /**
-     * `toAST` converts the operated on node into an stringified JSON object.
-     *
-     * @param {?(String|Number)} delimiter - When given, pretty prints the
-     *                                       stringified object—indenting
-     *                                       each level either with the given
-     *                                       string or with the given number
-     *                                       of spaces.
-     * @return {String} - The `JSON.stringify`d result of the simple object
-     *                    representation of the operated on node.
-     * @api public
-     * @memberof Node.prototype
-     */
-    nodePrototype.toAST = toAST;
-
-    /**
-     * `toAST` converts the operated on node into an JSON object.
-     *
-     * @return {Object} - A JSON representation without all the cyclical
-     *                    TextOM things.
-     * @api public
-     * @memberof Node.prototype
-     */
-    nodePrototype.toJSON = toJSON;
-
-    /**
-     * Expose `fromAST`.
-     *
-     * @param {Object|String} ast - The AST to convert.
-     * @return {Object} - A TextOM object model.
-     * @api public
-     * @memberof retext
-     */
-    retext.fromAST = fromAST;
-}
-
-/**
- * Expose `attach`.
- * @memberof exports
- */
-exports.attach = attach;
-
-/**
- * Expose `toJSON`.
- * @memberof exports
- */
-exports.toJSON = toJSON;
-
-/**
- * Expose `toAST`.
- * @memberof exports
- */
-exports.toAST = toAST;
-
-},{}],8:[function(require,module,exports){
-'use strict';
-
-/**
- * Utilities.
- */
-var arrayPrototype = Array.prototype,
-    arrayUnshift = arrayPrototype.unshift,
-    arrayPush = arrayPrototype.push,
-    arraySlice = arrayPrototype.slice,
-    arrayIndexOf = arrayPrototype.indexOf,
-    arraySplice = arrayPrototype.splice;
-
-/* istanbul ignore if: User forgot a polyfill much? */
-if (!arrayIndexOf) {
-    throw new Error('Missing Array#indexOf() method for TextOM');
-}
-
-function fire(context, callbacks, args) {
-    var iterator = -1;
-
-    if (!callbacks || !callbacks.length) {
-        return;
-    }
-
-    callbacks = callbacks.concat();
-
-    while (callbacks[++iterator]) {
-        callbacks[iterator].apply(context, args);
-    }
-
-    return;
-}
-
-function trigger(context, name) {
-    var args = arraySlice.call(arguments, 2),
-        callbacks;
-
-    while (context) {
-        callbacks = context.callbacks;
-        if (callbacks) {
-            fire(context, callbacks[name], args);
-        }
-
-        callbacks = context.constructor.callbacks;
-        if (callbacks) {
-            fire(context, callbacks[name], args);
-        }
-
-        context = context.parent;
-    }
-}
-
-function emit(context, name) {
-    var args = arraySlice.call(arguments, 2),
-        constructors = context.constructor.constructors,
-        iterator = -1,
-        callbacks = context.callbacks;
-
-    if (callbacks) {
-        fire(context, callbacks[name], args);
-    }
-
-    /* istanbul ignore if: Wrong-usage */
-    if (!constructors) {
-        return;
-    }
-
-    while (constructors[++iterator]) {
-        callbacks = constructors[iterator].callbacks;
-
-        if (callbacks) {
-            fire(context, callbacks[name], args);
-        }
-    }
-}
-
-/**
- * Inserts the given `child` after (when given), the `item`, and otherwise as
- * the first item of the given parents.
- *
- * @param {Object} parent
- * @param {Object} item
- * @param {Object} child
- * @api private
- */
-function insert(parent, item, child) {
-    var next;
-
-    if (!parent) {
-        throw new TypeError('Illegal invocation: \'' + parent +
-            ' is not a valid argument for \'insert\'');
-    }
-
-    if (!child) {
-        throw new TypeError('\'' + child +
-            ' is not a valid argument for \'insert\'');
-    }
-
-    if ('hierarchy' in child && 'hierarchy' in parent) {
-        if (parent.hierarchy + 1 !== child.hierarchy) {
-            throw new Error('HierarchyError: The operation would ' +
-                'yield an incorrect node tree');
-        }
-    }
-
-    if (typeof child.remove !== 'function') {
-        throw new Error('The operated on node did not have a ' +
-            '`remove` method');
-    }
-
-    /* Insert after... */
-    if (item) {
-        /* istanbul ignore if: Wrong-usage */
-        if (item.parent !== parent) {
-            throw new Error('The operated on node (the "pointer") ' +
-                'was detached from the parent');
-        }
-
-        /* istanbul ignore if: Wrong-usage */
-        if (arrayIndexOf.call(parent, item) === -1) {
-            throw new Error('The operated on node (the "pointer") ' +
-                'was attached to its parent, but the parent has no ' +
-                'indice corresponding to the item');
-        }
-    }
-
-    /* Detach the child. */
-    child.remove();
-
-    /* Set the child's parent to items parent. */
-    child.parent = parent;
-
-    if (item) {
-        next = item.next;
-
-        /* If item has a next node... */
-        if (next) {
-            /* ...link the child's next node, to items next node. */
-            child.next = next;
-
-            /* ...link the next nodes previous node, to the child. */
-            next.prev = child;
-        }
-
-        /* Set the child's previous node to item. */
-        child.prev = item;
-
-        /* Set the next node of item to the child. */
-        item.next = child;
-
-        /* If the parent has no last node or if item is the parent last node,
-         * link the parents last node to the child. */
-        if (item === parent.tail || !parent.tail) {
-            parent.tail = child;
-            arrayPush.call(parent, child);
-        /* Else, insert the child into the parent after the items index. */
-        } else {
-            arraySplice.call(
-                parent, arrayIndexOf.call(parent, item) + 1, 0, child
-            );
-        }
-    /* If parent has a first node... */
-    } else if (parent.head) {
-        next = parent.head;
-
-        /* Set the child's next node to head. */
-        child.next = next;
-
-        /* Set the previous node of head to the child. */
-        next.prev = child;
-
-        /* Set the parents heads to the child. */
-        parent.head = child;
-
-        /* If the the parent has no last node, link the parents last node to
-         * head. */
-        if (!parent.tail) {
-            parent.tail = next;
-        }
-
-        arrayUnshift.call(parent, child);
-    /* Prepend. There is no `head` (or `tail`) node yet. */
-    } else {
-        /* Set parent's first node to the prependee and return the child. */
-        parent.head = child;
-        parent[0] = child;
-        parent.length = 1;
-    }
-
-    next = child.next;
-
-    emit(child, 'insert');
-
-    if (item) {
-        emit(item, 'changenext', child, next);
-        emit(child, 'changeprev', item, null);
-    }
-
-    if (next) {
-        emit(next, 'changeprev', child, item);
-        emit(child, 'changenext', next, null);
-    }
-
-    trigger(parent, 'insertinside', child);
-
-    return child;
-}
-
-/**
- * Detach a node from its (when applicable) parent, links its (when
- * existing) previous and next items to each other.
- *
- * @param {Object} node
- * @api private
- */
-function remove(node) {
-    /* istanbul ignore if: Wrong-usage */
-    if (!node) {
-        return false;
-    }
-
-    /* Cache self, the parent list, and the previous and next items. */
-    var parent = node.parent,
-        prev = node.prev,
-        next = node.next,
-        indice;
-
-    /* If the item is already detached, return node. */
-    if (!parent) {
-        return node;
-    }
-
-    /* If node is the last item in the parent, link the parents last
-     * item to the previous item. */
-    if (parent.tail === node) {
-        parent.tail = prev;
-    }
-
-    /* If node is the first item in the parent, link the parents first
-     * item to the next item. */
-    if (parent.head === node) {
-        parent.head = next;
-    }
-
-    /* If both the last and first items in the parent are the same,
-     * remove the link to the last item. */
-    if (parent.tail === parent.head) {
-        parent.tail = null;
-    }
-
-    /* If a previous item exists, link its next item to nodes next
-     * item. */
-    if (prev) {
-        prev.next = next;
-    }
-
-    /* If a next item exists, link its previous item to nodes previous
-     * item. */
-    if (next) {
-        next.prev = prev;
-    }
-
-    /* istanbul ignore else: Wrong-usage */
-    if ((indice = arrayIndexOf.call(parent, node)) !== -1) {
-        arraySplice.call(parent, indice, 1);
-    }
-
-    /* Remove links from node to both the next and previous items,
-     * and to the parent. */
-    node.prev = node.next = node.parent = null;
-
-    emit(node, 'remove', parent);
-
-    if (next) {
-        emit(next, 'changeprev', prev || null, node);
-        emit(node, 'changenext', null, next);
-    }
-
-    if (prev) {
-        emit(node, 'changeprev', null, prev);
-        emit(prev, 'changenext', next || null, node);
-    }
-
-    trigger(parent, 'removeinside', node, parent);
-
-    /* Return node. */
-    return node;
-}
-
-function listen(name, callback) {
-    var self = this,
-        callbacks;
-
-    if (typeof name !== 'string') {
-        if (name === null || name === undefined) {
-            return self;
-        }
-
-        throw new TypeError('Illegal invocation: \'' + name +
-            ' is not a valid argument for \'listen\'');
-    }
-
-    if (typeof callback !== 'function') {
-        if (callback === null || callback === undefined) {
-            return self;
-        }
-
-        throw new TypeError('Illegal invocation: \'' + callback +
-            ' is not a valid argument for \'listen\'');
-    }
-
-    callbacks = self.callbacks || (self.callbacks = {});
-    callbacks = callbacks[name] || (callbacks[name] = []);
-    callbacks.unshift(callback);
-
-    return self;
-}
-
-function ignore(name, callback) {
-    var self = this,
-        callbacks, indice;
-
-    if ((name === null || name === undefined) &&
-        (callback === null || callback === undefined)) {
-        self.callbacks = {};
-        return self;
-    }
-
-    if (typeof name !== 'string') {
-        if (name === null || name === undefined) {
-            return self;
-        }
-
-        throw new TypeError('Illegal invocation: \'' + name +
-            ' is not a valid argument for \'listen\'');
-    }
-
-    if (!(callbacks = self.callbacks)) {
-        return self;
-    }
-
-    if (!(callbacks = callbacks[name])) {
-        return self;
-    }
-
-    if (typeof callback !== 'function') {
-        if (callback === null || callback === undefined) {
-            callbacks.length = 0;
-            return self;
-        }
-
-        throw new TypeError('Illegal invocation: \'' + callback +
-            ' is not a valid argument for \'listen\'');
-    }
-
-    if ((indice = callbacks.indexOf(callback)) !== -1) {
-        callbacks.splice(indice, 1);
-    }
-
-    return self;
-}
-
-function TextOMConstructor() {
-    /**
-     * Expose `Node`. Initialises a new `Node` object.
-     *
-     * @api public
-     * @constructor
-     */
-    function Node() {
-        if (!this.data) {
-            /** @member {Object} */
-            this.data = {};
-        }
-    }
-
-    var prototype = Node.prototype;
-
-    prototype.on = Node.on = listen;
-
-    prototype.off = Node.off = ignore;
-
-    /**
-     * Inherit the contexts' (Super) prototype into a given Constructor. E.g.,
-     * Node is implemented by Parent, Parent is implemented by RootNode, &c.
-     *
-     * @param {function} Constructor
-     * @api public
-     */
-    Node.isImplementedBy = function (Constructor) {
-        var self = this,
-            constructors = self.constructors || [self],
-            constructorPrototype, key, newPrototype;
-
-        constructors = [Constructor].concat(constructors);
-
-        constructorPrototype = Constructor.prototype;
-
-        function AltConstructor () {}
-        AltConstructor.prototype = self.prototype;
-        newPrototype = new AltConstructor();
-
-        for (key in constructorPrototype) {
-            newPrototype[key] = constructorPrototype[key];
-        }
-
-        if (constructorPrototype.toString !== {}.toString) {
-            newPrototype.toString = constructorPrototype.toString;
-        }
-
-        for (key in self) {
-            /* istanbul ignore else */
-            if (self.hasOwnProperty(key)) {
-                Constructor[key] = self[key];
-            }
-        }
-
-        newPrototype.constructor = Constructor;
-        Constructor.constructors = constructors;
-        Constructor.prototype = newPrototype;
-    };
-
-    /**
-     * Expose Parent. Constructs a new Parent node;
-     *
-     * @api public
-     * @constructor
-     */
-    function Parent() {
-        Node.apply(this, arguments);
-    }
-
-    prototype = Parent.prototype;
-
-    /**
-     * The first child of a parent, null otherwise.
-     *
-     * @api public
-     * @type {?Child}
-     * @readonly
-     */
-    prototype.head = null;
-
-    /**
-     * The last child of a parent (unless the last child is also the first
-     * child), null otherwise.
-     *
-     * @api public
-     * @type {?Child}
-     * @readonly
-     */
-    prototype.tail = null;
-
-    /**
-     * The number of children in a parent.
-     *
-     * @api public
-     * @type {number}
-     * @readonly
-     */
-    prototype.length = 0;
-
-    /**
-     * Insert a child at the beginning of the list (like Array#unshift).
-     *
-     * @param {Child} child - the child to insert as the (new) FIRST child
-     * @return {Child} - the given child.
-     * @api public
-     */
-    prototype.prepend = function (child) {
-        return insert(this, null, child);
-    };
-
-    /**
-     * Insert a child at the end of the list (like Array#push).
-     *
-     * @param {Child} child - the child to insert as the (new) LAST child
-     * @return {Child} - the given child.
-     * @api public
-     */
-    prototype.append = function (child) {
-        return insert(this, this.tail || this.head, child);
-    };
-
-    /**
-     * Return a child at given position in parent, and null otherwise. (like
-     * NodeList#item).
-     *
-     * @param {?number} [index=0] - the position to find a child at.
-     * @return {Child?} - the found child, or null.
-     * @api public
-     */
-    prototype.item = function (index) {
-        if (index === null || index === undefined) {
-            index = 0;
-        } else if (typeof index !== 'number' || index !== index) {
-            throw new TypeError('\'' + index + ' is not a valid argument ' +
-                'for \'Parent.prototype.item\'');
-        }
-
-        return this[index] || null;
-    };
-
-    /**
-     * Split the Parent into two, dividing the children from 0–position (NOT
-     * including the character at `position`), and position–length (including
-     * the character at `position`).
-     *
-     * @param {?number} [position=0] - the position to split at.
-     * @return {Parent} - the prepended parent.
-     * @api public
-     */
-    prototype.split = function (position) {
-        var self = this,
-            clone, cloneNode, iterator;
-
-        if (position === null || position === undefined ||
-            position !== position || position === -Infinity) {
-                position = 0;
-        } else if (position === Infinity) {
-            position = self.length;
-        } else if (typeof position !== 'number') {
-            throw new TypeError('\'' + position + ' is not a valid ' +
-                'argument for \'Parent.prototype.split\'');
-        } else if (position < 0) {
-            position = Math.abs((self.length + position) % self.length);
-        }
-
-        /* This throws if we're not attached, thus preventing appending. */
-        /*eslint-disable new-cap */
-        cloneNode = insert(self.parent, self.prev, new self.constructor());
-        /*eslint-enable new-cap */
-
-        clone = arraySlice.call(self);
-        iterator = -1;
-
-        while (++iterator < position && clone[iterator]) {
-            cloneNode.append(clone[iterator]);
-        }
-
-        return cloneNode;
-    };
-
-    /**
-     * Return the result of calling `toString` on each of `Parent`s children.
-     *
-     * NOTE The `toString` method is intentionally generic; It can be
-     * transferred to other kinds of (linked-list-like) objects for use as a
-     * method.
-     *
-     * @return {String}
-     * @api public
-     */
-    prototype.toString = function () {
-        var value, node;
-
-        value = '';
-        node = this.head;
-
-        while (node) {
-            value += node;
-            node = node.next;
-        }
-
-        return value;
-    };
-
-    /**
-     * Inherit from `Node.prototype`.
-     */
-    Node.isImplementedBy(Parent);
-
-    /**
-     * Expose Child. Constructs a new Child node;
-     *
-     * @api public
-     * @constructor
-     */
-    function Child() {
-        Node.apply(this, arguments);
-    }
-
-    prototype = Child.prototype;
-
-    /**
-     * The parent node, null otherwise (when the child is detached).
-     *
-     * @api public
-     * @type {?Parent}
-     * @readonly
-     */
-    prototype.parent = null;
-
-    /**
-     * The next node, null otherwise (when `child` is the parents last child
-     * or detached).
-     *
-     * @api public
-     * @type {?Child}
-     * @readonly
-     */
-    prototype.next = null;
-
-    /**
-     * The previous node, null otherwise (when `child` is the parents first
-     * child or detached).
-     *
-     * @api public
-     * @type {?Child}
-     * @readonly
-     */
-    prototype.prev = null;
-
-    /**
-     * Insert a given child before the operated on child in the parent.
-     *
-     * @param {Child} child - the child to insert before the operated on
-     *                        child.
-     * @return {Child} - the given child.
-     * @api public
-     */
-    prototype.before = function (child) {
-        return insert(this.parent, this.prev, child);
-    };
-
-    /**
-     * Insert a given child after the operated on child in the parent.
-     *
-     * @param {Child} child - the child to insert after the operated on child.
-     * @return {Child} - the given child.
-     * @api public
-     */
-    prototype.after = function (child) {
-        return insert(this.parent, this, child);
-    };
-
-    /**
-     * Remove the operated on child, and insert a given child at its previous
-     * position in the parent.
-     *
-     * @param {Child} child - the child to replace the operated on child with.
-     * @return {Child} - the given child.
-     * @api public
-     */
-    prototype.replace = function (child) {
-        var result = insert(this.parent, this, child);
-
-        remove(this);
-
-        return result;
-    };
-
-    /**
-     * Remove the operated on child.
-     *
-     * @return {Child} - the operated on child.
-     * @api public
-     */
-    prototype.remove = function () {
-        return remove(this);
-    };
-
-    /**
-     * Inherit from `Node.prototype`.
-     */
-    Node.isImplementedBy(Child);
-
-    /**
-     * Expose Element. Constructs a new Element node;
-     *
-     * @api public
-     * @constructor
-     */
-    function Element() {
-        Parent.apply(this, arguments);
-        Child.apply(this, arguments);
-    }
-
-    /**
-     * Inherit from `Parent.prototype` and `Child.prototype`.
-     */
-    Parent.isImplementedBy(Element);
-    Child.isImplementedBy(Element);
-
-    /* Add Parent as a constructor (which it is) */
-    Element.constructors.splice(2, 0, Parent);
-
-    /**
-     * Expose Text. Constructs a new Text node;
-     *
-     * @api public
-     * @constructor
-     */
-    function Text(value) {
-        Child.apply(this, arguments);
-
-        this.fromString(value);
-    }
-
-    prototype = Text.prototype;
-
-    /**
-     * The internal value.
-     *
-     * @api private
-     */
-    prototype.internalValue = '';
-
-    /**
-     * Return the internal value of a Text;
-     *
-     * @return {String}
-     * @api public
-     */
-    prototype.toString = function () {
-        return this.internalValue;
-    };
-
-    /**
-     * (Re)sets and returns the internal value of a Text with the stringified
-     * version of the given value.
-     *
-     * @param {?String} [value=''] - the value to set
-     * @return {String}
-     * @api public
-     */
-    prototype.fromString = function (value) {
-        var self = this,
-            previousValue = self.toString(),
-            parent;
-
-        if (value === null || value === undefined) {
-            value = '';
-        } else {
-            value = value.toString();
-        }
-
-        if (value !== previousValue) {
-            self.internalValue = value;
-
-            emit(self, 'changetext', value, previousValue);
-
-            parent = self.parent;
-            if (parent) {
-                trigger(
-                    parent, 'changetextinside', self, value, previousValue
-                );
-            }
-        }
-
-        return value;
-    };
-
-    /**
-     * Split the Text into two, dividing the internal value from 0–position
-     * (NOT including the character at `position`), and position–length
-     * (including the character at `position`).
-     *
-     * @param {?number} [position=0] - the position to split at.
-     * @return {Child} - the prepended child.
-     * @api public
-     */
-    prototype.split = function (position) {
-        var self = this,
-            value = self.internalValue,
-            cloneNode;
-
-        if (position === null ||
-            position === undefined ||
-            position !== position ||
-            position === -Infinity) {
-                position = 0;
-        } else if (position === Infinity) {
-            position = value.length;
-        } else if (typeof position !== 'number') {
-            throw new TypeError('\'' + position + ' is not a valid ' +
-                'argument for \'Text.prototype.split\'');
-        } else if (position < 0) {
-            position = Math.abs((value.length + position) % value.length);
-        }
-
-        /* This throws if we're not attached, thus preventing substringing. */
-        /*eslint-disable new-cap */
-        cloneNode = insert(self.parent, self.prev, new self.constructor());
-        /*eslint-enable new-cap */
-
-        self.fromString(value.slice(position));
-        cloneNode.fromString(value.slice(0, position));
-
-        return cloneNode;
-    };
-
-    /**
-     * Inherit from `Child.prototype`.
-     */
-    Child.isImplementedBy(Text);
-
-    /**
-     * Expose RootNode. Constructs a new RootNode (inheriting from Parent);
-     *
-     * @api public
-     * @constructor
-     */
-    function RootNode() {
-        Parent.apply(this, arguments);
-    }
-
-    /**
-     * The type of an instance of RootNode.
-     *
-     * @api public
-     * @readonly
-     * @static
-     */
-    RootNode.prototype.type = 1;
-    RootNode.prototype.hierarchy = 1;
-
-    /**
-     * Inherit from `Parent.prototype`.
-     */
-    Parent.isImplementedBy(RootNode);
-
-    /**
-     * Expose ParagraphNode. Constructs a new ParagraphNode (inheriting from
-     * both Parent and Child);
-     *
-     * @api public
-     * @constructor
-     */
-    function ParagraphNode() {
-        Element.apply(this, arguments);
-    }
-
-    /**
-     * The type of an instance of ParagraphNode.
-     *
-     * @api public
-     * @readonly
-     * @static
-     */
-    ParagraphNode.prototype.type = 2;
-    ParagraphNode.prototype.hierarchy = 2;
-
-    /**
-     * Inherit from `Parent.prototype` and `Child.prototype`.
-     */
-    Element.isImplementedBy(ParagraphNode);
-
-    /**
-     * Expose SentenceNode. Constructs a new SentenceNode (inheriting from
-     * both Parent and Child);
-     *
-     * @api public
-     * @constructor
-     */
-    function SentenceNode() {
-        Element.apply(this, arguments);
-    }
-
-    /**
-     * The type of an instance of SentenceNode.
-     *
-     * @api public
-     * @readonly
-     * @static
-     */
-    SentenceNode.prototype.type = 3;
-    SentenceNode.prototype.hierarchy = 3;
-
-    /**
-     * Inherit from `Parent.prototype` and `Child.prototype`.
-     */
-    Element.isImplementedBy(SentenceNode);
-
-    /**
-     * Expose WordNode.
-     */
-    function WordNode() {
-        Text.apply(this, arguments);
-    }
-
-    /**
-     * The type of an instance of WordNode.
-     *
-     * @api public
-     * @readonly
-     * @static
-     */
-    WordNode.prototype.type = 4;
-    WordNode.prototype.hierarchy = 4;
-
-    /**
-     * Inherit from `Text.prototype`.
-     */
-    Text.isImplementedBy(WordNode);
-
-    /**
-     * Expose WhiteSpaceNode.
-     */
-    function WhiteSpaceNode() {
-        Text.apply(this, arguments);
-    }
-
-    /**
-     * The type of an instance of WhiteSpaceNode.
-     *
-     * @api public
-     * @readonly
-     * @static
-     */
-    WhiteSpaceNode.prototype.type = 5;
-
-    /**
-     * Inherit from `Text.prototype`.
-     */
-    Text.isImplementedBy(WhiteSpaceNode);
-
-    /**
-     * Expose PunctuationNode.
-     */
-    function PunctuationNode() {
-        Text.apply(this, arguments);
-    }
-
-    /**
-     * The type of an instance of PunctuationNode.
-     *
-     * @api public
-     * @readonly
-     * @static
-     */
-    PunctuationNode.prototype.type = 6;
-    PunctuationNode.prototype.hierarchy = 4;
-
-    /**
-     * Inherit from `Text.prototype`.
-     */
-    Text.isImplementedBy(PunctuationNode);
-
-    /**
-     * Expose SourceNode.
-     */
-    function SourceNode() {
-        Text.apply(this, arguments);
-    }
-
-    /**
-     * The type of an instance of SourceNode.
-     *
-     * @api public
-     * @readonly
-     * @static
-     */
-    SourceNode.prototype.type = 7;
-
-    /**
-     * Inherit from `Text.prototype`.
-     */
-    Text.isImplementedBy(SourceNode);
-
-    var nodePrototype = Node.prototype,
-        TextOM;
-
-    /**
-     * Define the `TextOM` object.
-     * Expose `TextOM` on every instance of Node.
-     *
-     * @api public
-     */
-    nodePrototype.TextOM = TextOM = {};
-
-    /**
-     * Export all node types to `TextOM` and `Node#`.
-     */
-    TextOM.ROOT_NODE = nodePrototype.ROOT_NODE =
-        RootNode.prototype.type;
-    TextOM.PARAGRAPH_NODE = nodePrototype.PARAGRAPH_NODE =
-        ParagraphNode.prototype.type;
-    TextOM.SENTENCE_NODE = nodePrototype.SENTENCE_NODE =
-        SentenceNode.prototype.type;
-    TextOM.WORD_NODE = nodePrototype.WORD_NODE = WordNode.prototype.type;
-    TextOM.PUNCTUATION_NODE = nodePrototype.PUNCTUATION_NODE =
-        PunctuationNode.prototype.type;
-    TextOM.WHITE_SPACE_NODE = nodePrototype.WHITE_SPACE_NODE =
-        WhiteSpaceNode.prototype.type;
-    TextOM.SOURCE_NODE = nodePrototype.SOURCE_NODE =
-        SourceNode.prototype.type;
-
-    /**
-     * Export all `Node`s to `TextOM`.
-     */
-    TextOM.Node = Node;
-    TextOM.Parent = Parent;
-    TextOM.Child = Child;
-    TextOM.Element = Element;
-    TextOM.Text = Text;
-    TextOM.RootNode = RootNode;
-    TextOM.ParagraphNode = ParagraphNode;
-    TextOM.SentenceNode = SentenceNode;
-    TextOM.WordNode = WordNode;
-    TextOM.PunctuationNode = PunctuationNode;
-    TextOM.WhiteSpaceNode = WhiteSpaceNode;
-    TextOM.SourceNode = SourceNode;
-
-    /**
-     * Expose `TextOM`. Used to instantiate a new `RootNode`.
-     */
-    return TextOM;
-}
-
-module.exports = TextOMConstructor;
-
-},{}],9:[function(require,module,exports){
-'use strict';
-
-var Parser, retextAST, assert, parser, TextOM;
+var Parser, assert, parser;
 
 Parser = require('..');
-retextAST = require('retext-ast');
 assert = require('assert');
 parser = new Parser();
-TextOM = parser.TextOM;
-
-parser.TextOM.Node.prototype.toAST = retextAST.toAST;
-parser.TextOM.Node.prototype.toJSON = retextAST.toJSON;
 
 describe('ParseEnglish', function () {
     it('should be a function', function () {
@@ -3286,18 +2060,18 @@ describe('new ParseEnglish()', function () {
     it('should have a `tokenizeWhiteSpace` method', function () {
         assert(typeof parser.tokenizeWhiteSpace === 'function');
     });
-
-    it('should have a `TextOM` property', function () {
-        assert('TextOM' in parser);
-    });
 });
 
 describe('Root: Without a value', function () {
     it('should return an empty RootNode when invoked wihtout value',
         function () {
-            var root = parser.tokenizeRoot();
-            assert(root instanceof TextOM.RootNode);
-            assert(root.length === 0);
+            assert(
+                JSON.stringify(parser.tokenizeRoot()) ===
+                JSON.stringify({
+                    'type' : 'RootNode',
+                    'children' : []
+                })
+            );
         }
     );
 });
@@ -3316,7 +2090,9 @@ describe('Root: Given two paragraphs', function () {
         'of formal writing, used to organize longer prose.';
 
     it('should equal the test AST', function () {
-        assert(parser.tokenizeRoot(source).toAST() === JSON.stringify({
+        var root = parser.tokenizeRoot(source);
+
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'RootNode',
             'children' : [
                 {
@@ -3964,27 +2740,17 @@ describe('Root: Given a String object', function () {
             var source = 'Test.';
             /*eslint-disable no-new-wrappers */
             assert(
-                parser.tokenizeRoot(new String(source)).toAST() ===
-                parser.tokenizeRoot(source).toAST()
+                JSON.stringify(parser.tokenizeRoot(new String(source))) ===
+                JSON.stringify(parser.tokenizeRoot(source))
             );
             /*eslint-enable no-new-wrappers */
         }
     );
 });
 
-describe('Root: Given a TextOM Node', function () {
-    it('should tokenize the toString representation of the given object ' +
-        'when the given object is an instance of TextOM.Node', function () {
-            var source = 'Test.',
-                root = parser.tokenizeRoot(source);
-            assert(root.toAST() === parser.tokenizeRoot(root).toAST());
-        }
-    );
-});
-
 describe('Root: Given any other value', function () {
     it('should throw when the object is neither null, undefined, string, ' +
-        'String, nor TextOM.Node', function () {
+        'nor String object', function () {
             assert.throws(function () {
                 parser.tokenizeRoot({});
             });
@@ -3994,7 +2760,9 @@ describe('Root: Given any other value', function () {
 
 describe('A whitespace only document', function () {
     it('should equal the test AST', function () {
-        assert(parser.tokenizeRoot('\n\n').toAST() === JSON.stringify({
+        var root = parser.tokenizeRoot('\n\n');
+
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'RootNode',
             'children' : [
                 {
@@ -4011,11 +2779,11 @@ describe('A whitespace only document', function () {
 */
 describe('Sentence: Abbreviations followed by a full-stop', function () {
     it('should equal the test AST', function () {
-        var source = 'Like Miss and Mrs. the term Ms. has its origins ' +
-            'in English title once used for all women. Various plural ' +
-            'forms used are Mss., Mses. and Mmes.';
+        var root = parser.tokenizeParagraph('Like Miss and Mrs. the term ' +
+            'Ms. has its origins in English title once used for all women. ' +
+            'Various plural forms used are Mss., Mses. and Mmes.');
 
-        assert(parser.tokenizeParagraph(source).toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'ParagraphNode',
             'children' : [
                 {
@@ -4283,7 +3051,7 @@ describe('Sentence: Abbreviations with dot characters', function () {
         var root = parser.tokenizeParagraph('Esperanto was selectively ' +
             'designed by L.L. Zamenhof from natural languages.');
 
-        assert(root.head.toAST() === JSON.stringify({
+        assert(JSON.stringify(root.children[0]) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -4391,7 +3159,7 @@ describe('Sentence: common abbreviations suffixed by a dot', function () {
         var root = parser.tokenizeParagraph('Park Ave. was an indie pop ' +
             'band which started in January 1996 in Nebr. (Omaha).');
 
-        assert(root.head.toAST() === JSON.stringify({
+        assert(JSON.stringify(root.children[0]) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -4544,7 +3312,7 @@ describe('Sentence: common abbreviations preceded by a dot', function () {
             'distinction was lost when .com, .org and .net were opened ' +
             'for unrestricted registration.');
 
-        assert(root.head.toAST() === JSON.stringify({
+        assert(JSON.stringify(root.children[0]) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -4709,7 +3477,7 @@ describe('Sentence: A terminal marker before a closing quote or parenthesis',
             var source = '“However,” says my Grade 8 teacher, “the ' +
                 'period goes inside quotes.” This is another sentence';
 
-            assert(parser.tokenizeParagraph(source).toAST() ===
+            assert(JSON.stringify(parser.tokenizeParagraph(source)) ===
                 JSON.stringify({
                     'type' : 'ParagraphNode',
                     'children' : [
@@ -4880,10 +3648,11 @@ describe('Sentence: A terminal marker before a closing quote or parenthesis',
 describe('Sentence: Abbreviations followed by a dot, optional white ' +
     'space, and a comma', function () {
         it('should equal the test AST', function () {
-            var source = 'Wikipedia® is a registered trademark of the ' +
-                'Wikimedia Foundation, Inc., a non-profit organization.';
+            var root = parser.tokenizeParagraph('Wikipedia® is a ' +
+                'registered trademark of the Wikimedia Foundation, Inc., a ' +
+                'non-profit organization.');
 
-            assert(parser.tokenizeParagraph(source).head.toAST() ===
+            assert(JSON.stringify(root.children[0]) ===
                 JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
@@ -5025,7 +3794,7 @@ describe('Sentence: Abbreviations followed by a dot, optional white ' +
 describe('Sentence: Starting with ellipsis containing spaces', function () {
     it('should equal the test AST', function () {
         var root = parser.tokenizeParagraph('. . . to be continued.');
-        assert(root.head.toAST() === JSON.stringify({
+        assert(JSON.stringify(root.children[0]) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -5084,7 +3853,7 @@ describe('Sentence: Starting with ellipsis containing spaces', function () {
 describe('Sentence: Starting with ellipsis without spaces', function () {
     it('should equal the test AST', function () {
         var root = parser.tokenizeParagraph('...To be continued.');
-        assert(root.head.toAST() === JSON.stringify({
+        assert(JSON.stringify(root.children[0]) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -5123,7 +3892,7 @@ describe('Sentence: Starting with ellipsis without spaces', function () {
 describe('Sentence: With trailing white space', function () {
     it('should equal the test AST', function () {
         var root = parser.tokenizeParagraph('A sentence. ');
-        assert(root.head.toAST() === JSON.stringify({
+        assert(JSON.stringify(root.children[0]) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -5154,7 +3923,7 @@ describe('Sentence: With trailing white space', function () {
 describe('Sentence: Without terminal marker', function () {
     it('should equal the test AST', function () {
         var root = parser.tokenizeParagraph('A sentence');
-        assert(root.head.toAST() === JSON.stringify({
+        assert(JSON.stringify(root.children[0]) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -5177,7 +3946,7 @@ describe('Sentence: Without terminal marker', function () {
 describe('Sentence: Without alphabetic content', function () {
     it('should equal the test AST', function () {
         var root = parser.tokenizeParagraph('\uD83D\uDC38.');
-        assert(root.head.toAST() === JSON.stringify({
+        assert(JSON.stringify(root.children[0]) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -5235,7 +4004,7 @@ describe('White space characters', function () {
         it('should equal the test AST when using `' + character + '`',
             function () {
                 assert(
-                    parser.tokenizeSentence(source).toAST() ===
+                    JSON.stringify(parser.tokenizeSentence(source)) ===
                     JSON.stringify({
                         'type' : 'SentenceNode',
                         'children' : [
@@ -5270,7 +4039,7 @@ describe('A simple sentence testing for astral-plane characters',
     function () {
         var source = 'The unicode character \uD83D\uDCA9 is pile of poo.';
         it('should equal the test AST', function () {
-            assert(parser.tokenizeSentence(source).toAST() ===
+            assert(JSON.stringify(parser.tokenizeSentence(source)) ===
                 JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
@@ -5350,44 +4119,45 @@ describe('A simple sentence testing for astral-plane characters',
  * together forming a :zero: emoji
  */
 describe('Double combining marks', function () {
-    var source = 'He scored 0\uFE0F\u20E3 points.';
+    var root = parser.tokenizeSentence('He scored 0\uFE0F\u20E3 points.');
+
     it('should equal the test AST', function () {
-        assert(parser.tokenizeSentence(source).toAST() === JSON.stringify({
-        'type' : 'SentenceNode',
-        'children' : [
-            {
-                    'type' : 'WordNode',
-                    'value' : 'He'
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'SentenceNode',
+            'children' : [
+                {
+                        'type' : 'WordNode',
+                        'value' : 'He'
                 },
-            {
-                    'type' : 'WhiteSpaceNode',
-                    'value' : ' '
+                {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
                 },
-            {
-                    'type' : 'WordNode',
-                    'value' : 'scored'
+                {
+                        'type' : 'WordNode',
+                        'value' : 'scored'
                 },
-            {
-                    'type' : 'WhiteSpaceNode',
-                    'value' : ' '
+                {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
                 },
-            {
-                    'type' : 'PunctuationNode',
-                    'value' : '0\uFE0F\u20E3'
+                {
+                        'type' : 'PunctuationNode',
+                        'value' : '0\uFE0F\u20E3'
                 },
-            {
-                    'type' : 'WhiteSpaceNode',
-                    'value' : ' '
+                {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
                 },
-            {
-                    'type' : 'WordNode',
-                    'value' : 'points'
+                {
+                        'type' : 'WordNode',
+                        'value' : 'points'
                 },
-            {
-                    'type' : 'PunctuationNode',
-                    'value' : '.'
+                {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
                 }
-        ]
+            ]
         }));
     });
 });
@@ -5518,7 +4288,7 @@ describe('A simple sentence testing for combining diacritical marks',
             it('should equal the test AST when using \u25CC' + diacritic,
                 function () {
                     assert(
-                        parser.tokenizeSentence(source).toAST() ===
+                        JSON.stringify(parser.tokenizeSentence(source)) ===
                         JSON.stringify({
                             'type' : 'SentenceNode',
                             'children' : [
@@ -5567,11 +4337,12 @@ describe('A simple sentence testing for combining diacritical marks',
  * From wikipedias list: http://en.wikipedia.org/wiki/Contraction_(grammar)
 */
 describe('A simple sentence testing for common contractions', function () {
-    var source = 'Common examples of contractions include: Ain\'t, ' +
-        'let\'s, I\'m, we\'re, what\'s, where\'d, and I\'ll.';
+    var root = parser.tokenizeSentence('Common examples of contractions ' +
+        'include: Ain\'t, let\'s, I\'m, we\'re, what\'s, where\'d, and ' +
+        'I\'ll.');
 
     it('should equal the test AST', function () {
-        assert(parser.tokenizeSentence(source).toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -5778,7 +4549,7 @@ describe('Simple sentences testing for tie characters', function () {
     it('should equal the test AST, when using the combinding double ' +
         'breve \u25CC\u035D\u25CC', function () {
             var source = 'e.g. the combining double breve o\u035Do.';
-            assert(parser.tokenizeSentence(source).toAST() ===
+            assert(JSON.stringify(parser.tokenizeSentence(source)) ===
                 JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
@@ -5853,7 +4624,7 @@ describe('Simple sentences testing for tie characters', function () {
             var source =
                 'e.g. the combining double inverted breve /k\u0361p/';
 
-            assert(parser.tokenizeSentence(source).toAST() ===
+            assert(JSON.stringify(parser.tokenizeSentence(source)) ===
                 JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
@@ -5938,7 +4709,7 @@ describe('Simple sentences testing for tie characters', function () {
     it('should equal the test AST, when using the combinding double breve ' +
         'below \u25CC\u035C\u25CC', function () {
             var source = 'e.g. the combining double breve below /k\u035Cp/';
-            assert(parser.tokenizeSentence(source).toAST() ===
+            assert(JSON.stringify(parser.tokenizeSentence(source)) ===
                 JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
@@ -6023,7 +4794,7 @@ describe('Simple sentences testing for tie characters', function () {
     it('should equal the test AST, when using the undertie \u203F',
         function () {
             var source = 'e.g. the undertie /vuz\u203Fave/';
-            assert(parser.tokenizeSentence(source).toAST() ===
+            assert(JSON.stringify(parser.tokenizeSentence(source)) ===
                 JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
@@ -6092,7 +4863,7 @@ describe('Simple sentences testing for tie characters', function () {
     it('should equal the test AST, when using the character tie \u2040',
         function () {
             var source = 'e.g. the character tie s\u2040t';
-            assert(parser.tokenizeSentence(source).toAST() ===
+            assert(JSON.stringify(parser.tokenizeSentence(source)) ===
                 JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
@@ -6161,7 +4932,7 @@ describe('Simple sentences testing for tie characters', function () {
     it('should equal the test AST, when using the inverted undertie \u2054',
         function () {
             var source = 'e.g. the inverted undertie o\u2054o';
-            assert(parser.tokenizeSentence(source).toAST() ===
+            assert(JSON.stringify(parser.tokenizeSentence(source)) ===
                 JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
@@ -6232,7 +5003,7 @@ describe('Intelectual property marks', function () {
     it('should equal the test AST, when using the copyright symbol \u00A9',
         function () {
             var source = '\u00A9 2011 John Smith';
-            assert(parser.tokenizeSentence(source).toAST() ===
+            assert(JSON.stringify(parser.tokenizeSentence(source)) ===
                 JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
@@ -6275,7 +5046,7 @@ describe('Intelectual property marks', function () {
             var source = 'Designated by \u2117, the sound recording ' +
                 'copyright symbol.';
 
-            assert(parser.tokenizeSentence(source).toAST() ===
+            assert(JSON.stringify(parser.tokenizeSentence(source)) ===
                 JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
@@ -6356,7 +5127,7 @@ describe('Intelectual property marks', function () {
     it('should equal the test AST, when using the registered trademark ' +
         'symbol \u00AE', function () {
             var source = 'Wikipedia\u00AE is a registered trademark.';
-            assert(parser.tokenizeSentence(source).toAST() ===
+            assert(JSON.stringify(parser.tokenizeSentence(source)) ===
                 JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
@@ -6413,7 +5184,7 @@ describe('Intelectual property marks', function () {
     it('should equal the test AST, when using the service mark symbol \u2120',
         function () {
             var source = 'ABC Law\u2120 legal services.';
-            assert(parser.tokenizeSentence(source).toAST() ===
+            assert(JSON.stringify(parser.tokenizeSentence(source)) ===
                 JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
@@ -6461,50 +5232,51 @@ describe('Intelectual property marks', function () {
 
     it('should equal the test AST, when using the trademark symbol \u2122',
         function () {
-            var source = 'Mytrademark\u2122 is a trademark.';
-            assert(
-                parser.tokenizeSentence(source).toAST() === JSON.stringify({
-                    'type' : 'SentenceNode',
-                    'children' : [
-                        {
-                            'type' : 'WordNode',
-                            'value' : 'Mytrademark'
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'value' : '\u2122'
-                        },
-                        {
-                            'type' : 'WhiteSpaceNode',
-                            'value' : ' '
-                        },
-                        {
-                            'type' : 'WordNode',
-                            'value' : 'is'
-                        },
-                        {
-                            'type' : 'WhiteSpaceNode',
-                            'value' : ' '
-                        },
-                        {
-                            'type' : 'WordNode',
-                            'value' : 'a'
-                        },
-                        {
-                            'type' : 'WhiteSpaceNode',
-                            'value' : ' '
-                        },
-                        {
-                            'type' : 'WordNode',
-                            'value' : 'trademark'
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'value' : '.'
-                        }
-                    ]
-                })
+            var root = parser.tokenizeSentence(
+                'Mytrademark\u2122 is a trademark.'
             );
+
+            assert(JSON.stringify(root) === JSON.stringify({
+                'type' : 'SentenceNode',
+                'children' : [
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'Mytrademark'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '\u2122'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'is'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'a'
+                    },
+                    {
+                        'type' : 'WhiteSpaceNode',
+                        'value' : ' '
+                    },
+                    {
+                        'type' : 'WordNode',
+                        'value' : 'trademark'
+                    },
+                    {
+                        'type' : 'PunctuationNode',
+                        'value' : '.'
+                    }
+                ]
+            }));
         }
     );
 });
@@ -6514,8 +5286,11 @@ describe('Intelectual property marks', function () {
 */
 describe('A simple sentence testing for digit-letters', function () {
     var source = 'iPhone 5S is a high-end smartphone developed by Apple.';
+
     it('should equal the test AST', function () {
-        assert(parser.tokenizeSentence(source).toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence(source);
+
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -6617,7 +5392,9 @@ describe('A simple sentence testing for grapheme clusters', function () {
         'symbols.';
 
     it('should equal the test AST', function () {
-        assert(parser.tokenizeSentence(source).toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence(source);
+
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -6783,7 +5560,9 @@ describe('Unicode parsing', function () {
         '10\u207B\xB9\u2070 m.';
 
     it('should equal the test AST', function () {
-        assert(parser.tokenizeSentence(source).toAST() === JSON.stringify({
+        var root = parser.tokenizeSentence(source);
+
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -6977,7 +5756,7 @@ describe('Abbreviations: Decimals (affixed by a full-stop)', function () {
             while (digits[++iterator]) {
                 digit = digits[iterator];
                 root = parser.tokenizeSentence('See § ' + digit + '. ¶ 2.');
-                assert(root.toAST() === JSON.stringify({
+                assert(JSON.stringify(root) === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -7038,7 +5817,7 @@ describe('Abbreviations: Geographic', function () {
                 'Survey Reaffirms 5th Ave. at Top of the Retail Rent Heap'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7140,7 +5919,7 @@ describe('Abbreviations: Geographic', function () {
                 'A café located on the blvd. of Kusadasi'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7218,7 +5997,7 @@ describe('Abbreviations: Geographic', function () {
                 'Like all mountains, Mt. Gay is a large large mass of rock.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7336,7 +6115,7 @@ describe('Abbreviations: Geographic', function () {
                 'In law, Rd. is an abbreviation of road.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7422,7 +6201,7 @@ describe('Abbreviations: Geographic', function () {
                 'The many fine Victorian buildings in Wolverhampton.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7493,7 +6272,7 @@ describe('Abbreviations: Geographic', function () {
                 'The Teide Nat. Park in Tenerife, Spain.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7571,7 +6350,7 @@ describe('Abbreviations: Geographic', function () {
                 'The Teide Natl. Park in Tenerife, Spain.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7649,7 +6428,7 @@ describe('Abbreviations: Geographic', function () {
                 'U.S. Rt. 66, a historic highway in America.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7747,7 +6526,7 @@ describe('Abbreviations: Geographic', function () {
                 'U.S. Rte. 66, a historic highway in America.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7846,7 +6625,7 @@ describe('Abbreviations: Geographic', function () {
                 'English Midlands.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -7944,7 +6723,7 @@ describe('Abbreviations: Geographic', function () {
                 'St. James\'s Pk. covers 34 ha.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8022,7 +6801,7 @@ describe('Abbreviations: Geographic', function () {
                 'See the attachment for potential Times Sq. sites.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8104,7 +6883,7 @@ describe('Abbreviations: Geographic', function () {
                 'Continue on Pershing Dr. before turning right.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8180,7 +6959,7 @@ describe('Abbreviations: Geographic', function () {
                 'Department.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8299,7 +7078,7 @@ describe('Abbreviations: Geographic', function () {
                 'I used to live on 2nd St. in Clinton.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8390,7 +7169,7 @@ describe('Abbreviations: Geographic', function () {
                 'the Patton Museum has also been relocated.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8557,7 +7336,7 @@ describe('Abbreviations: Geographic', function () {
                 'New Guinea.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8680,7 +7459,7 @@ describe('Abbreviations: Geographic', function () {
                 'area of rugged mountains and high plateaus.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8838,7 +7617,7 @@ describe('Abbreviations: Geographic', function () {
                 'The Atlantic Hwy. was the direct predecessor to US 1.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -8936,7 +7715,7 @@ describe('Abbreviations: Geographic', function () {
                 'The San Diego Fwy. is most commonly called “The 405”.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -9043,7 +7822,7 @@ describe('Abbreviations: Geographic', function () {
                 'its scenic beauty.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -9174,7 +7953,7 @@ describe('Abbreviations: Geographic', function () {
                     'I live in Clinton, ' + state + '. on 2nd street.'
                 );
 
-                assert(root.toAST() === JSON.stringify({
+                assert(JSON.stringify(root) === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -9269,7 +8048,7 @@ describe('Abbreviations: Geographic', function () {
                     'I\'m from Mount Pleasant, ' + state + '. in Canada.'
                 );
 
-                assert(root.toAST() === JSON.stringify({
+                assert(JSON.stringify(root) === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -9370,7 +8149,7 @@ describe('Abbreviations: Geographic', function () {
                     'I\'m from Newton, ' + county + '. in England.'
                 );
 
-                assert(root.toAST() === JSON.stringify({
+                assert(JSON.stringify(root) === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -9463,7 +8242,7 @@ describe('Abbreviations: Title abbreviations', function () {
                     '. Smith about these questions.'
                 );
 
-                assert(root.toAST() === JSON.stringify({
+                assert(JSON.stringify(root) === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -9566,7 +8345,7 @@ describe('Abbreviations: Alphabetical', function () {
                     'Thomas ' + character + '. Swift'
                 );
 
-                assert(root.toAST() === JSON.stringify({
+                assert(JSON.stringify(root) === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -9609,7 +8388,7 @@ describe('Abbreviations: Business', function () {
                 'percent in the last two years.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -9755,7 +8534,7 @@ describe('Abbreviations: Business', function () {
                 'XYZ Associates Ltd. is a member of the confederation.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -9847,7 +8626,7 @@ describe('Abbreviations: Latin', function () {
                 'The antique clock is from ca. 1900.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -9921,7 +8700,7 @@ describe('Abbreviations: Latin', function () {
                 'Electronic Transactions Ordinance (Cap. 553)'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -9984,7 +8763,7 @@ describe('Abbreviations: Latin', function () {
                 'different techniques (cf. Wilson, 1999 and Ansmann, 1992)'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -10143,7 +8922,7 @@ describe('Abbreviations: Latin', function () {
                 'different techniques (cf. Wilson, 1999 and Ansmann, 1992).'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -10307,7 +9086,7 @@ describe('Abbreviations: Latin', function () {
                 'the Roman symbol for 100.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -10438,7 +9217,7 @@ describe('Abbreviations: Latin', function () {
                 'of idem, ead. (eadem).'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -10577,7 +9356,7 @@ describe('Abbreviations: Latin', function () {
                 'Pelon et al. (2002).'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -10701,7 +9480,7 @@ describe('Abbreviations: Latin', function () {
                 'forth.”'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -10916,7 +9695,7 @@ describe('Abbreviations: Latin', function () {
                 'renowned for his erudition.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -11048,7 +9827,7 @@ describe('Abbreviations: Latin', function () {
                 'pages following page 258.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -11269,7 +10048,7 @@ describe('Abbreviations: Latin', function () {
                 'cited in the preceding endnote or footnote.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -11591,7 +10370,7 @@ describe('Abbreviations: Latin', function () {
                 'Id. is particularly used in legal citations.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -11668,7 +10447,7 @@ describe('Abbreviations: Latin', function () {
                 'against.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -11840,7 +10619,7 @@ describe('Abbreviations: Latin', function () {
                 'typically given in italics.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -11979,7 +10758,7 @@ describe('Abbreviations: Latin', function () {
                 'formal language.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12119,7 +10898,7 @@ describe('Abbreviations: Latin', function () {
                 'or simply p.p.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12243,7 +11022,7 @@ describe('Abbreviations: Latin', function () {
                 'the presiding officer.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12367,7 +11146,7 @@ describe('Abbreviations: Latin', function () {
                 'was written.”'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12500,7 +11279,7 @@ describe('Abbreviations: Latin', function () {
                 'pages or sections.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12670,7 +11449,7 @@ describe('Abbreviations: Latin', function () {
                 'That patient needs attention, stat.!'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12734,7 +11513,7 @@ describe('Abbreviations: Latin', function () {
                 'exposed to this new element.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -12954,7 +11733,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 'The price for 15 bbls. is unknown to me.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13043,7 +11822,7 @@ describe('Abbreviations: English unit abbreviations', function () {
             var root = parser.tokenizeSentence(
                 '12 cu. in. could also be written as 12inch^3.'
             );
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13149,7 +11928,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 'Could you get 2 doz. of eggs?'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13224,7 +12003,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 '1 fl. oz. equals about 28 ml.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13302,7 +12081,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 '2 oz. equals about 56–57 gr.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13376,7 +12155,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 '2 ft. equals exactly 60.96 centimeters.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13450,7 +12229,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 '1 gal. equals 8 pints.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13509,7 +12288,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 'dosage is “325 mg.”'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13639,7 +12418,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 '1 Gro. (a gross) refers to a group of 144 items.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13753,7 +12532,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 'There are 12 in. in a foot.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13827,7 +12606,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 'Items 10-karat or greater are to be stamped with ' +
                 'either Kt. or K.'
             );
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -13957,7 +12736,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 'In the imperial systems of measurement, 1 lb. equals ' +
                 '0.45359237 kilograms'
             );
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14072,7 +12851,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 'commonly equivalent to 5,280 feet.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14251,7 +13030,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 'one sixteenth of a pound.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14386,7 +13165,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 'one eighth of a gallon.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14521,7 +13300,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 'equals one fourth of a gallon.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14655,7 +13434,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 'The large house boasts 29 sq. ft. of living space.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14757,7 +13536,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                 'Add 3 tbsp. sea salt flakes.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14819,7 +13598,7 @@ describe('Abbreviations: English unit abbreviations', function () {
     it('should *not* treat the dot-character succeeding `tsp` ' +
         '(abbreviation for `teaspoon`), as a terminal marker', function () {
             var root = parser.tokenizeSentence('Add 1 tsp. mustard powder.');
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14874,7 +13653,7 @@ describe('Abbreviations: English unit abbreviations', function () {
     it('should *not* treat the dot-character succeeding `yd` ' +
         '(abbreviation for `yard`), as a terminal marker', function () {
             var root = parser.tokenizeSentence('2 yd. is a fanthom.');
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -14933,7 +13712,7 @@ describe('Abbreviations: Time references', function () {
             var root = parser.tokenizeSentence(
                 'Sprint for 90 sec. more, before you do some stretches.'
             );
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -15035,7 +13814,7 @@ describe('Abbreviations: Time references', function () {
                 'Continue down the road 8 more min. before turning left ' +
                 'at the crossroads.'
             );
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -15157,7 +13936,7 @@ describe('Abbreviations: Time references', function () {
                 'We\'ll be there in 1 hr. I think'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -15250,7 +14029,7 @@ describe('Abbreviations: Time references', function () {
                     'Let\'s move the meeting to next ' + day + '. at 10:00.'
                 );
 
-                assert(root.toAST() === JSON.stringify({
+                assert(JSON.stringify(root) === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -15366,7 +14145,7 @@ describe('Abbreviations: Time references', function () {
                     'My birthday is in ' + month + ' on the 12th.'
                 );
 
-                assert(root.toAST() === JSON.stringify({
+                assert(JSON.stringify(root) === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -15454,7 +14233,7 @@ describe('Abbreviations: Decimals (prefixed by a full-stop)', function () {
                     'See § .' + digit + ' ¶ 2.'
                 );
 
-                assert(root.toAST() === JSON.stringify({
+                assert(JSON.stringify(root) === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -15525,7 +14304,7 @@ describe('Abbreviations: TLD abbreviations', function () {
                     'The domain .' + domain + ' is a top-level domain.'
                 );
 
-                assert(root.toAST() === JSON.stringify({
+                assert(JSON.stringify(root) === JSON.stringify({
                     'type' : 'SentenceNode',
                     'children' : [
                         {
@@ -15606,7 +14385,7 @@ describe('Abbreviations: TLD abbreviations', function () {
 describe('Contractions', function () {
     it('should break contractions of `‘ll` (from `will`)', function () {
         var root = parser.tokenizeSentence('She\'ll be at the meeting');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15659,7 +14438,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `‘re` (from `are`)', function () {
         var root = parser.tokenizeSentence('You\'re finished');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15688,7 +14467,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `‘ve` (from `have`)', function () {
         var root = parser.tokenizeSentence('Do you\'ve any tips');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15733,7 +14512,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `n‘t` (from `not`)', function () {
         var root = parser.tokenizeSentence('Ain\'t nobody');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15767,7 +14546,7 @@ describe('Contractions', function () {
     it('should break contractions of `‘s` (from `us`, `is`, `does`, ' +
         'and `has`)', function () {
             var root = parser.tokenizeSentence('It\'s backed up');
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -15805,7 +14584,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `‘m` (from `am`)', function () {
         var root = parser.tokenizeSentence('I\'m on a boat');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15851,7 +14630,7 @@ describe('Contractions', function () {
     it('should break contractions of `‘d` (from `had`, `did`, and `would`)',
         function () {
             var root = parser.tokenizeSentence('Where\'d he go');
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -15889,7 +14668,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `cannot`', function () {
         var root = parser.tokenizeSentence('They cannot fly');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15922,7 +14701,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `d\'ye` (from `do you`)', function () {
         var root = parser.tokenizeSentence('What d\'ye need?');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15963,7 +14742,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `gimme` (`from give me`)', function () {
         var root = parser.tokenizeSentence('Gimme more');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -15988,7 +14767,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `lemme` (from `let me`)', function () {
         var root = parser.tokenizeSentence('Lemme go!');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16017,7 +14796,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `‘em` (from `them`)', function () {
         var root = parser.tokenizeSentence('Have you seen \'em?');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16063,7 +14842,7 @@ describe('Contractions', function () {
     it('should break contractions of `o‘` (from `of (the)`, as in `o‘clock`)',
         function () {
             var root = parser.tokenizeSentence('See you at ten o\'clock.');
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16122,7 +14901,7 @@ describe('Contractions', function () {
     it('should break contractions of `y‘` (from `you`, as in `y‘all`)',
         function () {
             var root = parser.tokenizeSentence('Hold on, y\'all!');
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16172,7 +14951,7 @@ describe('Contractions', function () {
                 '\'Twas the night before Christmas.'
             );
 
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16231,7 +15010,7 @@ describe('Contractions', function () {
     it('should break contractions of `coulda` (from `could have`)',
         function () {
             var root = parser.tokenizeSentence('You coulda told him');
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16274,7 +15053,7 @@ describe('Contractions', function () {
     it('should break contractions of `musta` (from `must have`)',
         function () {
             var root = parser.tokenizeSentence('He musta guessed');
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16309,7 +15088,7 @@ describe('Contractions', function () {
     it('should break contractions of `shoulda` (from `should have`)',
         function () {
             var root = parser.tokenizeSentence('You shoulda told me');
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16352,7 +15131,7 @@ describe('Contractions', function () {
     it('should break contractions of `woulda` (from `would have`)',
         function () {
             var root = parser.tokenizeSentence('You woulda told him');
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16394,7 +15173,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `kinda` (from `kind of`)', function () {
         var root = parser.tokenizeSentence('That\'s kinda funny');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16435,7 +15214,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `sorta` (from `sort of`)', function () {
         var root = parser.tokenizeSentence('That\'s sorta funny');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16477,7 +15256,7 @@ describe('Contractions', function () {
     it('should break contractions of `oughta` (from `ought of`)',
         function () {
             var root = parser.tokenizeSentence('I oughta go');
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16512,7 +15291,7 @@ describe('Contractions', function () {
     it('should break contractions of `wanna` (from `want a` or `want to`)',
         function () {
             var root = parser.tokenizeSentence('I wanna puppy');
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16546,7 +15325,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `gonna` (from `going to`)', function () {
         var root = parser.tokenizeSentence('I’m gonna go');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16588,7 +15367,7 @@ describe('Contractions', function () {
     it('should break contractions of `doncha` (from `don‘t you`)',
         function () {
             var root = parser.tokenizeSentence('Doncha wanna?');
-            assert(root.toAST() === JSON.stringify({
+            assert(JSON.stringify(root) === JSON.stringify({
                 'type' : 'SentenceNode',
                 'children' : [
                     {
@@ -16622,7 +15401,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `gotcha` (from `got you`)', function () {
         var root = parser.tokenizeSentence('I gotcha now!');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16659,7 +15438,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `getcha` (from `get you`)', function () {
         var root = parser.tokenizeSentence('Gonna getcha!');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16692,7 +15471,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `outta` (from `out of`)', function () {
         var root = parser.tokenizeSentence('I\'m outta here');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16733,7 +15512,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `lotta` (from `lot of`)', function () {
         var root = parser.tokenizeSentence('A whole lotta people');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16774,7 +15553,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `hafta` (from `have to`)', function () {
         var root = parser.tokenizeSentence('I hafta fill in my tax return');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16839,7 +15618,7 @@ describe('Contractions', function () {
 
     it('should break contractions of `gotta` (from `got to`)', function () {
         var root = parser.tokenizeSentence('I gotta learn');
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
                 {
@@ -16879,7 +15658,7 @@ describe('Terminal markers', function () {
             'are Mss., Mses. and Mmes.'
         );
 
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'ParagraphNode',
             'children' : [
                 {
@@ -17141,7 +15920,7 @@ describe('Terminal markers', function () {
             'Is it good in form? style? meaning? He responded with yes.'
         );
 
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'ParagraphNode',
             'children' : [
                 {
@@ -17264,7 +16043,7 @@ describe('Terminal markers', function () {
             'low-priced rugs on sale this week.'
         );
 
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'ParagraphNode',
             'children' : [
                 {
@@ -17467,7 +16246,7 @@ describe('Terminal markers', function () {
             'Say what‽ She\'s pregnant?! Realy!? Wow.'
         );
 
-        assert(root.toAST() === JSON.stringify({
+        assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'ParagraphNode',
             'children' : [
                 {
@@ -17576,7 +16355,7 @@ describe('Terminal markers', function () {
             'She said that you should end a sentence with an ellipsis.'
         );
 
-        assert(root.head.toAST() === JSON.stringify({
+        assert(JSON.stringify(root.children[0]) === JSON.stringify({
             'type' : 'ParagraphNode',
             'children' : [
                 {
@@ -17754,4 +16533,4 @@ describe('Terminal markers', function () {
     });
 });
 
-},{"..":1,"assert":2,"retext-ast":7}]},{},[9])
+},{"..":1,"assert":2}]},{},[7])
