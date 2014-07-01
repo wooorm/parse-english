@@ -662,10 +662,9 @@ function tokenizePunctuation(value) {
  */
 function tokenizeSentence(value) {
     var breakpoints = [],
-        tokens = [],
         iterator = -1,
         length = EXPRESSION_WORD_CONTRACTION.length,
-        sentence, children, expression, pointer, match, token, start, end;
+        sentence, children, expression, match, token, start, end;
 
     /* Construct an AST object for the sentence. */
     sentence = {
