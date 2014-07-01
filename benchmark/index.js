@@ -1,48 +1,94 @@
 'use strict';
 
-var parseEnglish, source, tiny, small, medium, large;
+var Parser, sentence, paragraph, section, article, book;
 
-parseEnglish = require('..');
-
-source = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ' +
-    'ac ultricies diam, quis vehicula mauris. Vivamus accumsan eleifend ' +
-    'quam et varius. Etiam congue id magna eu fermentum. Aliquam mollis ' +
-    'adipiscing.\n\n';
+Parser = require('..');
 
 /* Test data */
-tiny = source;
-small = Array(11).join(source);
-medium = Array(11).join(small);
-large = Array(11).join(medium);
+
+/* Source: http://www.gutenberg.org/files/10745/10745-h/10745-h.htm */
+
+/* A sentence, 20 words. */
+sentence = 'Where she had stood was clear, and she was gone since Sir Kay does not choose to assume my quarrel.';
+
+/* A paragraph, 5 sentences, 100 words. */
+paragraph = 'Thou art a churlish knight to so affront a lady ' +
+    'he could not sit upon his horse any longer. ' +
+    'For methinks something hath befallen my lord and that he ' +
+    'then, after a while, he cried out in great voice. ' +
+    'For that light in the sky lieth in the south ' +
+    'then Queen Helen fell down in a swoon, and lay. ' +
+    'Touch me not, for I am not mortal, but Fay ' +
+    'so the Lady of the Lake vanished away, everything behind. ' +
+    sentence;
+
+/* A section, 10 paragraphs, 50 sentences, 1,000 words. */
+section = paragraph + Array(10).join('\n\n' + paragraph);
+
+/* An article, 100 paragraphs, 500 sentences, 10,000 words. */
+article = section + Array(10).join('\n\n' + section);
+
+/* A book, 1,000 paragraphs, 5,000 sentences, 100,000 words. */
+book = article + Array(10).join('\n\n' + article);
 
 /* Benchmarks */
-suite('parse(source); // Reuse instance', function () {
-    var parse = parseEnglish();
+suite('parser.tokenizeSentence(source);', function () {
+    var parser = new Parser();
 
-    bench('tiny (1 paragraph, 5 sentences, 30 words, 208 B)',
+    set('mintime', 50);
+
+    bench('A sentence (20 words)', function (next) {
+        parser.tokenizeSentence(sentence);
+        next();
+    });
+});
+
+
+/* Benchmarks */
+suite('parser.tokenizeParagraph(source);', function () {
+    var parser = new Parser();
+
+    set('mintime', 50);
+
+    bench('A sentence (20 words)', function (next) {
+        parser.tokenizeParagraph(sentence);
+        next();
+    });
+
+    bench('A paragraph (5 sentences, 100 words)', function (next) {
+        parser.tokenizeParagraph(paragraph);
+        next();
+    });
+});
+
+/* Benchmarks */
+suite('parser.tokenizeRoot(source);', function () {
+    var parser = Parser();
+
+    set('mintime', 100);
+
+    bench('A paragraph (5 sentences, 100 words)', function (next) {
+        parser.tokenizeRoot(paragraph);
+        next();
+    });
+
+    bench('A section (10 paragraphs, 50 sentences, 1,000 words)',
         function (next) {
-            parse.tokenizeRoot(tiny);
+            parser.tokenizeRoot(section);
             next();
         }
     );
 
-    bench('small (10 paragraphs, 50 sentences, 300 words, 2 kB)',
+    bench('An article (100 paragraphs, 500 sentences, 10,000 words)',
         function (next) {
-            parse.tokenizeRoot(small);
+            parser.tokenizeRoot(article);
             next();
         }
     );
 
-    bench('medium (100 paragraphs, 500 sentences, 3000 words, 21 kB)',
+    bench('A (large) book (1,000 paragraphs, 5,000 sentences, 100,000 words)',
         function (next) {
-            parse.tokenizeRoot(medium);
-            next();
-        }
-    );
-
-    bench('large (1000 paragraphs, 5000 sentences, 30000 words, 208 kB)',
-        function (next) {
-            parse.tokenizeRoot(large);
+            parser.tokenizeRoot(book);
             next();
         }
     );
