@@ -9,7 +9,9 @@ var GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE, EXPRESSION_ABBREVIATION_AFFIX,
     EXPRESSION_SENTENCE_END, EXPRESSION_WORD_COMBINING, EXPRESSION_ORDINAL,
     EXPRESSION_INITIAL_WHITE_SPACE, EXPRESSION_WHITE_SPACE,
-    GROUP_COMBINING_NONSPACING_MARK, parserPrototype;
+    GROUP_COMBINING_NONSPACING_MARK, parserPrototype,
+    GROUP_LETTER_LOWER, EXPRESSION_FULL_STOP_SUFFIX_EXCEPTION,
+    EXPRESSION_TERMINAL_MARKER_SUFFIX_EXCEPTION;
 
 /**
  * Expose `expand`. Expands a list of Unicode code points and ranges to
@@ -60,6 +62,57 @@ GROUP_NUMERICAL = expand(
     '0F2A-0F331369-137C17F0-17F919DA20702074-20792080-20892150-215F' +
     '21892460-249B24EA-24FF2776-27932CFD3192-31953220-32293248-324F' +
     '3251-325F3280-328932B1-32BFA830-A835'
+);
+
+/**
+ * Expose `GROUP_LETTER_LOWER`. Unicode Alphabetic category Ll (Letter,
+ * lowercase).
+ *
+ * “Borrowed” from XRegexp.
+ *
+ * @global
+ * @private
+ * @constant
+ */
+GROUP_LETTER_LOWER = expand('0061-007A00B500DF-00F600F8-00FF010101030105' +
+    '01070109010B010D010F01110113011501170119011B011D011F0121012301250127' +
+    '0129012B012D012F01310133013501370138013A013C013E01400142014401460148' +
+    '0149014B014D014F01510153015501570159015B015D015F01610163016501670169' +
+    '016B016D016F0171017301750177017A017C017E-0180018301850188018C018D0192' +
+    '01950199-019B019E01A101A301A501A801AA01AB01AD01B001B401B601B901BA01BD-' +
+    '01BF01C601C901CC01CE01D001D201D401D601D801DA01DC01DD01DF01E101E301E5' +
+    '01E701E901EB01ED01EF01F001F301F501F901FB01FD01FF02010203020502070209' +
+    '020B020D020F02110213021502170219021B021D021F02210223022502270229022B' +
+    '022D022F02310233-0239023C023F0240024202470249024B024D024F-02930295-' +
+    '02AF037103730377037B-037D039003AC-03CE03D003D103D5-03D703D903DB03DD' +
+    '03DF03E103E303E503E703E903EB03ED03EF-03F303F503F803FB03FC0430-045F0461' +
+    '0463046504670469046B046D046F04710473047504770479047B047D047F0481048B' +
+    '048D048F04910493049504970499049B049D049F04A104A304A504A704A904AB04AD' +
+    '04AF04B104B304B504B704B904BB04BD04BF04C204C404C604C804CA04CC04CE04CF' +
+    '04D104D304D504D704D904DB04DD04DF04E104E304E504E704E904EB04ED04EF04F1' +
+    '04F304F504F704F904FB04FD04FF05010503050505070509050B050D050F05110513' +
+    '051505170519051B051D051F05210523052505270561-05871D00-1D2B1D6B-1D77' +
+    '1D79-1D9A1E011E031E051E071E091E0B1E0D1E0F1E111E131E151E171E191E1B1E1D' +
+    '1E1F1E211E231E251E271E291E2B1E2D1E2F1E311E331E351E371E391E3B1E3D1E3F' +
+    '1E411E431E451E471E491E4B1E4D1E4F1E511E531E551E571E591E5B1E5D1E5F1E61' +
+    '1E631E651E671E691E6B1E6D1E6F1E711E731E751E771E791E7B1E7D1E7F1E811E83' +
+    '1E851E871E891E8B1E8D1E8F1E911E931E95-1E9D1E9F1EA11EA31EA51EA71EA91EAB' +
+    '1EAD1EAF1EB11EB31EB51EB71EB91EBB1EBD1EBF1EC11EC31EC51EC71EC91ECB1ECD' +
+    '1ECF1ED11ED31ED51ED71ED91EDB1EDD1EDF1EE11EE31EE51EE71EE91EEB1EED1EEF' +
+    '1EF11EF31EF51EF71EF91EFB1EFD1EFF-1F071F10-1F151F20-1F271F30-1F371F40-' +
+    '1F451F50-1F571F60-1F671F70-1F7D1F80-1F871F90-1F971FA0-1FA71FB0-1FB4' +
+    '1FB61FB71FBE1FC2-1FC41FC61FC71FD0-1FD31FD61FD71FE0-1FE71FF2-1FF41FF6' +
+    '1FF7210A210E210F2113212F21342139213C213D2146-2149214E21842C30-2C5E2C61' +
+    '2C652C662C682C6A2C6C2C712C732C742C76-2C7B2C812C832C852C872C892C8B2C8D' +
+    '2C8F2C912C932C952C972C992C9B2C9D2C9F2CA12CA32CA52CA72CA92CAB2CAD2CAF' +
+    '2CB12CB32CB52CB72CB92CBB2CBD2CBF2CC12CC32CC52CC72CC92CCB2CCD2CCF2CD1' +
+    '2CD32CD52CD72CD92CDB2CDD2CDF2CE12CE32CE42CEC2CEE2CF32D00-2D252D272D2D' +
+    'A641A643A645A647A649A64BA64DA64FA651A653A655A657A659A65BA65DA65FA661' +
+    'A663A665A667A669A66BA66DA681A683A685A687A689A68BA68DA68FA691A693A695' +
+    'A697A723A725A727A729A72BA72DA72F-A731A733A735A737A739A73BA73DA73FA741' +
+    'A743A745A747A749A74BA74DA74FA751A753A755A757A759A75BA75DA75FA761A763' +
+    'A765A767A769A76BA76DA76FA771-A778A77AA77CA77FA781A783A785A787A78CA78E' +
+    'A791A793A7A1A7A3A7A5A7A7A7A9A7FAFB00-FB06FB13-FB17FF41-FF5A'
 );
 
 /**
@@ -481,7 +534,7 @@ EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE = new RegExp(
  * @constant
  */
 EXPRESSION_ABBREVIATION_AFFIX = new RegExp(
-    '\\.(' + [
+    '\\.(?:' + [
     /*
      * Generic Top-level Domains:
      * Air transport industry, Asia-Pacific, business use, Catalan,
@@ -502,6 +555,37 @@ EXPRESSION_ABBREVIATION_AFFIX = new RegExp(
 'g');
 
 /**
+ * `EXPRESSION_FULL_STOP_SUFFIX_EXCEPTION` matches a full stop, optionally
+ * followed by closing punctuation, followed by either a number or a comma.
+ *
+ * @global
+ * @private
+ * @constant
+ */
+EXPRESSION_FULL_STOP_SUFFIX_EXCEPTION = new RegExp(
+    '\\.' +
+    '[' + GROUP_CLOSING_PUNCTUATION + GROUP_FINAL_PUNCTUATION + ']?' +
+    '[,' + GROUP_NUMERICAL + ']',
+    'g'
+);
+
+/**
+ * `EXPRESSION_TERMINAL_MARKER_SUFFIX_EXCEPTION` matches a terminal marker,
+ * optionally followed by closing punctuation, followed one or more white
+ * space characters and a lower letter.
+ *
+ * @global
+ * @private
+ * @constant
+ */
+EXPRESSION_TERMINAL_MARKER_SUFFIX_EXCEPTION = new RegExp(
+    '[\\.' + GROUP_TERMINAL_MARKER + ']' +
+    '[' + GROUP_CLOSING_PUNCTUATION + GROUP_FINAL_PUNCTUATION + ']?' +
+    '\\ +[' + GROUP_LETTER_LOWER + ']',
+    'g'
+);
+
+/**
  * `EXPRESSION_WORD_CHARACTER` finds a word character.
  *
  * @global
@@ -515,20 +599,20 @@ EXPRESSION_WORD_CHARACTER = new RegExp('[' + GROUP_ALPHABETIC + ']');
  *
  * A probable sentence end:
  * A terminal marker (`?`, `!`, or `.`),
- * followed by an optional closing punctuation (e.g., `)` or `”`),
- * followed by an optional comma, full stop, or number,
- * optionally followed by one or more spaces and a letter.
+ * followed by an optional closing punctuation (e.g., `)` or `”`).
  *
  * @global
  * @private
  * @constant
  */
 EXPRESSION_SENTENCE_END = new RegExp(
-    '$|(\\.|[' + GROUP_TERMINAL_MARKER + ']+)' +
-    '([' + GROUP_CLOSING_PUNCTUATION + GROUP_FINAL_PUNCTUATION + '])?' +
-    '([,\\.' + GROUP_NUMERICAL + '])?' +
-    '(?:(\\ +)([\\.' + GROUP_ALPHABETIC + ']))?',
-'g');
+    '$|(' +
+    '(?:\\.[' + GROUP_WHITE_SPACE + ']?)*\\.|' +
+    '[' + GROUP_TERMINAL_MARKER + ']+' +
+    ')' +
+    '([' + GROUP_CLOSING_PUNCTUATION + GROUP_FINAL_PUNCTUATION + '])?',
+    'g'
+);
 
 /**
  * `EXPRESSION_INITIAL_WHITE_SPACE` matches optional white space at the start
@@ -663,8 +747,7 @@ function tokenizePunctuation(value) {
 function tokenizeSentence(value) {
     var breakpoints = [],
         iterator = -1,
-        length = EXPRESSION_WORD_CONTRACTION.length,
-        sentence, children, expression, match, token, start, end;
+        length, sentence, children, expression, match, token, start, end;
 
     /* Construct an AST object for the sentence. */
     sentence = {
@@ -672,13 +755,20 @@ function tokenizeSentence(value) {
         'children' : []
     };
 
+    /* Return early if no content can be tokenized. */
+    if (!value) {
+        return sentence;
+    }
+
     children = sentence.children;
 
-    /* Reset indexes on expressions. */
+    /* Reset indices on expressions. */
     EXPRESSION_WORD_DIGIT_LETTER.lastIndex =
         EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
 
     /* Insert breakpoints between contractions. */
+    length = EXPRESSION_WORD_CONTRACTION.length;
+
     while (++iterator < length) {
         expression = EXPRESSION_WORD_CONTRACTION[iterator];
 
@@ -695,7 +785,7 @@ function tokenizeSentence(value) {
     }
 
     /*
-     * Inser breakpoints before and after general punctuation (One or more
+     * Insert breakpoints before and after general punctuation (One or more
      * of the same non-letter or non-number character), unless the
      * punctuation consists solely of combining diacritics.
      */
@@ -786,7 +876,8 @@ function tokenizeParagraph(value) {
         blacklist = {},
         iterator = -1,
         start = 0,
-        paragraph, children, sentence, whiteSpace, end, match, $5;
+        delimiter, paragraph, children, sentence, whiteSpace, end, match,
+        length, exceptions, exception, pointer;
 
     /* Construct an AST object for the paragraph. */
     paragraph = {
@@ -794,64 +885,82 @@ function tokenizeParagraph(value) {
         'children' : []
     };
 
+    /* Return early if no content can be tokenized. */
+    if (!value) {
+        return paragraph;
+    }
+
     children = paragraph.children;
 
-    /* Reset indexes on expressions. */
-    EXPRESSION_SENTENCE_END.lastIndex =
-        EXPRESSION_ABBREVIATION_PREFIX.lastIndex =
-        EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE.lastIndex =
-        EXPRESSION_ABBREVIATION_AFFIX.lastIndex = 0;
+    /* Get the sentence delimiter, and set its `lastIndex` property to 0. */
+    delimiter = this.DELIMITER_SENTENCE;
+    delimiter.lastIndex = 0;
 
-    /* A (case insensitive) common abbreviation, followed by a full stop. */
-    while (match = EXPRESSION_ABBREVIATION_PREFIX.exec(value)) {
-        blacklist[match.index + match[1].length] = true;
+    /* Get the sentence exceptions black list. */
+    exceptions = this.SENTENCE_BLACKLIST;
+    length = exceptions.length;
+
+    /* Iterate over the black list. */
+    while (++iterator < length) {
+        exception = exceptions[iterator];
+
+        /* Set the exception’s `lastIndex` property to 0. */
+        exception.lastIndex = 0;
+
+        /* While a match is found... */
+        while (match = exception.exec(value)) {
+            pointer = match.index;
+
+            /*
+             * If a first group matched, move the pointer over to after its
+             * end.
+             */
+            if (match[1]) {
+                pointer += match[1].length;
+            }
+
+            /* Black list the pointer. */
+            blacklist[pointer] = true;
+        }
     }
 
-    /* A (case sensitive) common abbreviation, followed by a full stop. */
-    while (match = EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE.exec(value)) {
-        blacklist[match.index + match[1].length] = true;
-    }
+    /* for every match of the sentence delimiter expression... */
+    while (match = delimiter.exec(value)) {
+        end = match.index;
 
-    /* A full stop, followed by a common abbreviation. */
-    while (match = EXPRESSION_ABBREVIATION_AFFIX.exec(value)) {
-        blacklist[match.index] = true;
-    }
-
-    /*
-     * A probable sentence end, either $ (end of value), or:
-     *   - A terminal marker (a full-stop, or multiple `?`, `!`, or `‽`
-     *     characters).
-     *   - Optionally followed by a closing or final punctuation (e.g., `)` or
-     *     `”`).
-     *   - Optionally followed by a comma, full stop, or number.
-     *   - Optionally followed by a comma, full stop, or number.
-     *   - Optionally followed by both:
-     *      - One or more spaces.
-     *      - A full-stop or a letter.
-     */
-    while (match = EXPRESSION_SENTENCE_END.exec(value)) {
         /*
-         * If the index is is blacklisted, thus in an abbreviation, continue.
-         *
-         * If three was set, the delimiter is followed by a comma character,
-         * or a number, thus it's probably not a terminal marker.
+         * If a first group matched, move the pointer over to its last
+         * character.
          */
-        if (match.index in blacklist || match[3]) {
+        if (match[1]) {
+            end += match[1].length - 1;
+        }
+
+        /* If the character at pointer is is blacklisted, continue. */
+        if (end in blacklist) {
             continue;
         }
 
-        $5 = match[5];
-
         /*
-         * If five was set, the delimiter is followed by a space and a letter.
-         * If that letter is lowercase, its probably not a terminal marker.
+         * If a first group matched, move the pointer over to after that
+         * group.
          */
-        if ($5 && $5 === $5.toLowerCase()) {
-            continue;
+        if (match[1]) {
+            end += 1;
         }
 
-        end = match.index + (match[1] || '').length + (match[2] || '').length;
+        /*
+         * If a second group matched (extra content which should be contained
+         * by the sentence), move the pointer over to after that group.
+         */
+        if (match[2]) {
+            end += match[2].length;
+        }
 
+        /*
+         * Slice the found sentence content, from (including) start to (not
+         * including) end.
+         */
         sentence = value.substring(start, end);
 
         /*
@@ -882,7 +991,7 @@ function tokenizeParagraph(value) {
          * The expression also matches $ (end-of-string), which keeps on
          * matching in global state, thus we detect it here and exit the loop.
          */
-        if (end === value.length) {
+        if (delimiter.lastIndex === value.length) {
             break;
         }
 
@@ -891,6 +1000,8 @@ function tokenizeParagraph(value) {
          */
         start = end;
     }
+
+    iterator = -1;
 
     /*
      * Walk over the previously defined sentences, break off their initial
@@ -931,22 +1042,26 @@ function tokenizeParagraph(value) {
  */
 function tokenizeRoot(value) {
     var start = 0,
-        root, children, match, end, paragraph, whiteSpace;
+        delimiter, root, children, match, end, paragraph, whiteSpace;
 
+    /* Construct an AST object for the paragraph. */
     root = {
         'type' : 'RootNode',
         'children' : []
     };
 
+    /* Return early if no content can be tokenized. */
     if (!value) {
         return root;
     }
 
     children = root.children;
 
-    EXPRESSION_MULTILINEBREAK.lastIndex = 0;
+    /* Get the sentence delimiter, and set its `lastIndex` property to 0. */
+    delimiter = this.DELIMITER_PARAGRAPH;
+    delimiter.lastIndex = 0;
 
-    while (match = EXPRESSION_MULTILINEBREAK.exec(value)) {
+    while (match = delimiter.exec(value)) {
         end = match.index + match[0].length;
 
         paragraph = value.substring(start, match.index);
@@ -1005,5 +1120,17 @@ parserPrototype.tokenizeSentence = tokenizerFactory(tokenizeSentence);
 parserPrototype.tokenizePunctuation = tokenizerFactory(tokenizePunctuation);
 parserPrototype.tokenizeWord = tokenizerFactory(tokenizeWord);
 parserPrototype.tokenizeWhiteSpace = tokenizerFactory(tokenizeWhiteSpace);
+
+parserPrototype.DELIMITER_PARAGRAPH = EXPRESSION_MULTILINEBREAK;
+
+parserPrototype.DELIMITER_SENTENCE = EXPRESSION_SENTENCE_END;
+
+parserPrototype.SENTENCE_BLACKLIST = [
+    EXPRESSION_ABBREVIATION_AFFIX,
+    EXPRESSION_ABBREVIATION_PREFIX,
+    EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE,
+    EXPRESSION_FULL_STOP_SUFFIX_EXCEPTION,
+    EXPRESSION_TERMINAL_MARKER_SUFFIX_EXCEPTION
+];
 
 module.exports = Parser;
