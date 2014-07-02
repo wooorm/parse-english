@@ -4,7 +4,7 @@ var GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     GROUP_COMBINING_DIACRITICAL_MARK, GROUP_TERMINAL_MARKER,
     GROUP_CLOSING_PUNCTUATION, GROUP_FINAL_PUNCTUATION,
     EXPRESSION_WORD_CONTRACTION, EXPRESSION_WORD_MULTIPUNCTUATION,
-    EXPRESSION_WORD_DIGIT_LETTER, EXPRESSION_MULTILINEBREAK, STRING_PIPE,
+    EXPRESSION_MULTILINEBREAK, STRING_PIPE,
     EXPRESSION_ABBREVIATION_PREFIX, EXPRESSION_WORD_CHARACTER,
     EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE, EXPRESSION_ABBREVIATION_AFFIX,
     EXPRESSION_SENTENCE_END, EXPRESSION_WORD_COMBINING, EXPRESSION_ORDINAL,
@@ -328,18 +328,6 @@ EXPRESSION_WORD_COMBINING = new RegExp(
     '^([' +
     GROUP_COMBINING_DIACRITICAL_MARK + GROUP_COMBINING_NONSPACING_MARK +
     '])+$'
-);
-
-/**
- * `EXPRESSION_WORD_DIGIT_LETTER` matches one or more digits followed by
- * one or more letters.
- *
- * @global
- * @private
- * @constant
- */
-EXPRESSION_WORD_DIGIT_LETTER = new RegExp('([' + GROUP_NUMERICAL +
-    ']+)([' + GROUP_ALPHABETIC + ']+)', 'g'
 );
 
 /**
@@ -762,10 +750,6 @@ function tokenizeSentence(value) {
 
     children = sentence.children;
 
-    /* Reset indices on expressions. */
-    EXPRESSION_WORD_DIGIT_LETTER.lastIndex =
-        EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
-
     /* Insert breakpoints between contractions. */
     length = EXPRESSION_WORD_CONTRACTION.length;
 
@@ -789,19 +773,11 @@ function tokenizeSentence(value) {
      * of the same non-letter or non-number character), unless the
      * punctuation consists solely of combining diacritics.
      */
+    EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
+
     while (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(value)) {
         if (!EXPRESSION_WORD_COMBINING.test(match[0])) {
             breakpoints.push(match.index, match.index + match[0].length);
-        }
-    }
-
-    /*
-     * Break on one or more digits followed by one or more letters, unless
-     * those letters are an ordinal suffix
-     */
-    while (match = EXPRESSION_WORD_DIGIT_LETTER.exec(value)) {
-        if (!EXPRESSION_ORDINAL.test(match[2])) {
-            breakpoints.push(match.index + match[1].length);
         }
     }
 

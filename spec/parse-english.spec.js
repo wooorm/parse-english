@@ -3314,11 +3314,7 @@ describe('A simple sentence testing for digit-letters', function () {
                 },
                 {
                     'type' : 'WordNode',
-                    'value' : '5'
-                },
-                {
-                    'type' : 'WordNode',
-                    'value' : 'S'
+                    'value' : '5S'
                 },
                 {
                     'type' : 'WhiteSpaceNode',
@@ -7871,11 +7867,7 @@ describe('Abbreviations: Latin', function () {
                     },
                     {
                         'type' : 'WordNode',
-                        'value' : '258'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'f'
+                        'value' : '258f'
                     },
                     {
                         'type' : 'PunctuationNode',
@@ -7943,11 +7935,7 @@ describe('Abbreviations: Latin', function () {
                     },
                     {
                         'type' : 'WordNode',
-                        'value' : '258'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'ff'
+                        'value' : '258ff'
                     },
                     {
                         'type' : 'PunctuationNode',
@@ -9910,11 +9898,7 @@ describe('Abbreviations: English unit abbreviations', function () {
                     },
                     {
                         'type' : 'WordNode',
-                        'value' : '12'
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'value' : 'inch'
+                        'value' : '12inch'
                     },
                     {
                         'type' : 'PunctuationNode',
