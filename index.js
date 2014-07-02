@@ -3,7 +3,7 @@
 var GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     GROUP_COMBINING_DIACRITICAL_MARK, GROUP_TERMINAL_MARKER,
     GROUP_CLOSING_PUNCTUATION, GROUP_FINAL_PUNCTUATION,
-    EXPRESSION_WORD_CONTRACTION, EXPRESSION_WORD_MULTIPUNCTUATION,
+    EXPRESSION_WORD_MULTIPUNCTUATION,
     EXPRESSION_MULTILINEBREAK, STRING_PIPE,
     EXPRESSION_ABBREVIATION_PREFIX, EXPRESSION_WORD_CHARACTER,
     EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE, EXPRESSION_ABBREVIATION_AFFIX,
@@ -276,31 +276,6 @@ GROUP_CLOSING_PUNCTUATION = expand('0029005D007D0F3B0F3D169C2046' +
 GROUP_FINAL_PUNCTUATION = expand(
     '00BB2019201D203A2E032E052E0A2E0D2E1D2E21'
 );
-
-/**
- * `EXPRESSION_WORD_CONTRACTION` caches contractions consisting of two
- * parts.
- *
- * Sources:
- * - http://en.wikipedia.org/wiki/Relaxed_pronunciation#English
- * - http://en.wikipedia.org/wiki/Contraction_(grammar)#English
- * - http://en.wikipedia.org/wiki/English_auxiliaries_and_contractions
- *
- * @global
- * @private
- * @constant
- */
-EXPRESSION_WORD_CONTRACTION = [
-    /([\s\S])(n['’]t)\b/ig,
-    /(['’]t)/ig,
-    /\b(can)(not)\b/ig,
-    /\b(gim)(me)\b/ig,
-    /\b(lem)(me)\b/ig,
-    /\b(could|must|should|would|kind|sort|ought)(a)\b/ig,
-    /\b(wan|gon)(na)\b/ig,
-    /\b(don|got|get)(cha)\b/ig,
-    /\b(out|lot|haf|got)(ta)\b/ig
-];
 
 /**
  * `EXPRESSION_WORD_MULTIPUNCTUATION` matches either an astral plane
@@ -735,7 +710,7 @@ function tokenizePunctuation(value) {
 function tokenizeSentence(value) {
     var breakpoints = [],
         iterator = -1,
-        length, sentence, children, expression, match, token, start, end;
+        length, sentence, children, match, token, start, end;
 
     /* Construct an AST object for the sentence. */
     sentence = {
@@ -749,24 +724,6 @@ function tokenizeSentence(value) {
     }
 
     children = sentence.children;
-
-    /* Insert breakpoints between contractions. */
-    length = EXPRESSION_WORD_CONTRACTION.length;
-
-    while (++iterator < length) {
-        expression = EXPRESSION_WORD_CONTRACTION[iterator];
-
-        /* Reset index on the expression. */
-        expression.lastIndex = 0;
-
-        /*
-         * Iterate over all contractions in the given source, and insert a
-         * breakpoint after the first match.
-         */
-        while (match = expression.exec(value)) {
-            breakpoints.push(match.index + match[1].length);
-        }
-    }
 
     /*
      * Insert breakpoints before and after general punctuation (One or more
