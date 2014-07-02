@@ -46,7 +46,7 @@ describe('new ParseEnglish()', function () {
 });
 
 describe('Root: Without a value', function () {
-    it('should return an empty RootNode when invoked wihtout value',
+    it('should return an empty RootNode when invoked without value',
         function () {
             assert(
                 JSON.stringify(parser.tokenizeRoot()) ===
@@ -755,6 +755,34 @@ describe('A whitespace only document', function () {
             ]
         }));
     });
+});
+
+describe('Paragraph: Without a value', function () {
+    it('should return an empty ParagraphNode when invoked without value',
+        function () {
+            assert(
+                JSON.stringify(parser.tokenizeParagraph()) ===
+                JSON.stringify({
+                    'type' : 'ParagraphNode',
+                    'children' : []
+                })
+            );
+        }
+    );
+});
+
+describe('Sentence: Without a value', function () {
+    it('should return an empty SentenceNode when invoked without value',
+        function () {
+            assert(
+                JSON.stringify(parser.tokenizeSentence()) ===
+                JSON.stringify({
+                    'type' : 'SentenceNode',
+                    'children' : []
+                })
+            );
+        }
+    );
 });
 
 /*
