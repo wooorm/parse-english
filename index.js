@@ -3,11 +3,11 @@
 var GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
     GROUP_COMBINING_DIACRITICAL_MARK, GROUP_TERMINAL_MARKER,
     GROUP_CLOSING_PUNCTUATION, GROUP_FINAL_PUNCTUATION,
-    EXPRESSION_WORD_MULTIPUNCTUATION,
+    GROUP_WORD, GROUP_ASTRAL, EXPRESSION_TOKEN, EXPRESSION_WORD,
     EXPRESSION_MULTILINEBREAK, STRING_PIPE,
     EXPRESSION_ABBREVIATION_PREFIX, EXPRESSION_WORD_CHARACTER,
     EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE, EXPRESSION_ABBREVIATION_AFFIX,
-    EXPRESSION_SENTENCE_END, EXPRESSION_WORD_COMBINING, EXPRESSION_ORDINAL,
+    EXPRESSION_SENTENCE_END,
     EXPRESSION_INITIAL_WHITE_SPACE, EXPRESSION_WHITE_SPACE,
     GROUP_COMBINING_NONSPACING_MARK, parserPrototype,
     GROUP_LETTER_LOWER, EXPRESSION_FULL_STOP_SUFFIX_EXCEPTION,
@@ -237,6 +237,29 @@ GROUP_COMBINING_NONSPACING_MARK = expand('0300-036F0483-04870591-05BD' +
 );
 
 /**
+ * Expose `GROUP_WORD`. Includes the Unicode:
+ * - Number Range (Nd, Nl, and No);
+ * - Alphabetic Range (Lu, Ll, and Lo);
+ * - Combining Diacritical Marks block;
+ * - Combining Diacritical Marks for Symbols block;
+ *
+ * @global
+ * @private
+ * @constant
+ */
+GROUP_WORD = GROUP_NUMERICAL + GROUP_ALPHABETIC +
+    GROUP_COMBINING_DIACRITICAL_MARK + GROUP_COMBINING_NONSPACING_MARK;
+
+/**
+ * Expose `GROUP_ASTRAL`. Unicode Cs (Other, Surrogate) category.
+ *
+ * @global
+ * @private
+ * @constant
+ */
+GROUP_ASTRAL = expand('D800-DBFFDC00-DFFF');
+
+/**
  * Expose `GROUP_TERMINAL_MARKER`. Interrobang, question-, and
  * exclamation mark
  *
@@ -247,8 +270,8 @@ GROUP_COMBINING_NONSPACING_MARK = expand('0300-036F0483-04870591-05BD' +
 GROUP_TERMINAL_MARKER = '\\u203D\\?\\!';
 
 /**
- * Expose `GROUP_CLOSING_PUNCTUATION`. Unicode
- * Pe (Punctuation, Close) category.
+ * Expose `GROUP_CLOSING_PUNCTUATION`. Unicode Pe (Punctuation, Close)
+ * category.
  *
  * “Borrowed” from XRegexp.
  *
@@ -273,47 +296,37 @@ GROUP_CLOSING_PUNCTUATION = expand('0029005D007D0F3B0F3D169C2046' +
  * @private
  * @constant
  */
-GROUP_FINAL_PUNCTUATION = expand(
-    '00BB2019201D203A2E032E052E0A2E0D2E1D2E21'
-);
+GROUP_FINAL_PUNCTUATION = expand('00BB2019201D203A2E032E052E0A2E0D2E1D2E21');
 
 /**
- * `EXPRESSION_WORD_MULTIPUNCTUATION` matches either an astral plane
- * character, or streaks of the same punctuation character.
+ * `EXPRESSION_WORD` matches a word.
  *
  * @global
  * @private
  * @constant
  */
-EXPRESSION_WORD_MULTIPUNCTUATION = new RegExp(
-    '([\\uD800-\\uDBFF][\\uDC00-\\uDFFF])+|[\\s\\S][' +
-    GROUP_COMBINING_DIACRITICAL_MARK + GROUP_COMBINING_NONSPACING_MARK +
-    ']{2,}|([^' + GROUP_NUMERICAL + GROUP_ALPHABETIC + '])\\2*', 'g'
-);
+EXPRESSION_WORD = new RegExp('^[' + GROUP_WORD + ']+$');
 
 /**
- * `EXPRESSION_WORD_COMBINING` matches multiple combining mark
- * characters.
+ * `EXPRESSION_TOKEN` matches all tokens:
+ * - One or more number, alphabetic, or combining characters;
+ * - One or more white space characters;
+ * - One or more astral plane characters;
+ * - One or more of the same characte;
  *
  * @global
  * @private
  * @constant
  */
-EXPRESSION_WORD_COMBINING = new RegExp(
-    '^([' +
-    GROUP_COMBINING_DIACRITICAL_MARK + GROUP_COMBINING_NONSPACING_MARK +
-    '])+$'
+EXPRESSION_TOKEN = new RegExp(
+    '(' +
+        '[' + GROUP_WORD + ']+|' +
+        '[' + GROUP_WHITE_SPACE + ']+|' +
+        '[' + GROUP_ASTRAL + ']+|' +
+        '([\\s\\S])\\2*' +
+    ')',
+    'g'
 );
-
-/**
- * `EXPRESSION_ORDINAL` matches an ordinal suffix: `th`, `st`, `nd`,
- * or `rd`.
- *
- * @global
- * @private
- * @constant
- */
-EXPRESSION_ORDINAL = /^(th|st|nd|rd)$/i;
 
 /**
  * `EXPRESSION_MULTILINEBREAK` matches initial, internal, and final white
@@ -555,7 +568,7 @@ EXPRESSION_TERMINAL_MARKER_SUFFIX_EXCEPTION = new RegExp(
  * @private
  * @constant
  */
-EXPRESSION_WORD_CHARACTER = new RegExp('[' + GROUP_ALPHABETIC + ']');
+EXPRESSION_WORD_CHARACTER = new RegExp('[' + GROUP_WORD + ']');
 
 /**
  * `EXPRESSION_SENTENCE_END` finds probable sentence ends.
@@ -599,20 +612,6 @@ EXPRESSION_INITIAL_WHITE_SPACE = new RegExp(
 EXPRESSION_WHITE_SPACE = new RegExp(
     '^[' + GROUP_WHITE_SPACE + ']+$'
 );
-
-/**
- * `BREAKPOINT_SORT` sorts breakpoints (an array of integers): Small to
- * large.
- *
- * @param {Number} a - the first integer.
- * @param {Number} b - the second integer.
- * @return {Number} - the result of substracting b from a.
- * @global
- * @private
- */
-function BREAKPOINT_SORT(a, b) {
-    return a - b;
-}
 
 /**
  * `validateInput` validates the input for tokenize* methods.
@@ -708,9 +707,7 @@ function tokenizePunctuation(value) {
  * @private
  */
 function tokenizeSentence(value) {
-    var breakpoints = [],
-        iterator = -1,
-        length, sentence, children, match, token, start, end;
+    var sentence, children, match, token, start, end, delimiter;
 
     /* Construct an AST object for the sentence. */
     sentence = {
@@ -725,41 +722,46 @@ function tokenizeSentence(value) {
 
     children = sentence.children;
 
-    /*
-     * Insert breakpoints before and after general punctuation (One or more
-     * of the same non-letter or non-number character), unless the
-     * punctuation consists solely of combining diacritics.
-     */
-    EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
+    /* Get the token delimiter, and set its `lastIndex` property to 0. */
+    delimiter = this.DELIMITER_TOKEN;
+    delimiter.lastIndex = 0;
 
-    while (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(value)) {
-        if (!EXPRESSION_WORD_COMBINING.test(match[0])) {
-            breakpoints.push(match.index, match.index + match[0].length);
-        }
-    }
-
-    /* Sort the breakpoints from small to large. */
-    breakpoints.sort(BREAKPOINT_SORT);
-
-    iterator = -1;
-    length = breakpoints.length + 1;
     start = 0;
 
-    while (++iterator < length) {
-        end = breakpoints[iterator];
+    /* for every match of the token delimiter expression... */
+    while (match = delimiter.exec(value)) {
+        end = match.index;
 
-        /* Skip if the previous end is the same. */
-        if (end === 0 || start === end) {
-            continue;
+        /*
+         * If a first group matched, move the pointer over to its last
+         * character.
+         */
+        /* istanbul ignore else: TOSPEC */
+        if (match[1]) {
+            end += match[1].length - 1;
         }
 
-        token = value.substring(start, end || value.length);
+        /* TODO: BLACKLIST */
 
+        /*
+         * If a first group matched, move the pointer over to after that
+         * group.
+         */
+        /* istanbul ignore else: TOSPEC */
+        if (match[1]) {
+            end += 1;
+        }
+
+        /*
+         * Slice the found token content, from (including) start to (not
+         * including) end.
+         */
+        token = value.substring(start, end);
+
+        /* istanbul ignore if: TOSPEC */
         if (!token) {
             continue;
         }
-
-        EXPRESSION_WORD_MULTIPUNCTUATION.lastIndex = 0;
 
         /*
          * If the token consists solely of white space, tokenize it as white
@@ -768,26 +770,27 @@ function tokenizeSentence(value) {
         if (EXPRESSION_WHITE_SPACE.test(token)) {
             children.push(this.tokenizeWhiteSpace(token));
         /*
-         * If the token contains a punctuation mark, and if that mark is not
-         * a combining diacritical mark, tokenize it as punctuation and add
-         * it to the sentences children.
+         * If the token contains just word characters, tokenize it as word
+         * and add it to the sentences children.
          */
-        } else if (
-            (match = EXPRESSION_WORD_MULTIPUNCTUATION.exec(token)) &&
-            !EXPRESSION_WORD_COMBINING.test(match[0])
-        ) {
-            children.push(this.tokenizePunctuation(token));
+        } else if (EXPRESSION_WORD.test(token)) {
+            children.push(this.tokenizeWord(token));
         /*
-         * Otherwise, tokenize it as a word, and add it to the sentences
+         * Otherwise, tokenize it as punctuation and add it to the sentences
          * children.
          */
         } else {
-            children.push(this.tokenizeWord(token));
+            children.push(this.tokenizePunctuation(token));
         }
 
         /*
-         * Continue on with the next iteration, starting at the current end.
+         * The expression may also match $ (end-of-string), which keeps on
+         * matching in global state, thus we detect it here and exit the loop.
          */
+        if (delimiter.lastIndex === value.length) {
+            break;
+        }
+
         start = end;
     }
 
@@ -1057,6 +1060,8 @@ parserPrototype.tokenizeWhiteSpace = tokenizerFactory(tokenizeWhiteSpace);
 parserPrototype.DELIMITER_PARAGRAPH = EXPRESSION_MULTILINEBREAK;
 
 parserPrototype.DELIMITER_SENTENCE = EXPRESSION_SENTENCE_END;
+
+parserPrototype.DELIMITER_TOKEN = EXPRESSION_TOKEN;
 
 parserPrototype.SENTENCE_BLACKLIST = [
     EXPRESSION_ABBREVIATION_AFFIX,

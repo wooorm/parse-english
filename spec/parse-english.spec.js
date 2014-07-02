@@ -2153,7 +2153,7 @@ describe('Double combining marks', function () {
                         'value' : ' '
                 },
                 {
-                        'type' : 'PunctuationNode',
+                        'type' : 'WordNode',
                         'value' : '0\uFE0F\u20E3'
                 },
                 {
