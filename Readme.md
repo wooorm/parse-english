@@ -136,6 +136,31 @@ Tokenize a given sentence into words, white space, and punctionation.
 ## Browser Support
 Pretty much every browser (available through browserstack) runs all parse-english unit tests.
 
+## Benchmark
+
+Run the benchmark yourself:
+
+```sh
+$ npm run benchmark
+```
+
+On a MacBook Air, it parser about 6 large books, 104 big articles, or 10,089 paragraphs per second.
+
+```
+              parser.tokenizeSentence(source);
+  40,675 op/s » A sentence (20 words)
+
+              parser.tokenizeParagraph(source);
+  41,542 op/s » A sentence (20 words)
+   9,467 op/s » A paragraph (5 sentences, 100 words)
+
+              parser.tokenizeRoot(source);
+  10,089 op/s » A paragraph (5 sentences, 100 words)
+     986 op/s » A section (10 paragraphs, 50 sentences, 1,000 words)
+     104 op/s » An article (100 paragraphs, 500 sentences, 10,000 words)
+       6 op/s » A (large) book (1,000 paragraphs, 5,000 sentences, 100,000 words)
+```
+
 ## Related
 
   * [retext](https://github.com/wooorm/retext "Retext")
