@@ -1892,24 +1892,30 @@ describe('Sentence: Starting with ellipsis without spaces', function () {
 describe('Sentence: With trailing white space', function () {
     it('should equal the test AST', function () {
         var root = parser.tokenizeParagraph('A sentence. ');
-        assert(JSON.stringify(root.children[0]) === JSON.stringify({
-            'type' : 'SentenceNode',
+
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'ParagraphNode',
             'children' : [
                 {
-                    'type' : 'WordNode',
-                    'value' : 'A'
-                },
-                {
-                    'type' : 'WhiteSpaceNode',
-                    'value' : ' '
-                },
-                {
-                    'type' : 'WordNode',
-                    'value' : 'sentence'
-                },
-                {
-                    'type' : 'PunctuationNode',
-                    'value' : '.'
+                    'type' : 'SentenceNode',
+                    'children' : [
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'A'
+                        },
+                        {
+                            'type' : 'WhiteSpaceNode',
+                            'value' : ' '
+                        },
+                        {
+                            'type' : 'WordNode',
+                            'value' : 'sentence'
+                        },
+                        {
+                            'type' : 'PunctuationNode',
+                            'value' : '.'
+                        }
+                    ]
                 },
                 {
                     'type' : 'WhiteSpaceNode',
