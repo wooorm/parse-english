@@ -1793,6 +1793,7 @@ describe('Sentence: Abbreviations followed by a dot, optional white ' +
 describe('Sentence: Starting with ellipsis containing spaces', function () {
     it('should equal the test AST', function () {
         var root = parser.tokenizeParagraph('. . . to be continued.');
+
         assert(JSON.stringify(root.children[0]) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
