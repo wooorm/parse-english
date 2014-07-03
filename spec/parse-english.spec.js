@@ -2125,9 +2125,9 @@ describe('A simple sentence testing for astral-plane characters',
  * together forming a :zero: emoji
  */
 describe('Double combining marks', function () {
-    var root = parser.tokenizeSentence('He scored 0\uFE0F\u20E3 points.');
-
     it('should equal the test AST', function () {
+        var root = parser.tokenizeSentence('He scored 0\uFE0F\u20E3 points.');
+
         assert(JSON.stringify(root) === JSON.stringify({
             'type' : 'SentenceNode',
             'children' : [
