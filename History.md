@@ -1,4 +1,42 @@
 
+n.n.n / 2014-07-03
+==================
+
+ * Moved a wrongly places tokenizer call
+ * Modified a unit test testing for functionality that changed in 3169a8c
+ * Added a missing newline
+ * Removed unit tests for functionality removed in 3169a8c
+ * Completely rewrote the API
+ * The API-linter no longer checks for inconsistent return values
+ * Updated istanbul version to 0.2.14
+ * tokenizeSentence now depends accepts a `DELIMITER` option
+ * Removed support for breaking contractions into multiple “words” (e.g., gim|me to gimme)
+ * Removed functionality to split between alphabetic and number (e.g., 258|f to 258f, 5|S to 5S)
+ * tokenizeRoot and tokenizeParagraph no longer depend on global variables
+ * Added two unit tests for the changes in 04e8212
+ * Modified the benchmark to better reflect actual natural english language
+ * Removed two unused variables from the API
+ * Refactored code (better performance, comments, and readability)
+ * Merge branch 'master' into feature/alpha
+ * Removed functionality to browserify unit tests by default
+ * Added a factory method for the APIs tokenizers
+ * Added documentation for the changes in 04e8212 and 7dd0818
+ * API no longer depends on TextOM, instead returning AST objects; fixes #2
+ * API now exposes all tokenisation steps; fixes #4
+ * Update jscs dependency version
+ * Bring browser specs up to par with latest code 33204fd
+ * 0.0.24
+ * Removed redundant contractions
+ * Removed complexity-report from dependencies
+ * Added a unit test for white space only documents
+ * Refactored code to work faster and be more readable
+ * Added benchmarks
+ * Fixed newline
+ * Fixed newline
+ * Added History.md
+ * Fixed an ungrammatical sentence
+ * Updated dependencies
+
 0.0.24 / 2014-06-29
 ==================
 
