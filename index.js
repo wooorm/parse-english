@@ -1,17 +1,14 @@
 'use strict';
 
-var GROUP_NUMERICAL, GROUP_ALPHABETIC, GROUP_WHITE_SPACE,
-    GROUP_COMBINING_DIACRITICAL_MARK, GROUP_TERMINAL_MARKER,
-    GROUP_CLOSING_PUNCTUATION, GROUP_FINAL_PUNCTUATION,
-    GROUP_WORD, GROUP_ASTRAL, EXPRESSION_TOKEN, EXPRESSION_WORD,
-    EXPRESSION_MULTILINEBREAK, STRING_PIPE,
-    EXPRESSION_ABBREVIATION_PREFIX, EXPRESSION_WORD_CHARACTER,
-    EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE, EXPRESSION_ABBREVIATION_AFFIX,
-    EXPRESSION_SENTENCE_END,
-    EXPRESSION_INITIAL_WHITE_SPACE, EXPRESSION_WHITE_SPACE,
-    GROUP_COMBINING_NONSPACING_MARK, parserPrototype,
-    GROUP_LETTER_LOWER, EXPRESSION_FULL_STOP_SUFFIX_EXCEPTION,
-    EXPRESSION_TERMINAL_MARKER_SUFFIX_EXCEPTION;
+var EXPRESSION_ABBREVIATION_PREFIX,
+    EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE, EXPRESSION_AFFIX_PUNCTUATION,
+    EXPRESSION_LOWER_INITIAL_EXCEPTION,
+    GROUP_ALPHABETIC, GROUP_ASTRAL, GROUP_CLOSING_PUNCTUATION,
+    GROUP_COMBINING_DIACRITICAL_MARK, GROUP_COMBINING_NONSPACING_MARK,
+    GROUP_FINAL_PUNCTUATION, GROUP_LETTER_LOWER, GROUP_NUMERICAL,
+    GROUP_TERMINAL_MARKER, GROUP_WHITE_SPACE, GROUP_WORD,
+    STRING_PIPE,
+    parserPrototype;
 
 /**
  * Expose `expand`. Expands a list of Unicode code points and ranges to
@@ -267,7 +264,7 @@ GROUP_ASTRAL = expand('D800-DBFFDC00-DFFF');
  * @private
  * @constant
  */
-GROUP_TERMINAL_MARKER = '\\u203D\\?\\!';
+GROUP_TERMINAL_MARKER = '\\.\\u203D?!';
 
 /**
  * Expose `GROUP_CLOSING_PUNCTUATION`. Unicode Pe (Punctuation, Close)
@@ -299,46 +296,6 @@ GROUP_CLOSING_PUNCTUATION = expand('0029005D007D0F3B0F3D169C2046' +
 GROUP_FINAL_PUNCTUATION = expand('00BB2019201D203A2E032E052E0A2E0D2E1D2E21');
 
 /**
- * `EXPRESSION_WORD` matches a word.
- *
- * @global
- * @private
- * @constant
- */
-EXPRESSION_WORD = new RegExp('^[' + GROUP_WORD + ']+$');
-
-/**
- * `EXPRESSION_TOKEN` matches all tokens:
- * - One or more number, alphabetic, or combining characters;
- * - One or more white space characters;
- * - One or more astral plane characters;
- * - One or more of the same characte;
- *
- * @global
- * @private
- * @constant
- */
-EXPRESSION_TOKEN = new RegExp(
-    '(' +
-        '[' + GROUP_WORD + ']+|' +
-        '[' + GROUP_WHITE_SPACE + ']+|' +
-        '[' + GROUP_ASTRAL + ']+|' +
-        '([\\s\\S])\\2*' +
-    ')',
-    'g'
-);
-
-/**
- * `EXPRESSION_MULTILINEBREAK` matches initial, internal, and final white
- *  space.
- *
- * @global
- * @private
- * @constant
- */
-EXPRESSION_MULTILINEBREAK = /(\r?\n|\r)*$|^(\r?\n|\r)+|(\r?\n|\r){2,}/g;
-
-/**
  * `STRING_PIPE` holds a pipe (`|`) character.
  *
  * @global
@@ -360,52 +317,53 @@ STRING_PIPE = '|';
  * @constant
  */
 EXPRESSION_ABBREVIATION_PREFIX = new RegExp(
-    '\\b(' + [
-    /* *Alphabet*. */
-    '[a-z]',
+    '^(' + [
+        /* *Alphabet*. */
+        '[a-z]',
 
-    /*
-     * Common Latin Abbreviations:
-     * Based on: http://en.wikipedia.org/wiki/List_of_Latin_abbreviations
-     * Where only the abbreviations written without joining full stops,
-     * but with a final full stop, were extracted.
-     *
-     * circa, capitulus, confer, compare, centum weight, eadem, (et) alii,
-     * et cetera, floruit, foliis, ibidem, idem, nemine && contradicente,
-     * opere && citato, (per) cent, (per) procurationem, (pro) tempore,
-     * sic erat scriptum, (et) sequentia, statim, videlicet.
-     */
-    'c?ca|cap|cf|cp|cwt|ead|al|etc|fl|ff|ibid|id|nem|con|op|cit|cent',
-    'pro|tem|sic|seq|stat|viz',
+        /*
+         * Common Latin Abbreviations:
+         * Based on: http://en.wikipedia.org/wiki/List_of_Latin_abbreviations
+         * Where only the abbreviations written without joining full stops,
+         * but with a final full stop, were extracted.
+         *
+         * circa, capitulus, confer, compare, centum weight, eadem, (et) alii,
+         * et cetera, floruit, foliis, ibidem, idem, nemine && contradicente,
+         * opere && citato, (per) cent, (per) procurationem, (pro) tempore,
+         * sic erat scriptum, (et) sequentia, statim, videlicet.
+         */
+        'c?ca|cap|cf|cp|cwt|ead|al|etc|fl|ff|ibid|id|nem|con|op|cit|cent',
+        'pro|tem|sic|seq|stat|viz',
 
-    /*
-     * Business Abbreviations:
-     * Incorporation, Limited company.
-     */
-    'inc|ltd',
+        /*
+         * Business Abbreviations:
+         * Incorporation, Limited company.
+         */
+        'inc|ltd',
 
-    /*
-     * English unit abbreviations:
-     * Note that *Metric abbreviations* do not use full stops.
-     *
-     * barrel, cubic, dozen, fluid ounce, foot, gallon, grain, gross,
-     * inch, karat / knot, pound, mile, ounce, pint, quart, square,
-     * tablespoon, teaspoon, yard.
-     */
-    'bbls?|cu|dozfl|oz|ft|gal|gr|gro|in|kt|lb|mi|oz|pt|qt|sq|tbsp|tsp|yd',
+        /*
+         * English unit abbreviations:
+         * Note that *Metric abbreviations* do not use full stops.
+         *
+         * barrel, cubic, dozen, fluid ounce, foot, gallon, grain, gross,
+         * inch, karat / knot, pound, mile, ounce, pint, quart, square,
+         * tablespoon, teaspoon, yard.
+         */
+        'bbls?|cu|dozfl|oz|ft|gal|gr|gro|in|kt|lb|mi|oz|pt|qt|sq|tbsp|tsp|yd',
 
-    /*
-     * Abbreviations of time references:
-     *
-     * seconds, minutes, hours, Monday, Tuesday, *, Wednesday,
-     * Thursday, *, Friday, Saturday, Sunday, January, Februari, March,
-     * April, June, July, August, September, *, October, November,
-     * December.
-     */
-    'sec|min|hr|mon|tue|tues|wed|thu|thurs|fri|sat|sun|jan|feb|mar',
-    'apr|jun|jul|aug|sep|sept|oct|nov|dec'
-    ].join(STRING_PIPE) + ')\\.',
-'gi');
+        /*
+         * Abbreviations of time references:
+         *
+         * seconds, minutes, hours, Monday, Tuesday, *, Wednesday,
+         * Thursday, *, Friday, Saturday, Sunday, January, Februari, March,
+         * April, June, July, August, September, *, October, November,
+         * December.
+         */
+        'sec|min|hr|mon|tue|tues|wed|thu|thurs|fri|sat|sun|jan|feb|mar',
+        'apr|jun|jul|aug|sep|sept|oct|nov|dec'
+    ].join(STRING_PIPE) +
+    ')$'
+);
 
 /**
  * `EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE` holds a blacklist of full
@@ -421,615 +379,377 @@ EXPRESSION_ABBREVIATION_PREFIX = new RegExp(
  * @constant
  */
 EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE = new RegExp(
-    '\\b(' + [
-    /* Decimals */
-    '[0-9]',
+    '^(' + [
+        /* Decimals */
+        '[0-9]',
 
-    /* Social:
-     * Mister, Mistress, Mistress, woman, Mademoiselle, Madame, Monsieur,
-     * Misters, Mesdames, Junior, Senior, *.
-     */
-    'Mr|Mrs|Miss|Ms|Mlle|Mme|M|Messrs|Mmes|Jr|Sr|Snr',
+        /* Social:
+         * Mister, Mistress, Mistress, woman, Mademoiselle, Madame, Monsieur,
+         * Misters, Mesdames, Junior, Senior, *.
+         */
+        'Mr|Mrs|Miss|Ms|Mss|Mses|Mlle|Mme|M|Messrs|Mmes|Jr|Sr|Snr',
 
-    /*
-     * Rank and academic:
-     * Doctor, Magister, Attorney, Profesor, Honourable, Reverend,
-     * Father, Monsignor, Sister, Brother, Saint, President,
-     * Superintendent, Representative, Senator.
-     */
-    'Dr|Mgr|Atty|Prof|Hon|Rev|Fr|Msgr|Sr|Br|St|Pres|Supt|Rep|Sen',
+        /*
+         * Rank and academic:
+         * Doctor, Magister, Attorney, Profesor, Honourable, Reverend,
+         * Father, Monsignor, Sister, Brother, Saint, President,
+         * Superintendent, Representative, Senator.
+         */
+        'Dr|Mgr|Atty|Prof|Hon|Rev|Fr|Msgr|Sr|Br|St|Pres|Supt|Rep|Sen',
 
-    /* Rank and military:
-     * Governor, Ambassador, Treasurer, Secretary, Admiral, Brigadier,
-     * General, Commander, Colonel, Captain, Lieutenant, Major,
-     * Sergeant, Petty Officer, Warrant Officer, Purple Heart.
-     */
-    'Gov|Amb|Treas|Sec|Amd|Brig|Gen|Cdr|Col|Capt|Lt|Maj|Sgt|Po|Wo|Ph',
+        /* Rank and military:
+         * Governor, Ambassador, Treasurer, Secretary, Admiral, Brigadier,
+         * General, Commander, Colonel, Captain, Lieutenant, Major,
+         * Sergeant, Petty Officer, Warrant Officer, Purple Heart.
+         */
+        'Gov|Amb|Treas|Sec|Amd|Brig|Gen|Cdr|Col|Capt|Lt|Maj|Sgt|Po|Wo|Ph',
 
-    /*
-     * Common geographical abbreviations:
-     * Avenue, Boulevard, Mountain, Road, Building, National, *, Route, *,
-     * County, Park, Square, Drive, Port or Point, Street or State, Fort,
-     * Peninsula, Territory, Highway, Freeway, Parkway.
-     */
-    'Ave|Blvd|Mt|Rd|Bldgs?|Nat|Natl|Rt|Rte|Co|Pk|Sq|Dr|Pt|St',
-    'Ft|Pen|Terr|Hwy|Fwy|Pkwy',
+        /*
+         * Common geographical abbreviations:
+         * Avenue, Boulevard, Mountain, Road, Building, National, *, Route, *,
+         * County, Park, Square, Drive, Port or Point, Street or State, Fort,
+         * Peninsula, Territory, Highway, Freeway, Parkway.
+         */
+        'Ave|Blvd|Mt|Rd|Bldgs?|Nat|Natl|Rt|Rte|Co|Pk|Sq|Dr|Pt|St',
+        'Ft|Pen|Terr|Hwy|Fwy|Pkwy',
 
-    /*
-     * American state abbreviations:
-     * Alabama, Arizona, Arkansas, California, *, Colorado, *,
-     * Connecticut, Delaware, Florida, Georgia,Idaho, *, Illinois,
-     * Indiana, Iowa, Kansas, *, Kentucky, *, Louisiana, Maine, Maryland,
-     * Massachusetts, Michigan, Minnesota, Mississippi, Missouri, Montana,
-     * Nebraska, *, Nevada, Mexico, Dakota, Oklahoma, *, Oregon,
-     * Pennsylvania, *, *, Tennessee, Texas, Utah, Vermont, Virginia,
-     * Washington, Wisconsin, *, Wyoming.
-     */
-    'Ala|Ariz|Ark|Cal|Calif|Col|Colo|Conn|Del|Fla|Ga|Ida|Id|Ill|Ind',
-    'Ia|Kan|Kans|Ken|Ky|La|Me|Md|Mass|Mich|Minn|Miss|Mo|Mont|Neb',
-    'Nebr|Nev|Mex|Dak|Okla|Ok|Ore|Penna|Penn|Pa|Tenn|Tex|Ut|Vt|Va',
-    'Wash|Wis|Wisc|Wyo',
+        /*
+         * American state abbreviations:
+         * Alabama, Arizona, Arkansas, California, *, Colorado, *,
+         * Connecticut, Delaware, Florida, Georgia,Idaho, *, Illinois,
+         * Indiana, Iowa, Kansas, *, Kentucky, *, Louisiana, Maine, Maryland,
+         * Massachusetts, Michigan, Minnesota, Mississippi, Missouri, Montana,
+         * Nebraska, *, Nevada, Mexico, Dakota, Oklahoma, *, Oregon,
+         * Pennsylvania, *, *, Tennessee, Texas, Utah, Vermont, Virginia,
+         * Washington, Wisconsin, *, Wyoming.
+         */
+        'Ala|Ariz|Ark|Cal|Calif|Col|Colo|Conn|Del|Fla|Ga|Ida|Id|Ill|Ind',
+        'Ia|Kan|Kans|Ken|Ky|La|Me|Md|Mass|Mich|Minn|Miss|Mo|Mont|Neb',
+        'Nebr|Nev|Mex|Dak|Okla|Ok|Ore|Penna|Penn|Pa|Tenn|Tex|Ut|Vt|Va',
+        'Wash|Wis|Wisc|Wyo',
 
-    /*
-     * Canadian province abbreviations:
-     * Alberta, Manitoba, Ontario, Québec, *, Saskatchewan,
-     * Yukon Territory.
-     */
-    'Alta|Man|Ont|Qué|Que|Sask|Yuk',
+        /*
+         * Canadian province abbreviations:
+         * Alberta, Manitoba, Ontario, Québec, *, Saskatchewan,
+         * Yukon Territory.
+         */
+        'Alta|Man|Ont|Qué|Que|Sask|Yuk',
 
-    /*
-     * English county abbreviations
-     * Bedfordshire, Berkshire, Buckinghamshire, Cambridgeshire,
-     * Cheshire, Cornwall, Cumberland, Derbyshire, *, Devon, Dorset,
-     * Durham, Gloucestershire, Hampshire, Herefordshire, *,
-     * Hertfordshire, Huntingdonshire, Lancashire, Leicestershire,
-     * Lincolnshire, Middlesex, *, *, Norfolk, Northamptonshire,
-     * Northumberland, *, Nottinghamshire, Oxfordshire, Rutland,
-     * Shropshire, Somerset, Staffordshire, *, Suffolk, Surrey,
-     * Sussex, *, Warwickshire, *, *, Westmorland, Wiltshire,
-     * Worcestershire, Yorkshire.
-     */
-    'Beds|Berks|Bucks|Cambs|Ches|Corn|Cumb|Derbys|Derbs|Dev|Dor|Dur|Glos',
-    'Hants|Here|Heref|Herts|Hunts|Lancs|Leics|Lincs|Mx|Middx|Mddx|Norf',
-    'Northants|Northumb|Northd|Notts|Oxon|Rut|Shrops|Salop|Som|Staffs',
-    'Staf|Suff|Sy|Sx|Ssx|Warks|War|Warw|Westm|Wilts|Worcs|Yorks'
+        /*
+         * English county abbreviations
+         * Bedfordshire, Berkshire, Buckinghamshire, Cambridgeshire,
+         * Cheshire, Cornwall, Cumberland, Derbyshire, *, Devon, Dorset,
+         * Durham, Gloucestershire, Hampshire, Herefordshire, *,
+         * Hertfordshire, Huntingdonshire, Lancashire, Leicestershire,
+         * Lincolnshire, Middlesex, *, *, Norfolk, Northamptonshire,
+         * Northumberland, *, Nottinghamshire, Oxfordshire, Rutland,
+         * Shropshire, Somerset, Staffordshire, *, Suffolk, Surrey,
+         * Sussex, *, Warwickshire, *, *, Westmorland, Wiltshire,
+         * Worcestershire, Yorkshire.
+         */
+        'Beds|Berks|Bucks|Cambs|Ches|Corn|Cumb|Derbys|Derbs|Dev|Dor|Dur|Glos',
+        'Hants|Here|Heref|Herts|Hunts|Lancs|Leics|Lincs|Mx|Middx|Mddx|Norf',
+        'Northants|Northumb|Northd|Notts|Oxon|Rut|Shrops|Salop|Som|Staffs',
+        'Staf|Suff|Sy|Sx|Ssx|Warks|War|Warw|Westm|Wilts|Worcs|Yorks'
 
-    ].join(STRING_PIPE) + ')\\.',
-'g');
-
-/**
- * `EXPRESSION_ABBREVIATION_AFFIX` holds a blacklist of full stop
- * characters that should not be treated as terminal sentence markers:
- *
- * A full stop,
- * followed by a case-sensitive abbreviation,
- * followed by “word” boundry.
- *
- * @global
- * @private
- * @constant
- */
-EXPRESSION_ABBREVIATION_AFFIX = new RegExp(
-    '\\.(?:' + [
-    /*
-     * Generic Top-level Domains:
-     * Air transport industry, Asia-Pacific, business use, Catalan,
-     * commercial organizations, cooperatives,
-     * U.S. post-secondary educational establishments,
-     * U.S. government entities, informational sites,
-     * international organizations, employment-related,
-     * U.S. military, mobile devices, museums, families and individuals,
-     * network infrastructures, organizations, postal services,
-     * professions, telephone network, travel, pornography.
-     */
-    'aero|asia|biz|cat|com|coop|edu|gov|info|int|jobs|mil|mobi',
-    'museum|name|net|org|post|pro|tel|travel|xxx',
-
-    /* Decimals */
-    '0|1|2|3|4|5|6|7|8|9'
-    ].join(STRING_PIPE) + ')\\b',
-'g');
-
-/**
- * `EXPRESSION_FULL_STOP_SUFFIX_EXCEPTION` matches a full stop, optionally
- * followed by closing punctuation, followed by either a number or a comma.
- *
- * @global
- * @private
- * @constant
- */
-EXPRESSION_FULL_STOP_SUFFIX_EXCEPTION = new RegExp(
-    '\\.' +
-    '[' + GROUP_CLOSING_PUNCTUATION + GROUP_FINAL_PUNCTUATION + ']?' +
-    '[,' + GROUP_NUMERICAL + ']',
-    'g'
+    ].join(STRING_PIPE) +
+    ')$'
 );
 
 /**
- * `EXPRESSION_TERMINAL_MARKER_SUFFIX_EXCEPTION` matches a terminal marker,
- * optionally followed by closing punctuation, followed one or more white
- * space characters and a lower letter.
+ * `EXPRESSION_AFFIX_PUNCTUATION` matches closing or final punctuation, or
+ * terminal markers that should still be included in the previous sentence,
+ * even though they follow the sentence's terminal marker.
  *
  * @global
  * @private
  * @constant
  */
-EXPRESSION_TERMINAL_MARKER_SUFFIX_EXCEPTION = new RegExp(
-    '[\\.' + GROUP_TERMINAL_MARKER + ']' +
-    '[' + GROUP_CLOSING_PUNCTUATION + GROUP_FINAL_PUNCTUATION + ']?' +
-    '\\ +[' + GROUP_LETTER_LOWER + ']',
-    'g'
+EXPRESSION_AFFIX_PUNCTUATION = new RegExp(
+    '^([' +
+        GROUP_CLOSING_PUNCTUATION +
+        GROUP_FINAL_PUNCTUATION +
+        GROUP_TERMINAL_MARKER +
+    '])\\1*$'
 );
 
 /**
- * `EXPRESSION_WORD_CHARACTER` finds a word character.
+ * `EXPRESSION_LOWER_INITIAL_EXCEPTION` matches an initial lower case letter.
  *
  * @global
  * @private
  * @constant
  */
-EXPRESSION_WORD_CHARACTER = new RegExp('[' + GROUP_WORD + ']');
-
-/**
- * `EXPRESSION_SENTENCE_END` finds probable sentence ends.
- *
- * A probable sentence end:
- * A terminal marker (`?`, `!`, or `.`),
- * followed by an optional closing punctuation (e.g., `)` or `”`).
- *
- * @global
- * @private
- * @constant
- */
-EXPRESSION_SENTENCE_END = new RegExp(
-    '$|(' +
-    '(?:\\.[' + GROUP_WHITE_SPACE + ']?)*\\.|' +
-    '[' + GROUP_TERMINAL_MARKER + ']+' +
-    ')' +
-    '([' + GROUP_CLOSING_PUNCTUATION + GROUP_FINAL_PUNCTUATION + '])?',
-    'g'
+EXPRESSION_LOWER_INITIAL_EXCEPTION = new RegExp(
+    '^[' +
+        GROUP_LETTER_LOWER +
+    ']'
 );
 
-/**
- * `EXPRESSION_INITIAL_WHITE_SPACE` matches optional white space at the start
- * of a string, followed by any other characters.
- *
- * @global
- * @private
- * @constant
- */
-EXPRESSION_INITIAL_WHITE_SPACE = new RegExp(
-    '^([' + GROUP_WHITE_SPACE + ']+)?'
-);
-
-/**
- * `EXPRESSION_WHITE_SPACE` matches a string containing ONLY white space.
- *
- * @global
- * @private
- * @constant
- */
-EXPRESSION_WHITE_SPACE = new RegExp(
-    '^[' + GROUP_WHITE_SPACE + ']+$'
-);
-
-/**
- * `validateInput` validates the input for tokenize* methods.
- *
- * @param {String?} value - The value to validate / convert to a string.
- * @return {String} - the converted string.
- * @global
- * @private
- */
-function validateInput(value) {
-    if (value === null || value === undefined) {
-        value = '';
-    } else if (value instanceof String) {
-        value = value.toString();
-    }
-
-    if (typeof value !== 'string') {
-        throw new TypeError('Illegal invocation: \'' + value +
-            '\' is not a valid argument for \'ParseEnglish\'');
-    }
-
-    return value;
-}
-
-/**
- * `tokenizerFactory` validates the input, before passing it to a tokenizer.
- *
- * @param {Function} tokenizer - The tokenizer to wrap.
- * @return {Object} - An AST object returned by the tokenizer.
- * @global
- * @private
- */
-function tokenizerFactory(tokenizer) {
-    return function (value) {
-        return tokenizer.call(this, validateInput(value));
-    };
-}
-
-/*eslint-disable no-cond-assign */
-
-/**
- * `tokenizeWord` tokenizes a word token.
- *
- * @param {String} value - The word to parse.
- * @return {Object} - An AST object representing the given word.
- * @global
- * @private
- */
-function tokenizeWord(value) {
-    return {
-        'type' : 'WordNode',
-        'value' : value
-    };
-}
-
-/**
- * `tokenizeWhiteSpace` tokenizes a white space token.
- *
- * @param {String} value - The white space to parse.
- * @return {Object} - An AST object representing the given white space.
- * @global
- * @private
- */
-function tokenizeWhiteSpace(value) {
-    return {
-        'type' : 'WhiteSpaceNode',
-        'value' : value
-    };
-}
-
-/**
- * `tokenizePunctuation` tokenizes a punctuation token.
- *
- * @param {String} value - The punctuation to parse.
- * @return {Object} - An AST object representing the given punctuation.
- * @global
- * @private
- */
-function tokenizePunctuation(value) {
-    return {
-        'type' : 'PunctuationNode',
-        'value' : value
-    };
-}
-
-/**
- * `tokenizeSentence` tokenizes a sentence into words, punctuation, and white
- * space (which in turn all get tokenized).
- *
- * @param {String} value - The sentence to parse.
- * @return {Object} - An AST object representing the given sentence.
- * @global
- * @private
- */
-function tokenizeSentence(value) {
-    var sentence, children, match, token, start, end, delimiter;
-
-    /* Construct an AST object for the sentence. */
-    sentence = {
-        'type' : 'SentenceNode',
-        'children' : []
-    };
-
-    /* Return early if no content can be tokenized. */
-    if (!value) {
-        return sentence;
-    }
-
-    children = sentence.children;
-
-    /* Get the token delimiter, and set its `lastIndex` property to 0. */
-    delimiter = this.DELIMITER_TOKEN;
-    delimiter.lastIndex = 0;
-
-    start = 0;
-
-    /* for every match of the token delimiter expression... */
-    while (match = delimiter.exec(value)) {
-        end = match.index;
-
-        /*
-         * If a first group matched, move the pointer over to its last
-         * character.
-         */
-        /* istanbul ignore else: TOSPEC */
-        if (match[1]) {
-            end += match[1].length - 1;
-        }
-
-        /* TODO: BLACKLIST */
-
-        /*
-         * If a first group matched, move the pointer over to after that
-         * group.
-         */
-        /* istanbul ignore else: TOSPEC */
-        if (match[1]) {
-            end += 1;
-        }
-
-        /*
-         * Slice the found token content, from (including) start to (not
-         * including) end.
-         */
-        token = value.substring(start, end);
-
-        /* istanbul ignore if: TOSPEC */
-        if (!token) {
-            continue;
-        }
-
-        /*
-         * If the token consists solely of white space, tokenize it as white
-         * space and add it to the sentences children.
-         */
-        if (EXPRESSION_WHITE_SPACE.test(token)) {
-            children.push(this.tokenizeWhiteSpace(token));
-        /*
-         * If the token contains just word characters, tokenize it as word
-         * and add it to the sentences children.
-         */
-        } else if (EXPRESSION_WORD.test(token)) {
-            children.push(this.tokenizeWord(token));
-        /*
-         * Otherwise, tokenize it as punctuation and add it to the sentences
-         * children.
-         */
-        } else {
-            children.push(this.tokenizePunctuation(token));
-        }
-
-        /*
-         * The expression may also match $ (end-of-string), which keeps on
-         * matching in global state, thus we detect it here and exit the loop.
-         */
-        if (delimiter.lastIndex === value.length) {
-            break;
-        }
-
-        start = end;
-    }
-
-    /* Return the AST object (now with children) of the sentence. */
-    return sentence;
-}
-
-/**
- * `tokenizeParagraph` tokenizes a paragraph into sentences and white
- * space (which in turn all get tokenized).
- *
- * @param {String} value - The paragraph to parse.
- * @return {Object} - An AST object representing the given paragraph.
- * @global
- * @private
- */
-function tokenizeParagraph(value) {
-    var sentences = [],
-        blacklist = {},
+function modify(modifiers, parent) {
+    var length = modifiers.length,
         iterator = -1,
-        start = 0,
-        delimiter, paragraph, children, sentence, whiteSpace, end, match,
-        length, exceptions, exception, pointer;
+        modifier, pointer, child, result;
 
-    /* Construct an AST object for the paragraph. */
-    paragraph = {
-        'type' : 'ParagraphNode',
-        'children' : []
-    };
-
-    /* Return early if no content can be tokenized. */
-    if (!value) {
-        return paragraph;
-    }
-
-    children = paragraph.children;
-
-    /* Get the sentence delimiter, and set its `lastIndex` property to 0. */
-    delimiter = this.DELIMITER_SENTENCE;
-    delimiter.lastIndex = 0;
-
-    /* Get the sentence exceptions black list. */
-    exceptions = this.SENTENCE_BLACKLIST;
-    length = exceptions.length;
-
-    /* Iterate over the black list. */
+    /* Iterate over all modifiers... */
     while (++iterator < length) {
-        exception = exceptions[iterator];
+        modifier = modifiers[iterator];
+        pointer = -1;
 
-        /* Set the exception’s `lastIndex` property to 0. */
-        exception.lastIndex = 0;
+        /*
+         * We allow conditional assignment here, because the length of the
+         * parent's children will probably change.
+         */
+        /*eslint-disable no-cond-assign */
 
-        /* While a match is found... */
-        while (match = exception.exec(value)) {
-            pointer = match.index;
+        /* Iterate over all children... */
+        while (child = parent.children[++pointer]) {
+            result = modifier(child, pointer, parent);
 
             /*
-             * If a first group matched, move the pointer over to after its
-             * end.
+             * If the modifier returned a number, move the pointer over to
+             * that child.
              */
-            if (match[1]) {
-                pointer += match[1].length;
+            if (typeof result === 'number') {
+                pointer = result - 1;
             }
-
-            /* Black list the pointer. */
-            blacklist[pointer] = true;
         }
+
+        /*eslint-enable no-cond-assign */
+    }
+}
+
+/**
+ * `tokenizerFactory` creates a (modifiable) tokenizer.
+ *
+ * @param {Object} options               - The settings to use.
+ * @param {string} options.type          - The type of parent node to create.
+ * @param {string} options.tokenizer     - The property where the child
+ *                                         tokenizer lives
+ * @param {Function[]} options.modifiers - The initial modifiers to apply on
+ *                                         each parse.
+ * @param {RegExp} options.delimiter     - The delimiter to break children at.
+ * @return {Function} - The tokenizer.
+ * @global
+ * @private
+ */
+function tokenizerFactory(options) {
+    function tokenizer(value) {
+        var delimiter = tokenizer.delimiter,
+            child, children, iterator, length, root, start, stem, token,
+            tokens;
+
+        root = {
+            'type' : options.type
+        };
+
+        children = [];
+
+        stem = this[options.tokenizer](value);
+        tokens = stem.children;
+
+        length = tokens.length;
+        iterator = -1;
+        start = 0;
+
+        while (++iterator < length) {
+            token = tokens[iterator];
+
+            if (
+                iterator === length - 1 ||
+                (token.value && delimiter.test(token.value))
+            ) {
+                child = {
+                    'type' : stem.type
+                };
+
+                child.children = tokens.slice(start, iterator + 1);
+                children.push(child);
+                start = iterator + 1;
+            }
+        }
+
+        root.children = children;
+
+        modify(tokenizer.modifiers, root);
+
+        return root;
     }
 
-    /* for every match of the sentence delimiter expression... */
-    while (match = delimiter.exec(value)) {
-        end = match.index;
+    tokenizer.modifiers = options.modifiers;
+    tokenizer.delimiter = options.delimiter;
 
-        /*
-         * If a first group matched, move the pointer over to its last
-         * character.
-         */
-        if (match[1]) {
-            end += match[1].length - 1;
-        }
+    return tokenizer;
+}
 
-        /* If the character at pointer is is blacklisted, continue. */
-        if (end in blacklist) {
-            continue;
-        }
+function mergePrefixExceptions(child, index, parent) {
+    var children = child.children,
+        node;
 
-        /*
-         * If a first group matched, move the pointer over to after that
-         * group.
-         */
-        if (match[1]) {
-            end += 1;
-        }
+    if (
+        !children ||
+        !children.length ||
+        index === parent.children.length - 1
+    ) {
+        return;
+    }
 
-        /*
-         * If a second group matched (extra content which should be contained
-         * by the sentence), move the pointer over to after that group.
-         */
-        if (match[2]) {
-            end += match[2].length;
-        }
+    node = children[children.length - 1];
 
-        /*
-         * Slice the found sentence content, from (including) start to (not
-         * including) end.
-         */
-        sentence = value.substring(start, end);
+    if (!node || node.value !== '.') {
+        return;
+    }
 
-        /*
-         * If the sentence contains an alphabetic character...
-         * This prevents ellipses joined by spaces from classifying as a
-         * sentence.
-         */
-        if (EXPRESSION_WORD_CHARACTER.test(sentence)) {
-            sentences.push(sentence);
-        /*
-         * Otherwise, if a previous sentence already exists, append the
-         * invalid “sentence” to the previous sentence.
-         */
-        } else if (sentences.length) {
-            sentences[sentences.length - 1] += sentence;
-        /*
-         * Otherwise, if this is the only content in the paragraph,
-         * classify it as a sentence nonetheless.
-         */
-        } else if (end === value.length) {
-            sentences.push(sentence);
-        /* Otherwise, prepend the content to the next sentence. */
-        } else {
-            end -= sentence.length;
-        }
+    node = children[children.length - 2];
 
-        /*
-         * The expression also matches $ (end-of-string), which keeps on
-         * matching in global state, thus we detect it here and exit the loop.
-         */
-        if (delimiter.lastIndex === value.length) {
-            break;
-        }
+    if (
+        !node ||
+        node.type !== 'WordNode' || !(
+        EXPRESSION_ABBREVIATION_PREFIX.test(node.value.toLowerCase()) ||
+        EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE.test(node.value)
+        )
+    ) {
+        return;
+    }
 
-        /*
-         * Continue on with the next iteration, starting at the current end.
-         */
-        start = end;
+    child.children = children.concat(
+        parent.children[index + 1].children
+    );
+
+    parent.children.splice(index + 1, 1);
+
+    return index > 0 ? index - 1 : 0;
+}
+
+function makeInitialWhiteSpaceSiblings(child, index, parent) {
+    var node;
+
+    if (!child.children || !child.children.length) {
+        return;
+    }
+
+    node = child.children[0];
+
+    if (node.type !== 'WhiteSpaceNode') {
+        return;
+    }
+
+    parent.children.splice(index, 0, child.children.shift());
+}
+
+function makeFinalWhiteSpaceSiblings(child, index, parent) {
+    var children = child.children,
+        node;
+
+    if (!children || !children.length/* || index === 0*/) {
+        return;
+    }
+
+    node = children[children.length - 1];
+
+    if (node.type !== 'WhiteSpaceNode') {
+        return;
+    }
+
+    parent.children.splice(index + 1, 0, child.children.pop());
+}
+
+function mergeInitialLowerCaseLetterSentences(child, index, parent) {
+    var node, children, iterator, previousChild;
+
+    children = child.children;
+
+    if (!children || !children.length || index === 0) {
+        return;
     }
 
     iterator = -1;
 
-    /*
-     * Walk over the previously defined sentences, break off their initial
-     * white space, and transform them into an AST.
-     */
-    while (sentence = sentences[++iterator]) {
-        whiteSpace = EXPRESSION_INITIAL_WHITE_SPACE.exec(sentence)[0];
+    while (children[++iterator]) {
+        node = children[iterator];
 
-        /*
-         * If the sentence contains initial white space, break it off and
-         * add it to paragraphs children.
-         */
-        if (whiteSpace) {
-            children.push(this.tokenizeWhiteSpace(whiteSpace));
-        }
-
-        /*
-         * Add the rest of the sentence (the actual sentence) to paragraphs
-         * children.
-         */
-        children.push(this.tokenizeSentence(
-            sentence.substring(whiteSpace.length))
-        );
-    }
-
-    /* Return the AST object (now with children) of the paragraph. */
-    return paragraph;
-}
-
-/**
- * `tokenizeRoot` tokenizes a document into paragraphs and white space (which
- * in turn all get tokenized).
- *
- * @param {String} value - The paragraphs and white space to parse.
- * @return {Object} - An AST object representing the given document.
- * @global
- * @private
- */
-function tokenizeRoot(value) {
-    var start = 0,
-        delimiter, root, children, match, end, paragraph, whiteSpace;
-
-    /* Construct an AST object for the paragraph. */
-    root = {
-        'type' : 'RootNode',
-        'children' : []
-    };
-
-    /* Return early if no content can be tokenized. */
-    if (!value) {
-        return root;
-    }
-
-    children = root.children;
-
-    /* Get the sentence delimiter, and set its `lastIndex` property to 0. */
-    delimiter = this.DELIMITER_PARAGRAPH;
-    delimiter.lastIndex = 0;
-
-    while (match = delimiter.exec(value)) {
-        end = match.index + match[0].length;
-
-        paragraph = value.substring(start, match.index);
-        whiteSpace = value.substring(match.index, end);
-
-        if (paragraph) {
-            children.push(this.tokenizeParagraph(paragraph));
-        }
-
-        if (whiteSpace) {
-            children.push(this.tokenizeWhiteSpace(whiteSpace));
-        }
-
-        /*
-         * The expression also matches $ (end-of-string), which keeps on
-         * matching in global state, thus we detect it here and exit the loop.
-         */
-        if (end === value.length) {
+        if (node.type === 'PunctuationNode') {
+            return;
+        } else if (node.type === 'WordNode') {
             break;
         }
-
-        /*
-         * Continue on with the next iteration, starting at the current end.
-         */
-        start = end;
     }
 
-    /* Return the AST object (now with children) of the document. */
-    return root;
+    if (!node || node.type !== 'WordNode') {
+        return;
+    }
+
+    if (!EXPRESSION_LOWER_INITIAL_EXCEPTION.test(node.value)) {
+        return;
+    }
+
+    previousChild = parent.children[index - 1];
+
+    previousChild.children = previousChild.children.concat(
+        children
+    );
+
+    parent.children.splice(index, 1);
+
+    return index - 1;
 }
 
-/*eslint-enable no-cond-assign */
+function mergeNonWordSentences(child, index, parent) {
+    var children, node, iterator, nextChild;
+
+    children = child.children;
+
+    if (
+        !children || !children.length || index !== 0 ||
+        index === parent.children.length - 1
+    ) {
+        return;
+    }
+
+    iterator = -1;
+
+    while (children[++iterator]) {
+        node = children[iterator];
+        if (node.type === 'WordNode') {
+            return;
+        }
+    }
+
+    nextChild = parent.children[index + 1];
+
+    nextChild.children = children.concat(nextChild.children);
+
+    /* Remove the child. */
+    parent.children.splice(index, 1);
+
+    return 0;
+}
+
+function mergeAffixPunctuation(child, index, parent) {
+    var children = child.children;
+
+    if (!children || !children.length || index === 0) {
+        return;
+    }
+
+    if (
+        children[0].type !== 'PunctuationNode' ||
+        !EXPRESSION_AFFIX_PUNCTUATION.test(children[0].value)
+    ) {
+        return;
+    }
+
+    parent.children[index - 1].children.push(children.shift());
+
+    return index - 1;
+}
+
+function removeEmptyNodes(child, index, parent) {
+    if ('children' in child && !child.children.length) {
+        parent.children.splice(index, 1);
+        return index > 0 ? index - 1 : 0;
+    }
+}
 
 /**
  * `Parser` contains the functions needed to tokenize english natural
@@ -1050,25 +770,168 @@ function Parser() {
 
 parserPrototype = Parser.prototype;
 
-parserPrototype.tokenizeRoot = tokenizerFactory(tokenizeRoot);
-parserPrototype.tokenizeParagraph = tokenizerFactory(tokenizeParagraph);
-parserPrototype.tokenizeSentence = tokenizerFactory(tokenizeSentence);
-parserPrototype.tokenizePunctuation = tokenizerFactory(tokenizePunctuation);
-parserPrototype.tokenizeWord = tokenizerFactory(tokenizeWord);
-parserPrototype.tokenizeWhiteSpace = tokenizerFactory(tokenizeWhiteSpace);
+/**
+ * `EXPRESSION_TOKEN` matches all tokens:
+ * - One or more number, alphabetic, or combining characters;
+ * - One or more white space characters;
+ * - One or more astral plane characters;
+ * - One or more of the same character;
+ */
+parserPrototype.EXPRESSION_TOKEN = new RegExp(
+    '[' + GROUP_WORD + ']+|' +
+    '[' + GROUP_WHITE_SPACE + ']+|' +
+    '[' + GROUP_ASTRAL + ']+|' +
+    '([\\s\\S])\\1*',
+    'g'
+);
 
-parserPrototype.DELIMITER_PARAGRAPH = EXPRESSION_MULTILINEBREAK;
+/**
+ * `EXPRESSION_WORD` matches a word.
+ *
+ * @global
+ * @private
+ * @constant
+ */
+parserPrototype.EXPRESSION_WORD = new RegExp(
+    '^[' + GROUP_WORD + ']+$'
+);
 
-parserPrototype.DELIMITER_SENTENCE = EXPRESSION_SENTENCE_END;
+/**
+ * `EXPRESSION_WHITE_SPACE` matches a string containing ONLY white space.
+ *
+ * @global
+ * @private
+ * @constant
+ */
+parserPrototype.EXPRESSION_WHITE_SPACE = new RegExp(
+    '^[' + GROUP_WHITE_SPACE + ']+$'
+);
 
-parserPrototype.DELIMITER_TOKEN = EXPRESSION_TOKEN;
+/**
+ * @param {String?} value - The value to validate / convert to a string.
+ * @return {Object[]} - Classified tokens.
+ * @global
+ * @private
+ */
+parserPrototype.tokenize = function (value) {
+    var self, tokens, delimiter, start, end, match;
 
-parserPrototype.SENTENCE_BLACKLIST = [
-    EXPRESSION_ABBREVIATION_AFFIX,
-    EXPRESSION_ABBREVIATION_PREFIX,
-    EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE,
-    EXPRESSION_FULL_STOP_SUFFIX_EXCEPTION,
-    EXPRESSION_TERMINAL_MARKER_SUFFIX_EXCEPTION
-];
+    if (value === null || value === undefined) {
+        value = '';
+    } else if (value instanceof String) {
+        value = value.toString();
+    }
+
+    if (typeof value !== 'string') {
+        throw new TypeError('Illegal invocation: \'' + value +
+            '\' is not a valid argument for \'ParseEnglish\'');
+    }
+
+    self = this;
+
+    tokens = [];
+
+    if (!value) {
+        return tokens;
+    }
+
+    delimiter = self.EXPRESSION_TOKEN;
+
+    delimiter.lastIndex = 0;
+    start = 0;
+
+    /*eslint-disable no-cond-assign */
+
+    /* for every match of the token delimiter expression... */
+    while (match = delimiter.exec(value)) {
+        /*
+         * Move the pointer over to after its last character.
+         */
+        end = match.index + match[0].length;
+
+        /*
+         * Slice the found content, from (including) start to (not including)
+         * end, classify it, and add the result to tokens.
+         */
+        tokens.push(self.classifier(value.substring(start, end)));
+
+        /*
+         * The delimiter may also match $ (end-of-string), which keeps on
+         * matching in global state, thus we detect it here and exit the
+         * loop.
+         */
+        if (delimiter.lastIndex === value.length) {
+            break;
+        }
+
+        start = end;
+    }
+    /*eslint-enable no-cond-assign */
+
+    return tokens;
+};
+
+/*eslint-enable no-cond-assign */
+
+parserPrototype.classifier = function (value) {
+    var type;
+
+    /*
+     * If the token consists solely of white space, classify it as white
+     * space.
+     */
+    if (this.EXPRESSION_WHITE_SPACE.test(value)) {
+        type = 'WhiteSpaceNode';
+    /*
+     * Otherwise, if the token contains just word characters, classify it as
+     * a word.
+     */
+    } else if (this.EXPRESSION_WORD.test(value)) {
+        type = 'WordNode';
+    /*
+     * Otherwise, classify it as punctuation.
+     */
+    } else {
+        type = 'PunctuationNode';
+    }
+
+    /* Return a token. */
+    return {
+        'type' : type,
+        'value' : value
+    };
+};
+
+parserPrototype.tokenizeSentence = function (value) {
+    /*
+     * Return a sentence token, with its children set to the result of
+     * tokenizing the given value.
+     */
+    return {
+        'type' : 'SentenceNode',
+        'children' : this.tokenize(value)
+    };
+};
+
+parserPrototype.tokenizeParagraph = tokenizerFactory({
+    'tokenizer' : 'tokenizeSentence',
+    'type' : 'ParagraphNode',
+    'delimiter' : new RegExp('^([' + GROUP_TERMINAL_MARKER + ']+)$'),
+    'modifiers' : [
+        mergePrefixExceptions,
+        mergeNonWordSentences,
+        mergeAffixPunctuation,
+        mergeInitialLowerCaseLetterSentences,
+        makeInitialWhiteSpaceSiblings,
+        removeEmptyNodes
+    ]
+});
+
+parserPrototype.tokenizeRoot = tokenizerFactory({
+    'tokenizer' : 'tokenizeParagraph',
+    'type' : 'RootNode',
+    'delimiter' : /^(\r?\n|\r)+$/,
+    'modifiers' : [makeFinalWhiteSpaceSiblings, removeEmptyNodes]
+});
 
 module.exports = Parser;
