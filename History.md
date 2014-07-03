@@ -1,5 +1,5 @@
 
-n.n.n / 2014-07-03
+0.1.0-rc.1 / 2014-07-03
 ==================
 
  * Moved a wrongly places tokenizer call
