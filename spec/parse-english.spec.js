@@ -31,18 +31,6 @@ describe('new ParseEnglish()', function () {
     it('should have a `tokenizeSentence` method', function () {
         assert(typeof parser.tokenizeSentence === 'function');
     });
-
-    it('should have a `tokenizeWord` method', function () {
-        assert(typeof parser.tokenizeWord === 'function');
-    });
-
-    it('should have a `tokenizePunctuation` method', function () {
-        assert(typeof parser.tokenizePunctuation === 'function');
-    });
-
-    it('should have a `tokenizeWhiteSpace` method', function () {
-        assert(typeof parser.tokenizeWhiteSpace === 'function');
-    });
 });
 
 describe('Root: Without a value', function () {
