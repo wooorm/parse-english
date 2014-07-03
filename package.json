@@ -1,26 +1,21 @@
 {
   "name": "parse-english",
-  "version": "0.0.24",
-  "description": "English (natural language) parser build on TextOM",
+  "version": "0.1.0-rc.1",
+  "description": "English (natural language) parser",
   "keywords": [
     "english",
     "natural",
     "language",
-    "parser",
-    "textom"
+    "parser"
   ],
   "author": "Titus Wormer <tituswormer@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "textom": "~0.0.20"
-  },
   "devDependencies": {
     "eslint": "^0.6.2",
-    "istanbul": "~0.2.13",
+    "istanbul": "~0.2.14",
     "jscs": "^1.5.7",
     "matcha": "^0.5.0",
-    "mocha": "~1.20.1",
-    "retext-ast": "~0.0.4"
+    "mocha": "~1.20.1"
   },
   "repository": {
     "type": "git",
@@ -30,7 +25,7 @@
     "test": "node_modules/.bin/_mocha --reporter spec --check-leaks -u exports spec/parse-english.spec.js",
     "test-travis": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha --report lcovonly -- --reporter spec --check-leaks -u exports spec/parse-english.spec.js",
     "lint": "npm run-script lint-api && npm run-script lint-test && npm run-script lint-benchmark && npm run-script lint-style",
-    "lint-api": "node_modules/.bin/eslint index.js --env node --env browser --rule 'quotes: [2, single]'",
+    "lint-api": "node_modules/.bin/eslint index.js --env node --env browser --rule 'quotes: [2, single], consistent-return: false'",
     "lint-test": "node_modules/.bin/eslint spec/parse-english.spec.js --env node --env mocha --rule 'quotes: [2, single], no-loop-func: false'",
     "lint-benchmark": "node_modules/.bin/eslint benchmark/index.js --env node --global suite,set,bench --rule 'quotes: [2, single]'",
     "lint-style": "node_modules/.bin/jscs index.js spec/parse-english.spec.js --reporter=inline",

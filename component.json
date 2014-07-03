@@ -1,18 +1,14 @@
 {
   "name": "parse-english",
   "repository": "wooorm/parse-english",
-  "description": "English (natural language) parser build on TextOM",
-  "version": "0.0.24",
+  "description": "English (natural language) parser",
+  "version": "0.1.0-rc.1",
   "keywords": [
     "english",
     "natural",
     "language",
-    "parser",
-    "textom"
+    "parser"
   ],
-  "dependencies": {
-    "wooorm/textom": "^0.0.20"
-  },
   "scripts" : [
     "index.js"
   ],
