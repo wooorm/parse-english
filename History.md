@@ -1,4 +1,13 @@
 
+n.n.n / 2014-07-04
+==================
+
+ * The API now merges hyphens surrounded by two words: non-profit, high-end
+ * The api now merges apostrophs when surrounded by two words: cat’s, O’Doole, 1000’s
+ * The API now supports children in white space, punctuation, and words (e.g., punctuation inside a word)
+ * Updated dependency version of istanbul to 0.2.16
+ * Added benchmarks to documentation
+
 0.1.0-rc.1 / 2014-07-03
 ==================
 
