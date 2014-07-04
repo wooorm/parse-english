@@ -1,7 +1,7 @@
 'use strict';
 
 var EXPRESSION_ABBREVIATION_PREFIX, EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE,
-    EXPRESSION_AFFIX_PUNCTUATION, EXPRESSION_APOSTROPHE,
+    EXPRESSION_AFFIX_PUNCTUATION, EXPRESSION_INNER_WORD_PUNCTUATION,
     EXPRESSION_LOWER_INITIAL_EXCEPTION,
     GROUP_ALPHABETIC, GROUP_ASTRAL, GROUP_CLOSING_PUNCTUATION,
     GROUP_COMBINING_DIACRITICAL_MARK, GROUP_COMBINING_NONSPACING_MARK,
@@ -473,7 +473,25 @@ EXPRESSION_AFFIX_PUNCTUATION = new RegExp(
     '])\\1*$'
 );
 
-EXPRESSION_APOSTROPHE = /^['’]$/;
+/**
+ * `EXPRESSION_INNER_WORD_PUNCTUATION` matches punctuation which can be
+ * used to join two (sub?) words together.
+ *
+ * Included:
+ * - Hyphen-minus;
+ * - Dumb single quote;
+ * - Right single quote;
+ * - Soft hyphen;
+ * - Hyphen;
+ * - Non-breaking hyphen;
+ * - Hyphenation point;
+ * - Middle dot
+ *
+ * @global
+ * @private
+ * @constant
+ */
+EXPRESSION_INNER_WORD_PUNCTUATION = /^[-'’\u00AD\u00B7\u2010\2011\u2027]$/;
 
 /**
  * `EXPRESSION_LOWER_INITIAL_EXCEPTION` matches an initial lower case letter.
@@ -606,7 +624,7 @@ function mergeInnerWordPunctuation(child, index, parent) {
         return;
     }
 
-    if (!EXPRESSION_APOSTROPHE.test(tokenToString(child))) {
+    if (!EXPRESSION_INNER_WORD_PUNCTUATION.test(tokenToString(child))) {
         return;
     }
 

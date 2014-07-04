@@ -393,21 +393,16 @@ describe('Root: Given two paragraphs', function () {
                                         {
                                             'type' : 'TextNode',
                                             'value' : 'self'
-                                        }
-                                    ]
-                                },
-                                {
-                                    'type' : 'PunctuationNode',
-                                    'children' : [
+                                        },
                                         {
-                                            'type' : 'TextNode',
-                                            'value' : '-'
-                                        }
-                                    ]
-                                },
-                                {
-                                    'type' : 'WordNode',
-                                    'children' : [
+                                            'type' : 'PunctuationNode',
+                                            'children' : [
+                                                {
+                                                    'type' : 'TextNode',
+                                                    'value' : '-'
+                                                }
+                                            ]
+                                        },
                                         {
                                             'type' : 'TextNode',
                                             'value' : 'contained'
@@ -3605,21 +3600,16 @@ describe('Sentence: Abbreviations followed by a dot, optional white ' +
                                 {
                                     'type' : 'TextNode',
                                     'value' : 'non'
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'children' : [
+                                },
                                 {
-                                    'type' : 'TextNode',
-                                    'value' : '-'
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'WordNode',
-                            'children' : [
+                                    'type' : 'PunctuationNode',
+                                    'children' : [
+                                        {
+                                            'type' : 'TextNode',
+                                            'value' : '-'
+                                        }
+                                    ]
+                                },
                                 {
                                     'type' : 'TextNode',
                                     'value' : 'profit'
@@ -6093,21 +6083,16 @@ describe('A simple sentence testing for digit-letters', function () {
                         {
                             'type' : 'TextNode',
                             'value' : 'high'
-                        }
-                    ]
-                },
-                {
-                    'type' : 'PunctuationNode',
-                    'children' : [
+                        },
                         {
-                            'type' : 'TextNode',
-                            'value' : '-'
-                        }
-                    ]
-                },
-                {
-                    'type' : 'WordNode',
-                    'children' : [
+                            'type' : 'PunctuationNode',
+                            'children' : [
+                                {
+                                    'type' : 'TextNode',
+                                    'value' : '-'
+                                }
+                            ]
+                        },
                         {
                             'type' : 'TextNode',
                             'value' : 'end'
@@ -15188,21 +15173,16 @@ describe('Abbreviations: Latin', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : '2050'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '-'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'children' : [
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '-'
+                                    }
+                                ]
+                            },
                             {
                                 'type' : 'TextNode',
                                 'value' : '75'
@@ -19194,21 +19174,16 @@ describe('Abbreviations: Latin', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'non'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '-'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'children' : [
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '-'
+                                    }
+                                ]
+                            },
                             {
                                 'type' : 'TextNode',
                                 'value' : 'expected'
@@ -21169,21 +21144,16 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : '10'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '-'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'children' : [
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '-'
+                                    }
+                                ]
+                            },
                             {
                                 'type' : 'TextNode',
                                 'value' : 'karat'
@@ -24733,21 +24703,16 @@ describe('Abbreviations: TLD abbreviations', function () {
                                 {
                                     'type' : 'TextNode',
                                     'value' : 'top'
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'children' : [
+                                },
                                 {
-                                    'type' : 'TextNode',
-                                    'value' : '-'
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'WordNode',
-                            'children' : [
+                                    'type' : 'PunctuationNode',
+                                    'children' : [
+                                        {
+                                            'type' : 'TextNode',
+                                            'value' : '-'
+                                        }
+                                    ]
+                                },
                                 {
                                     'type' : 'TextNode',
                                     'value' : 'level'
@@ -25898,21 +25863,16 @@ describe('Terminal markers', function () {
                                 {
                                     'type' : 'TextNode',
                                     'value' : 'low'
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'children' : [
+                                },
                                 {
-                                    'type' : 'TextNode',
-                                    'value' : '-'
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'WordNode',
-                            'children' : [
+                                    'type' : 'PunctuationNode',
+                                    'children' : [
+                                        {
+                                            'type' : 'TextNode',
+                                            'value' : '-'
+                                        }
+                                    ]
+                                },
                                 {
                                     'type' : 'TextNode',
                                     'value' : 'priced'
