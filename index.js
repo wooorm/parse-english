@@ -519,6 +519,24 @@ function modify(modifiers, parent) {
     }
 }
 
+function tokenToString(token) {
+    var value = '',
+        iterator, children;
+
+    if ('children' in token) {
+        iterator = -1;
+        children = token.children;
+
+        while (children[++iterator]) {
+            value += tokenToString(children[iterator]);
+        }
+
+        return value;
+    }
+
+    return token.value;
+}
+
 /**
  * `tokenizerFactory` creates a (modifiable) tokenizer.
  *
@@ -536,8 +554,7 @@ function modify(modifiers, parent) {
 function tokenizerFactory(options) {
     function tokenizer(value) {
         var delimiter = tokenizer.delimiter,
-            child, children, iterator, length, root, start, stem, token,
-            tokens;
+            child, children, iterator, length, root, start, stem, tokens;
 
         root = {
             'type' : options.type
@@ -553,11 +570,9 @@ function tokenizerFactory(options) {
         start = 0;
 
         while (++iterator < length) {
-            token = tokens[iterator];
-
             if (
                 iterator === length - 1 ||
-                (token.value && delimiter.test(token.value))
+                (delimiter.test(tokenToString(tokens[iterator])))
             ) {
                 child = {
                     'type' : stem.type
@@ -584,7 +599,7 @@ function tokenizerFactory(options) {
 
 function mergePrefixExceptions(child, index, parent) {
     var children = child.children,
-        node;
+        node, value;
 
     if (
         !children ||
@@ -596,19 +611,25 @@ function mergePrefixExceptions(child, index, parent) {
 
     node = children[children.length - 1];
 
-    if (!node || node.value !== '.') {
+    if (
+        !node || node.type !== 'PunctuationNode' ||
+        tokenToString(node) !== '.'
+    ) {
         return;
     }
 
     node = children[children.length - 2];
 
-    if (
-        !node ||
-        node.type !== 'WordNode' || !(
-        EXPRESSION_ABBREVIATION_PREFIX.test(node.value.toLowerCase()) ||
-        EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE.test(node.value)
-        )
-    ) {
+    if (!node || node.type !== 'WordNode') {
+        return;
+    }
+
+    value = tokenToString(node);
+
+    if (!(
+        EXPRESSION_ABBREVIATION_PREFIX.test(value.toLowerCase()) ||
+        EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE.test(value)
+    )) {
         return;
     }
 
@@ -640,10 +661,6 @@ function makeInitialWhiteSpaceSiblings(child, index, parent) {
 function makeFinalWhiteSpaceSiblings(child, index, parent) {
     var children = child.children,
         node;
-
-    if (!children || !children.length/* || index === 0*/) {
-        return;
-    }
 
     node = children[children.length - 1];
 
@@ -679,7 +696,7 @@ function mergeInitialLowerCaseLetterSentences(child, index, parent) {
         return;
     }
 
-    if (!EXPRESSION_LOWER_INITIAL_EXCEPTION.test(node.value)) {
+    if (!EXPRESSION_LOWER_INITIAL_EXCEPTION.test(tokenToString(node))) {
         return;
     }
 
@@ -734,7 +751,7 @@ function mergeAffixPunctuation(child, index, parent) {
 
     if (
         children[0].type !== 'PunctuationNode' ||
-        !EXPRESSION_AFFIX_PUNCTUATION.test(children[0].value)
+        !EXPRESSION_AFFIX_PUNCTUATION.test(tokenToString(children[0]))
     ) {
         return;
     }
@@ -898,7 +915,12 @@ parserPrototype.classifier = function (value) {
     /* Return a token. */
     return {
         'type' : type,
-        'value' : value
+        'children' : [
+            {
+                'type' : 'TextNode',
+                'value' : value
+            }
+        ]
     };
 };
 
