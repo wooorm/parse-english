@@ -1,7 +1,7 @@
 'use strict';
 
-var EXPRESSION_ABBREVIATION_PREFIX,
-    EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE, EXPRESSION_AFFIX_PUNCTUATION,
+var EXPRESSION_ABBREVIATION_PREFIX, EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE,
+    EXPRESSION_AFFIX_PUNCTUATION, EXPRESSION_APOSTROPHE,
     EXPRESSION_LOWER_INITIAL_EXCEPTION,
     GROUP_ALPHABETIC, GROUP_ASTRAL, GROUP_CLOSING_PUNCTUATION,
     GROUP_COMBINING_DIACRITICAL_MARK, GROUP_COMBINING_NONSPACING_MARK,
@@ -473,6 +473,8 @@ EXPRESSION_AFFIX_PUNCTUATION = new RegExp(
     '])\\1*$'
 );
 
+EXPRESSION_APOSTROPHE = /^['’]$/;
+
 /**
  * `EXPRESSION_LOWER_INITIAL_EXCEPTION` matches an initial lower case letter.
  *
@@ -595,6 +597,34 @@ function tokenizerFactory(options) {
     tokenizer.delimiter = options.delimiter;
 
     return tokenizer;
+}
+
+function mergeInnerWordPunctuation(child, index, parent) {
+    var children, prev, next;
+
+    if (index === 0 || child.type !== 'PunctuationNode') {
+        return;
+    }
+
+    if (!EXPRESSION_APOSTROPHE.test(tokenToString(child))) {
+        return;
+    }
+
+    children = parent.children;
+    prev = children[index - 1];
+    next = children[index + 1];
+
+    if (prev.type !== 'WordNode' || !next || next.type !== 'WordNode') {
+        return;
+    }
+
+    /* Remove `child` and `next` from parent. */
+    parent.children.splice(index, 2);
+
+    /* Add child and next.children to prev.children. */
+    prev.children = prev.children.concat(child, next.children);
+
+    return index - 1;
 }
 
 function mergePrefixExceptions(child, index, parent) {
@@ -925,15 +955,21 @@ parserPrototype.classifier = function (value) {
 };
 
 parserPrototype.tokenizeSentence = function (value) {
+    var root = {
+        'type' : 'SentenceNode',
+        'children' : this.tokenize(value)
+    };
+
+    modify(this.tokenizeSentence.modifiers, root);
+
     /*
      * Return a sentence token, with its children set to the result of
      * tokenizing the given value.
      */
-    return {
-        'type' : 'SentenceNode',
-        'children' : this.tokenize(value)
-    };
+    return root;
 };
+
+parserPrototype.tokenizeSentence.modifiers = [mergeInnerWordPunctuation];
 
 parserPrototype.tokenizeParagraph = tokenizerFactory({
     'tokenizer' : 'tokenizeSentence',

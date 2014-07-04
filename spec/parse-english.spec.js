@@ -8982,21 +8982,16 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'James'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '\''
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'children' : [
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '\''
+                                    }
+                                ]
+                            },
                             {
                                 'type' : 'TextNode',
                                 'value' : 's'
@@ -11690,21 +11685,16 @@ describe('Abbreviations: Geographic', function () {
                                 {
                                     'type' : 'TextNode',
                                     'value' : 'I'
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'children' : [
+                                },
                                 {
-                                    'type' : 'TextNode',
-                                    'value' : '\''
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'WordNode',
-                            'children' : [
+                                    'type' : 'PunctuationNode',
+                                    'children' : [
+                                        {
+                                            'type' : 'TextNode',
+                                            'value' : '\''
+                                        }
+                                    ]
+                                },
                                 {
                                     'type' : 'TextNode',
                                     'value' : 'm'
@@ -11881,21 +11871,16 @@ describe('Abbreviations: Geographic', function () {
                                 {
                                     'type' : 'TextNode',
                                     'value' : 'I'
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'children' : [
+                                },
                                 {
-                                    'type' : 'TextNode',
-                                    'value' : '\''
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'WordNode',
-                            'children' : [
+                                    'type' : 'PunctuationNode',
+                                    'children' : [
+                                        {
+                                            'type' : 'TextNode',
+                                            'value' : '\''
+                                        }
+                                    ]
+                                },
                                 {
                                     'type' : 'TextNode',
                                     'value' : 'm'
@@ -23951,21 +23936,16 @@ describe('Abbreviations: Time references', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'We'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '\''
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'children' : [
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '\''
+                                    }
+                                ]
+                            },
                             {
                                 'type' : 'TextNode',
                                 'value' : 'll'
@@ -24134,21 +24114,16 @@ describe('Abbreviations: Time references', function () {
                                 {
                                     'type' : 'TextNode',
                                     'value' : 'Let'
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'children' : [
+                                },
                                 {
-                                    'type' : 'TextNode',
-                                    'value' : '\''
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'WordNode',
-                            'children' : [
+                                    'type' : 'PunctuationNode',
+                                    'children' : [
+                                        {
+                                            'type' : 'TextNode',
+                                            'value' : '\''
+                                        }
+                                    ]
+                                },
                                 {
                                     'type' : 'TextNode',
                                     'value' : 's'
@@ -26116,21 +26091,16 @@ describe('Terminal markers', function () {
                                 {
                                     'type' : 'TextNode',
                                     'value' : 'She'
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'children' : [
+                                },
                                 {
-                                    'type' : 'TextNode',
-                                    'value' : '\''
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'WordNode',
-                            'children' : [
+                                    'type' : 'PunctuationNode',
+                                    'children' : [
+                                        {
+                                            'type' : 'TextNode',
+                                            'value' : '\''
+                                        }
+                                    ]
+                                },
                                 {
                                     'type' : 'TextNode',
                                     'value' : 's'
