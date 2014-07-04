@@ -1,5 +1,5 @@
 
-n.n.n / 2014-07-04
+0.1.0-rc.2 / 2014-07-04
 ==================
 
  * The API now merges hyphens surrounded by two words: non-profit, high-end
