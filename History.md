@@ -1,4 +1,13 @@
 
+n.n.n / 2014-07-05
+==================
+
+ * Updated jscs to 1.5.8
+ * Added parse-latin as a dependency
+ * Fixed a typo
+ * Modified documentation due to changes in 4188485
+ * Removed all functionality and tests now available in parse-latin (fixes #3)
+
 0.1.0-rc.2 / 2014-07-04
 ==================
 
