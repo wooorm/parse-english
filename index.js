@@ -4,7 +4,7 @@ var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX,
     EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE,
     Parser, parserPrototype;
 
-Parser = require('../parse-latin');
+Parser = require('parse-latin');
 
 /**
  * `EXPRESSION_ABBREVIATION_PREFIX_SENSITIVE` holds a blacklist of full
