@@ -21,6 +21,9 @@
     "type": "git",
     "url": "https://github.com/wooorm/parse-english.git"
   },
+  "dependencies" : {
+    "parse-latin": "^0.1.0-rc.3"
+  },
   "scripts": {
     "test": "node_modules/.bin/_mocha --reporter spec --check-leaks -u exports spec/parse-english.spec.js",
     "test-travis": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha --report lcovonly -- --reporter spec --check-leaks -u exports spec/parse-english.spec.js",
