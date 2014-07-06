@@ -1,4 +1,9 @@
 
+n.n.n / 2014-07-06
+==================
+
+ * Added support for properly tokenising elision in words
+
 0.1.0-rc.3 / 2014-07-05
 ==================
 
