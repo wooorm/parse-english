@@ -2,6 +2,8 @@
 
 var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX,
     EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE,
+    EXPRESSION_ELISION_ENGLISH_AFFIX,
+    EXPRESSION_APOSTROPHE,
     Parser, parserPrototype;
 
 Parser = require('parse-latin');
@@ -184,6 +186,95 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
     return index > 0 ? index - 1 : 0;
 }
 
+EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
+    '^(' +
+        /* Elisions of [h]im, [h]er, and [th]em. */
+        'im|er|em|' +
+
+        /* Elisions of [i]t[ ]was, [i]t[ ]is, and [i]t[ ]were. */
+        'twas|tis|twere|' +
+
+        /* Groups of years. */
+        '\\d\\ds' +
+    ')$'
+);
+
+EXPRESSION_APOSTROPHE = /^['’]$/;
+
+function mergeEnglishElisionExceptions(child, index, parent) {
+    var siblings = parent.children,
+        length = siblings.length,
+        node, value;
+
+    /* Return if the child is not an apostrophe. */
+    if (
+        child.type !== 'PunctuationNode' ||
+        !EXPRESSION_APOSTROPHE.test(child.children[0].value)
+    ) {
+        return;
+    }
+
+    /* If two preceding (the first white space and the second a word), and
+     * one following (white space) nodes exist... */
+    if (
+        index > 2 && index < length - 1 &&
+        siblings[index - 1].type === 'WordNode' &&
+        siblings[index - 2].type === 'WhiteSpaceNode' &&
+        siblings[index + 1].type === 'WhiteSpaceNode'
+    ) {
+        node = siblings[index - 1];
+
+        /* If the preceding node is just an `o`... */
+        if (node.children[0].value.toLowerCase() === 'o') {
+            /* Remove the apostrophe from parent. */
+            siblings.splice(index, 1);
+
+            /* Append the apostrophe into the children of node. */
+            node.children = node.children.concat(child);
+
+            return;
+        }
+    }
+
+    /* If a following word exists, and the preceding node is not a word... */
+    if (
+        index < length - 1 &&
+        siblings[index + 1].type === 'WordNode' && (
+            index === 0 ||
+            siblings[index - 1].type !== 'WordNode'
+        )
+    ) {
+        node = siblings[index + 1];
+        value = node.children[0].value.toLowerCase();
+
+        /* If the following word matches a known elision... */
+        if (EXPRESSION_ELISION_ENGLISH_AFFIX.test(value)) {
+            /* Remove the apostrophe from parent. */
+            siblings.splice(index, 1);
+
+            /* Prepend the apostrophe into the children of node. */
+            node.children = [child].concat(node.children);
+        /* Otherwise, if the following word is an `n`, and is followed by an
+         * apostrophe. */
+        } else if (
+            value === 'n' && index < length - 2 &&
+            siblings[index + 2].type === 'PunctuationNode' &&
+            EXPRESSION_APOSTROPHE.test(
+                siblings[index + 2].children[0].value
+            )
+        ) {
+            /* Remove the apostrophe from parent. */
+            siblings.splice(index, 1);
+
+            /* Prepend the apostrophe and append the next apostrophe, into
+             * the children of node. */
+            node.children = [child].concat(
+                node.children, siblings.splice(index + 1, 1)
+            );
+        }
+    }
+}
+
 function ParserPrototype () {}
 ParserPrototype.prototype = Parser.prototype;
 parserPrototype = new ParserPrototype();
@@ -201,6 +292,10 @@ function ParseEnglish() {
 }
 
 ParseEnglish.prototype = parserPrototype;
+
+parserPrototype.tokenizeSentenceModifiers = [
+        mergeEnglishElisionExceptions
+    ].concat(parserPrototype.tokenizeSentenceModifiers);
 
 parserPrototype.tokenizeParagraphModifiers = [
         mergeEnglishPrefixExceptions

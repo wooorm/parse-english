@@ -61,7 +61,8 @@ Support includes:
 * Geographical abbreviations (Ave., Blvd., Ft., Hwy., &c.);
 * American state abbreviations (Ala., Minn., La., Tex., &c.);
 * Canadian province abbreviations (Alta., Qué., Yuk., &c.);
-* English county abbreviations (Beds., Leics., Shrops., &c.).
+* English county abbreviations (Beds., Leics., Shrops., &c.);
+* Common elision (omission of letters) ('n', 'o, 'em, 'twas, '80s, &c.).
 
 ## Browser Support
 Pretty much every browser (available through browserstack) runs all parse-english unit tests.

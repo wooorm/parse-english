@@ -10755,3 +10755,477 @@ describe('Abbreviations: Time references', function () {
         }
     );
 });
+
+describe('Elision', function () {
+    it('should treat `o\'` as one word', function () {
+        var root = parser.tokenizeParagraph(
+            'Lots o\' luck!'
+        ).children[0].children[2];
+
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'WordNode',
+            'children' : [
+                {
+                    'type' : 'TextNode',
+                    'value' : 'o'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                }
+            ]
+        }));
+    });
+
+    it('should treat `\'em` as one word', function () {
+        var root = parser.tokenizeParagraph(
+            'Tell \'em!'
+        ).children[0].children[2];
+
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'WordNode',
+            'children' : [
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                },
+                {
+                    'type' : 'TextNode',
+                    'value' : 'em'
+                }
+            ]
+        }));
+    });
+
+    it('should treat `\'er` as one word', function () {
+        var root = parser.tokenizeParagraph(
+            'Tell \'er!'
+        ).children[0].children[2];
+
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'WordNode',
+            'children' : [
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                },
+                {
+                    'type' : 'TextNode',
+                    'value' : 'er'
+                }
+            ]
+        }));
+    });
+
+    it('should treat `\'im` as one word', function () {
+        var root = parser.tokenizeParagraph(
+            'Tell \'im!'
+        ).children[0].children[2];
+
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'WordNode',
+            'children' : [
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                },
+                {
+                    'type' : 'TextNode',
+                    'value' : 'im'
+                }
+            ]
+        }));
+    });
+
+    it('should treat `\'n\'` as one word', function () {
+        var root = parser.tokenizeParagraph(
+            'Rock \'n\' Roll!'
+        ).children[0].children[2];
+
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'WordNode',
+            'children' : [
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                },
+                {
+                    'type' : 'TextNode',
+                    'value' : 'n'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                }
+            ]
+        }));
+    });
+
+    it('should treat `\'twas` as one word', function () {
+        var root = parser.tokenizeParagraph(
+            '\'Twas the night before Christmas'
+        ).children[0].children[0];
+
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'WordNode',
+            'children' : [
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                },
+                {
+                    'type' : 'TextNode',
+                    'value' : 'Twas'
+                }
+            ]
+        }));
+    });
+
+    it('should treat `\'tis` as one word', function () {
+        var root = parser.tokenizeParagraph(
+            '\'Tis the season to'
+        ).children[0].children[0];
+
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'WordNode',
+            'children' : [
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                },
+                {
+                    'type' : 'TextNode',
+                    'value' : 'Tis'
+                }
+            ]
+        }));
+    });
+
+    it('should treat `\'twere` as one word', function () {
+        var root = parser.tokenizeParagraph(
+            'If \'twere us...'
+        ).children[0].children[2];
+
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'WordNode',
+            'children' : [
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                },
+                {
+                    'type' : 'TextNode',
+                    'value' : 'twere'
+                }
+            ]
+        }));
+    });
+
+    it('should treat `\'80s` as one word', function () {
+        var root = parser.tokenizeParagraph(
+            'Acceptable in the \'80s.'
+        ).children[0].children[6];
+
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'WordNode',
+            'children' : [
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                },
+                {
+                    'type' : 'TextNode',
+                    'value' : '80s'
+                }
+            ]
+        }));
+    });
+
+    it('should NOT treat other words following an apostrophe, as one word',
+        function () {
+            var root = parser.tokenizeParagraph(
+                'For example, a\' or whatevs.'
+            ).children[0].children;
+
+            assert(JSON.stringify(root) === JSON.stringify([
+                {
+                    'type' : 'WordNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : 'For'
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : ' '
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WordNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : 'example'
+                        }
+                    ]
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : ','
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : ' '
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WordNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : 'a'
+                        }
+                    ]
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : ' '
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WordNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : 'or'
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : ' '
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WordNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : 'whatevs'
+                        }
+                    ]
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '.'
+                        }
+                    ]
+                }
+            ]));
+        }
+    );
+
+    it('should NOT treat other words preceding an apostrophe, as one word',
+        function () {
+            var root = parser.tokenizeParagraph(
+                'For example, \'a or whatevs.'
+            ).children[0].children;
+
+            assert(JSON.stringify(root) === JSON.stringify([
+                {
+                    'type' : 'WordNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : 'For'
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : ' '
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WordNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : 'example'
+                        }
+                    ]
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : ','
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : ' '
+                        }
+                    ]
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WordNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : 'a'
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : ' '
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WordNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : 'or'
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WhiteSpaceNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : ' '
+                        }
+                    ]
+                },
+                {
+                    'type' : 'WordNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : 'whatevs'
+                        }
+                    ]
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '.'
+                        }
+                    ]
+                }
+            ]));
+        }
+    );
+});
