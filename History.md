@@ -1,5 +1,5 @@
 
-n.n.n / 2014-07-17
+0.1.0-rc.5 / 2014-07-17
 ==================
 
  * Replaced unicode characters in API with their ASCII equivalent
