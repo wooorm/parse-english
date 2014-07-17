@@ -13,7 +13,7 @@ Parser = require('parse-latin');
  * stop characters that should not be treated as terminal sentence
  * markers:
  *
- * A “word” boundry,
+ * A "word" boundry,
  * followed by a case-sensitive abbreviation,
  * followed by full stop.
  *
@@ -58,7 +58,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
  * stop characters that should not be treated as terminal sentence
  * markers:
  *
- * A “word” boundry,
+ * A "word" boundry,
  * followed by a case-sensitive abbreviation,
  * followed by full stop.
  *
@@ -115,10 +115,10 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
 
         /*
          * Canadian province abbreviations:
-         * Alberta, Manitoba, Ontario, Québec, *, Saskatchewan,
+         * Alberta, Manitoba, Ontario, Quebec, *, Saskatchewan,
          * Yukon Territory.
          */
-        'Alta|Man|Ont|Qué|Que|Sask|Yuk|' +
+        'Alta|Man|Ont|Qu\u00E9|Que|Sask|Yuk|' +
 
         /*
          * English county abbreviations
@@ -199,7 +199,7 @@ EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
     ')$'
 );
 
-EXPRESSION_APOSTROPHE = /^['’]$/;
+EXPRESSION_APOSTROPHE = /^['\u2019]$/;
 
 function mergeEnglishElisionExceptions(child, index, parent) {
     var siblings = parent.children,
