@@ -1,4 +1,10 @@
 
+n.n.n / 2014-07-17
+==================
+
+ * Replaced unicode characters in API with their ASCII equivalent
+ * Fix broken unit tests since parse-latin@0.1.0-rc.4
+
 0.1.0-rc.4 / 2014-07-06
 ==================
 
