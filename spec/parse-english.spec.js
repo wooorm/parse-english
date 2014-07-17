@@ -1256,33 +1256,28 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'U'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'children' : [
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
+                            },
                             {
                                 'type' : 'TextNode',
                                 'value' : 'S'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -1459,33 +1454,28 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'U'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'children' : [
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
+                            },
                             {
                                 'type' : 'TextNode',
                                 'value' : 'S'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -2400,33 +2390,28 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'L'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'children' : [
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
+                            },
                             {
                                 'type' : 'TextNode',
                                 'value' : 'A'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -6572,21 +6557,16 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : '60'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'children' : [
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
+                            },
                             {
                                 'type' : 'TextNode',
                                 'value' : '96'
@@ -7869,21 +7849,16 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : '0'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'WordNode',
-                        'children' : [
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
+                            },
                             {
                                 'type' : 'TextNode',
                                 'value' : '45359237'
@@ -10551,21 +10526,16 @@ describe('Abbreviations: Time references', function () {
                                 {
                                     'type' : 'TextNode',
                                     'value' : '10'
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'children' : [
+                                },
                                 {
-                                    'type' : 'TextNode',
-                                    'value' : ':'
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'WordNode',
-                            'children' : [
+                                    'type' : 'PunctuationNode',
+                                    'children' : [
+                                        {
+                                            'type' : 'TextNode',
+                                            'value' : ':'
+                                        }
+                                    ]
+                                },
                                 {
                                     'type' : 'TextNode',
                                     'value' : '00'
