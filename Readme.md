@@ -49,7 +49,7 @@ parser.tokenizeRoot('Mr. Henry Brown: A hapless but friendly City of London work
 
 ## API
 
-parse-english has the same API as [parse-latin](https://github.com/wooorm/parse-latin "ParseLatin"), but returns results better suited for English natural language.
+parse-english has the same [API as parse-latin](https://github.com/wooorm/parse-latin#api "ParseLatin API"), but returns results better suited for English natural language.
 
 Support includes:
 
