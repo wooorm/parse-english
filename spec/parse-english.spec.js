@@ -14,7 +14,9 @@ describe('ParseEnglish', function () {
     it('should return a newly initialized `Parser` object, when invoked',
         function () {
             assert(new Parser() instanceof Parser);
+            /*eslint-disable new-cap */
             assert(Parser() instanceof Parser);
+            /*eslint-enable new-cap */
         }
     );
 });

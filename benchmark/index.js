@@ -63,7 +63,7 @@ suite('parser.tokenizeParagraph(source);', function () {
 
 /* Benchmarks */
 suite('parser.tokenizeRoot(source);', function () {
-    var parser = Parser();
+    var parser = new Parser();
 
     set('mintime', 100);
 
