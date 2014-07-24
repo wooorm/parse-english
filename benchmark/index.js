@@ -9,7 +9,8 @@ Parser = require('..');
 /* Source: http://www.gutenberg.org/files/10745/10745-h/10745-h.htm */
 
 /* A sentence, 20 words. */
-sentence = 'Where she had stood was clear, and she was gone since Sir Kay does not choose to assume my quarrel.';
+sentence = 'Where she had stood was clear, and she was gone since Sir Kay ' +
+    'does not choose to assume my quarrel.';
 
 /* A paragraph, 5 sentences, 100 words. */
 paragraph = 'Thou art a churlish knight to so affront a lady ' +
