@@ -139,6 +139,41 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
     ')$'
 );
 
+/**
+ * Returns the value of all `TextNode` tokens inside a given token.
+ *
+ * @param {Object} token
+ * @return {string} - The stringified token.
+ * @global
+ * @private
+ */
+function tokenToString(token) {
+    var value = '',
+        iterator, children;
+
+    /* istanbul ignore if: TODO, Untestable, will change soon. */
+    if (token.value) {
+        return token.value;
+    }
+
+    iterator = -1;
+    children = token.children;
+
+    /* Shortcut: This is pretty common, and a small performance win. */
+    /* istanbul ignore else: TODO, Untestable, will change soon. */
+    if (children.length === 1 && children[0].type === 'TextNode') {
+        return children[0].value;
+    }
+
+    /* istanbul ignore next: TODO, Untestable, will change soon. */
+    while (children[++iterator]) {
+        value += tokenToString(children[iterator]);
+    }
+
+    /* istanbul ignore next: TODO, Untestable, will change soon. */
+    return value;
+}
+
 function mergeEnglishPrefixExceptions(child, index, parent) {
     var children = child.children,
         node;
@@ -155,7 +190,7 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
 
     if (
         !node || node.type !== 'PunctuationNode' ||
-        node.children[0].value !== '.'
+        tokenToString(node) !== '.'
     ) {
         return;
     }
@@ -168,10 +203,10 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
 
     if (!(
         EXPRESSION_ABBREVIATION_ENGLISH_PREFIX.test(
-            node.children[0].value.toLowerCase()
+            tokenToString(node).toLowerCase()
         ) ||
         EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE.test(
-            node.children[0].value
+            tokenToString(node)
         )
     )) {
         return;
@@ -209,7 +244,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
     /* Return if the child is not an apostrophe. */
     if (
         child.type !== 'PunctuationNode' ||
-        !EXPRESSION_APOSTROPHE.test(child.children[0].value)
+        !EXPRESSION_APOSTROPHE.test(tokenToString(child))
     ) {
         return;
     }
@@ -225,7 +260,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
         node = siblings[index - 1];
 
         /* If the preceding node is just an `o`... */
-        if (node.children[0].value.toLowerCase() === 'o') {
+        if (tokenToString(node).toLowerCase() === 'o') {
             /* Remove the apostrophe from parent. */
             siblings.splice(index, 1);
 
@@ -245,7 +280,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
         )
     ) {
         node = siblings[index + 1];
-        value = node.children[0].value.toLowerCase();
+        value = tokenToString(node).toLowerCase();
 
         /* If the following word matches a known elision... */
         if (EXPRESSION_ELISION_ENGLISH_AFFIX.test(value)) {
@@ -260,7 +295,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
             value === 'n' && index < length - 2 &&
             siblings[index + 2].type === 'PunctuationNode' &&
             EXPRESSION_APOSTROPHE.test(
-                siblings[index + 2].children[0].value
+                tokenToString(siblings[index + 2])
             )
         ) {
             /* Remove the apostrophe from parent. */
