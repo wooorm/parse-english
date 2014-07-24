@@ -67,6 +67,24 @@ Support includes:
 ## Browser Support
 Pretty much every browser (available through browserstack) runs all parse-english unit tests.
 
+## Benchmark
+
+Run the benchmark yourself:
+
+```sh
+$ npm run benchmark
+```
+
+On a MacBook Air, it parser about 3 large books, 60 big articles, or 6,146 paragraphs per second.
+
+```
+              parser.parse(source);
+   6,146 op/s » A paragraph (5 sentences, 100 words)
+     659 op/s » A section (10 paragraphs, 50 sentences, 1,000 words)
+      59 op/s » An article (100 paragraphs, 500 sentences, 10,000 words)
+       3 op/s » A (large) book (1,000 paragraphs, 5,000 sentences, 100,000 words)
+```
+
 ## Related
 
   * [parse-latin](https://github.com/wooorm/parse-latin "ParseLatin")
