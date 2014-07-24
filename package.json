@@ -11,11 +11,11 @@
   "author": "Titus Wormer <tituswormer@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^0.6.2",
-    "istanbul": "~0.2.16",
+    "eslint": "^0.7.4",
+    "istanbul": "^0.3.0",
     "jscs": "^1.5.8",
     "matcha": "^0.5.0",
-    "mocha": "~1.20.1"
+    "mocha": "^1.21.0"
   },
   "repository": {
     "type": "git",
