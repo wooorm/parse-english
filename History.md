@@ -1,4 +1,22 @@
 
+n.n.n / 2014-07-24
+==================
+
+ * Fix JSDoc comments
+ * Fix future-proofing by using tokenToString rather than property checking
+ * Update travis to auto-deploy to NPM
+ * Add parse-dutch to list of related projects
+ * Fix link to parse-latin
+ * Fix style in benchmark
+ * Add benchmark/index.js to lint-style
+ * Add spec/browser.spec.js to gitignore
+ * Add components to gitignore
+ * Add codeclimate badge; opt for shields.io badges
+ * Add benchmark to Readme
+ * Simplify benchmark
+ * Fix style for new eslint rules
+ * Update mocha, eslint, istanbul
+
 0.1.0-rc.5 / 2014-07-17
 ==================
 
