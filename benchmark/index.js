@@ -32,63 +32,33 @@ article = section + Array(10).join('\n\n' + section);
 book = article + Array(10).join('\n\n' + article);
 
 /* Benchmarks */
-suite('parser.tokenizeSentence(source);', function () {
-    var parser = new Parser();
-
-    set('mintime', 50);
-
-    bench('A sentence (20 words)', function (next) {
-        parser.tokenizeSentence(sentence);
-        next();
-    });
-});
-
-
-/* Benchmarks */
-suite('parser.tokenizeParagraph(source);', function () {
-    var parser = new Parser();
-
-    set('mintime', 50);
-
-    bench('A sentence (20 words)', function (next) {
-        parser.tokenizeParagraph(sentence);
-        next();
-    });
-
-    bench('A paragraph (5 sentences, 100 words)', function (next) {
-        parser.tokenizeParagraph(paragraph);
-        next();
-    });
-});
-
-/* Benchmarks */
-suite('parser.tokenizeRoot(source);', function () {
+suite('parser.parse(source);', function () {
     var parser = new Parser();
 
     set('mintime', 100);
 
     bench('A paragraph (5 sentences, 100 words)', function (next) {
-        parser.tokenizeRoot(paragraph);
+        parser.parse(paragraph);
         next();
     });
 
     bench('A section (10 paragraphs, 50 sentences, 1,000 words)',
         function (next) {
-            parser.tokenizeRoot(section);
+            parser.parse(section);
             next();
         }
     );
 
     bench('An article (100 paragraphs, 500 sentences, 10,000 words)',
         function (next) {
-            parser.tokenizeRoot(article);
+            parser.parse(article);
             next();
         }
     );
 
     bench('A (large) book (1,000 paragraphs, 5,000 sentences, 100,000 words)',
         function (next) {
-            parser.tokenizeRoot(book);
+            parser.parse(book);
             next();
         }
     );
