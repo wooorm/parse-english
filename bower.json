@@ -1,0 +1,33 @@
+{
+  "name": "parse-english",
+  "description": "English (natural language) parser",
+  "authors": [
+    "Titus Wormer <tituswormer@gmail.com>"
+  ],
+  "keywords": [
+    "english",
+    "natural",
+    "language",
+    "parser"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wooorm/parse-english.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "parse-latin": "^0.1.1"
+  },
+  "main": "index.js",
+  "ignore": [
+    ".*",
+    "*.log",
+    "*.md",
+    "component.json",
+    "package.json",
+    "coverage",
+    "node_modules",
+    "benchmark",
+    "spec"
+  ]
+}
