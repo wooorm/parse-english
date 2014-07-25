@@ -1,7 +1,13 @@
 
+n.n.n / 2014-07-25
+==================
+
+ * Add bower.json
+
 0.1.0 / 2014-07-24
 ==================
 
+ * Update changelog for 0.1.0
  * Fix JSDoc comments
  * Fix future-proofing by using tokenToString rather than property checking
  * Update travis to auto-deploy to NPM
