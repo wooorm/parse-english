@@ -10754,6 +10754,31 @@ describe('Elision', function () {
         }));
     });
 
+    it('should treat `ol\'` as one word', function () {
+        var root = parser.tokenizeParagraph(
+            'your ol\' Grandpa'
+        ).children[0].children[2];
+
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'WordNode',
+            'children' : [
+                {
+                    'type' : 'TextNode',
+                    'value' : 'ol'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                }
+            ]
+        }));
+    });
+
     it('should treat `\'em` as one word', function () {
         var root = parser.tokenizeParagraph(
             'Tell \'em!'
