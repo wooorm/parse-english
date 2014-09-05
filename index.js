@@ -279,10 +279,28 @@ function mergeEnglishElisionExceptions(child, index, parent) {
         node, value;
 
     /* Return if the child is not an apostrophe. */
+    if (child.type !== 'PunctuationNode') {
+        return;
+    }
+
+    value = tokenToString(child);
+
+    /* Match abbreviation of with, w/ */
     if (
-        child.type !== 'PunctuationNode' ||
-        !EXPRESSION_APOSTROPHE.test(tokenToString(child))
+        value === '/' &&
+        index !== 0 &&
+        tokenToString(siblings[index - 1]).toLowerCase() === 'w'
     ) {
+        /* Remove the slash from parent. */
+        siblings.splice(index, 1);
+
+        /* Append the slash into the children of the previous node. */
+        siblings[index - 1].children.push(child);
+
+        return;
+    }
+
+    if (!EXPRESSION_APOSTROPHE.test(value)) {
         return;
     }
 
@@ -302,7 +320,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
             siblings.splice(index, 1);
 
             /* Append the apostrophe into the children of node. */
-            node.children = node.children.concat(child);
+            node.children.push(child);
 
             return;
         }
