@@ -1,4 +1,18 @@
 
+n.n.n / 2014-09-05
+==================
+
+ * Update travis to always deploy to npm
+ * Fix metric units abbreviations
+ * Add functionality for merging singular years preceded by an apostrophe as elision
+ * Add spec for classifying singular years (preceded by an apostrophe) as elision
+ * Add functionality for classifying `ol'` as elision
+ * Add spec for classifying `ol'` as elision
+ * Add functionality for classifying `w/` as a single word
+ * Add spec for classifying `w/` as a single word
+ * Update spec for changes in parse-latin
+ * Update parse-latin to 0.1.3
+
 0.1.1 / 2014-07-25
 ==================
 
