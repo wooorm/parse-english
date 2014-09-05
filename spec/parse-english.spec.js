@@ -10988,6 +10988,31 @@ describe('Elision', function () {
         }));
     });
 
+    it('should treat `\'49` as one word', function () {
+        var root = parser.tokenizeParagraph(
+            'Fun in \'49.'
+        ).children[0].children[4];
+
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'WordNode',
+            'children' : [
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                },
+                {
+                    'type' : 'TextNode',
+                    'value' : '49'
+                }
+            ]
+        }));
+    });
+
     it('should NOT treat other words following an apostrophe, as one word',
         function () {
             var root = parser.tokenizeParagraph(
