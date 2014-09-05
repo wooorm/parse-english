@@ -3,6 +3,7 @@
 var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX,
     EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE,
     EXPRESSION_ELISION_ENGLISH_AFFIX,
+    EXPRESSION_ELISION_ENGLISH_PREFIX,
     EXPRESSION_APOSTROPHE,
     Parser, parserPrototype;
 
@@ -233,6 +234,21 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
 }
 
 /**
+ * Holds a blacklist of common word-parts followed by an apostrophe,
+ * depicting elision.
+ *
+ * @global
+ * @private
+ * @constant
+ */
+EXPRESSION_ELISION_ENGLISH_PREFIX = new RegExp(
+    '^(' +
+        /* Elisions of [o]f, and [ol]d. */
+        'o|ol' +
+    ')$'
+);
+
+/**
  * Holds a blacklist of common word-parts preceded by an apostrophe,
  * depicting elision.
  *
@@ -314,8 +330,12 @@ function mergeEnglishElisionExceptions(child, index, parent) {
     ) {
         node = siblings[index - 1];
 
-        /* If the preceding node is just an `o`... */
-        if (tokenToString(node).toLowerCase() === 'o') {
+        /* If the preceding node matches known elision */
+        if (
+            EXPRESSION_ELISION_ENGLISH_PREFIX.test(
+                tokenToString(node).toLowerCase()
+            )
+        ) {
             /* Remove the apostrophe from parent. */
             siblings.splice(index, 1);
 
