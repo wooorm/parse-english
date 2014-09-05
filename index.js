@@ -265,7 +265,7 @@ EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
         'twas|tis|twere|' +
 
         /* Groups of years. */
-        '\\d\\ds' +
+        '\\d\\ds?' +
     ')$'
 );
 
