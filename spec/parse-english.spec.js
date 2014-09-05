@@ -11200,4 +11200,29 @@ describe('Elision', function () {
             ]));
         }
     );
+
+    it('should treat `w/` as one word', function () {
+        var root = parser.tokenizeParagraph(
+            'Let\'s meet w/ Eric.'
+        ).children[0];
+
+        assert(JSON.stringify(root.children[4]) === JSON.stringify({
+            'type' : 'WordNode',
+            'children' : [
+                {
+                    'type' : 'TextNode',
+                    'value' : 'w'
+                },
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '/'
+                        }
+                    ]
+                }
+            ]
+        }));
+    });
 });
