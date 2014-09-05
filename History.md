@@ -1,5 +1,5 @@
 
-n.n.n / 2014-09-05
+0.1.2 / 2014-09-05
 ==================
 
  * Update travis to always deploy to npm
