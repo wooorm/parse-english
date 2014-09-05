@@ -12,5 +12,4 @@ deploy:
   api_key:
     secure: S5CTTMI6OCc13TyqCO3wcBfvnTClRSyUZe8n7MO2WCkfoA2j3S9WCmM34u+fu+WlHSSe6NLc5lyNgDXrwkRmNcnUJYHvUqpXpI51Y0nhNouhINQl8+1c8ve9oIa4pvYfKU8p1EhlwCoLgyZEy4wP0MZfEv/cPgPR9GLGvUyBgzw=
   on:
-    tags: true
     repo: wooorm/parse-english
