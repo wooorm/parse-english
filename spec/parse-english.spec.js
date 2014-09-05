@@ -79,15 +79,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Ave'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -309,15 +309,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'blvd'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -440,15 +440,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Mt'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -670,15 +670,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Rd'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -978,15 +978,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Nat'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -1136,15 +1136,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Natl'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -1298,15 +1298,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Rt'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -1496,15 +1496,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Rte'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -1673,15 +1673,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Co'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -1858,15 +1858,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'St'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -1916,15 +1916,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Pk'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -2119,15 +2119,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Sq'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -2232,15 +2232,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Dr'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -2347,15 +2347,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Pt'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -2681,15 +2681,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'St'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -2777,15 +2777,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Ft'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -3134,15 +3134,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Pen'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -3464,15 +3464,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Yuk'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -3491,15 +3491,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Terr'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -3748,15 +3748,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Hwy'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -3969,15 +3969,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Fwy'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -4173,15 +4173,15 @@ describe('Abbreviations: Geographic', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Pkwy'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -4479,15 +4479,15 @@ describe('Abbreviations: Geographic', function () {
                                 {
                                     'type' : 'TextNode',
                                     'value' : state
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'children' : [
+                                },
                                 {
-                                    'type' : 'TextNode',
-                                    'value' : '.'
+                                    'type' : 'PunctuationNode',
+                                    'children' : [
+                                        {
+                                            'type' : 'TextNode',
+                                            'value' : '.'
+                                        }
+                                    ]
                                 }
                             ]
                         },
@@ -4677,15 +4677,15 @@ describe('Abbreviations: Geographic', function () {
                                 {
                                     'type' : 'TextNode',
                                     'value' : state
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'children' : [
+                                },
                                 {
-                                    'type' : 'TextNode',
-                                    'value' : '.'
+                                    'type' : 'PunctuationNode',
+                                    'children' : [
+                                        {
+                                            'type' : 'TextNode',
+                                            'value' : '.'
+                                        }
+                                    ]
                                 }
                             ]
                         },
@@ -4845,15 +4845,15 @@ describe('Abbreviations: Geographic', function () {
                                 {
                                     'type' : 'TextNode',
                                     'value' : county
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'children' : [
+                                },
                                 {
-                                    'type' : 'TextNode',
-                                    'value' : '.'
+                                    'type' : 'PunctuationNode',
+                                    'children' : [
+                                        {
+                                            'type' : 'TextNode',
+                                            'value' : '.'
+                                        }
+                                    ]
                                 }
                             ]
                         },
@@ -5009,15 +5009,15 @@ describe('Abbreviations: Title abbreviations', function () {
                                 {
                                     'type' : 'TextNode',
                                     'value' : title
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'children' : [
+                                },
                                 {
-                                    'type' : 'TextNode',
-                                    'value' : '.'
+                                    'type' : 'PunctuationNode',
+                                    'children' : [
+                                        {
+                                            'type' : 'TextNode',
+                                            'value' : '.'
+                                        }
+                                    ]
                                 }
                             ]
                         },
@@ -5198,15 +5198,15 @@ describe('Abbreviations: Business', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Inc'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -5473,15 +5473,15 @@ describe('Abbreviations: Business', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Ltd'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -5696,15 +5696,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'bbls'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -5827,15 +5827,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'cu'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -5854,15 +5854,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'in'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -6093,15 +6093,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'doz'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -6189,15 +6189,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'fl'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -6216,15 +6216,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'oz'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -6347,15 +6347,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'oz'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -6496,15 +6496,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'ft'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -6640,15 +6640,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'gal'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -6754,15 +6754,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'gr'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -7029,15 +7029,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Gro'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -7304,15 +7304,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'in'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -7593,15 +7593,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'Kt'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -7806,15 +7806,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'lb'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -8005,15 +8005,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'mi'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -8425,15 +8425,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'oz'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -8710,15 +8710,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'pt'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -8995,15 +8995,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'qt'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -9234,15 +9234,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'sq'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -9261,15 +9261,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'ft'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -9392,15 +9392,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'tbsp'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -9522,15 +9522,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'tsp'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -9617,15 +9617,15 @@ describe('Abbreviations: English unit abbreviations', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'yd'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -9768,15 +9768,15 @@ describe('Abbreviations: Time references', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'sec'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -10035,15 +10035,15 @@ describe('Abbreviations: Time references', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'min'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -10287,15 +10287,15 @@ describe('Abbreviations: Time references', function () {
                             {
                                 'type' : 'TextNode',
                                 'value' : 'hr'
-                            }
-                        ]
-                    },
-                    {
-                        'type' : 'PunctuationNode',
-                        'children' : [
+                            },
                             {
-                                'type' : 'TextNode',
-                                'value' : '.'
+                                'type' : 'PunctuationNode',
+                                'children' : [
+                                    {
+                                        'type' : 'TextNode',
+                                        'value' : '.'
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -10483,15 +10483,15 @@ describe('Abbreviations: Time references', function () {
                                 {
                                     'type' : 'TextNode',
                                     'value' : day
-                                }
-                            ]
-                        },
-                        {
-                            'type' : 'PunctuationNode',
-                            'children' : [
+                                },
                                 {
-                                    'type' : 'TextNode',
-                                    'value' : '.'
+                                    'type' : 'PunctuationNode',
+                                    'children' : [
+                                        {
+                                            'type' : 'TextNode',
+                                            'value' : '.'
+                                        }
+                                    ]
                                 }
                             ]
                         },
