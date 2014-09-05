@@ -32,13 +32,15 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
         /*
          * English unit abbreviations:
          * Note that *Metric abbreviations* do not use full stops.
+         * Note that some common plurals are included (although units should
+         * not be pluralised).
          *
-         * barrel, *, cubic, dozen, fluid ounce, foot, gallon, grain, gross,
+         * barrel, cubic, dozen, fluid (ounce), foot, gallon, grain, gross,
          * inch, karat / knot, pound, mile, ounce, pint, quart, square,
          * tablespoon, teaspoon, yard.
          */
-        'bbl|bbls|cu|dozfl|oz|ft|gal|gr|gro|in|kt|lb|mi|oz|pt|qt|sq|tbsp|' +
-        'tsp|yd|' +
+        'bbls?|cu|doz|fl|ft|gal|gr|gro|in|kt|lbs?|mi|oz|pt|qt|sq|tbsp|' +
+        'tsp|yds?|' +
 
         /*
          * Abbreviations of time references:
