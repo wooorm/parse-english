@@ -1,13 +1,25 @@
 'use strict';
 
+/**
+ * Dependencies.
+ */
+
+var Parser,
+    nlcstToString;
+
+Parser = require('parse-latin');
+nlcstToString = require('nlcst-to-string');
+
+/**
+ * Constants.
+ */
+
 var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX,
     EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE,
     EXPRESSION_ELISION_ENGLISH_AFFIX,
     EXPRESSION_ELISION_ENGLISH_PREFIX,
     EXPRESSION_APOSTROPHE,
-    Parser, parserPrototype;
-
-Parser = require('parse-latin');
+    parserPrototype;
 
 /**
  * A blacklist of full stop characters that should not be treated as terminal
@@ -141,41 +153,6 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
 );
 
 /**
- * Returns the value of all `TextNode` tokens inside a given token.
- *
- * @param {Object} token
- * @return {string} - The stringified token.
- * @global
- * @private
- */
-function tokenToString(token) {
-    var value = '',
-        iterator, children;
-
-    /* istanbul ignore if: TODO, Untestable, will change soon. */
-    if (token.value) {
-        return token.value;
-    }
-
-    iterator = -1;
-    children = token.children;
-
-    /* Shortcut: This is pretty common, and a small performance win. */
-    /* istanbul ignore else: TODO, Untestable, will change soon. */
-    if (children.length === 1 && children[0].type === 'TextNode') {
-        return children[0].value;
-    }
-
-    /* istanbul ignore next: TODO, Untestable, will change soon. */
-    while (children[++iterator]) {
-        value += tokenToString(children[iterator]);
-    }
-
-    /* istanbul ignore next: TODO, Untestable, will change soon. */
-    return value;
-}
-
-/**
  * Merges a sentence into its next sentence, when the sentence ends with
  * a certain word.
  *
@@ -204,7 +181,7 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
 
     if (
         !node || node.type !== 'PunctuationNode' ||
-        tokenToString(node) !== '.'
+        nlcstToString(node) !== '.'
     ) {
         return;
     }
@@ -217,10 +194,10 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
 
     if (!(
         EXPRESSION_ABBREVIATION_ENGLISH_PREFIX.test(
-            tokenToString(node).toLowerCase()
+            nlcstToString(node).toLowerCase()
         ) ||
         EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE.test(
-            tokenToString(node)
+            nlcstToString(node)
         )
     )) {
         return;
@@ -301,13 +278,13 @@ function mergeEnglishElisionExceptions(child, index, parent) {
         return;
     }
 
-    value = tokenToString(child);
+    value = nlcstToString(child);
 
     /* Match abbreviation of with, w/ */
     if (
         value === '/' &&
         index !== 0 &&
-        tokenToString(siblings[index - 1]).toLowerCase() === 'w'
+        nlcstToString(siblings[index - 1]).toLowerCase() === 'w'
     ) {
         /* Remove the slash from parent. */
         siblings.splice(index, 1);
@@ -335,7 +312,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
         /* If the preceding node matches known elision */
         if (
             EXPRESSION_ELISION_ENGLISH_PREFIX.test(
-                tokenToString(node).toLowerCase()
+                nlcstToString(node).toLowerCase()
             )
         ) {
             /* Remove the apostrophe from parent. */
@@ -357,7 +334,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
         )
     ) {
         node = siblings[index + 1];
-        value = tokenToString(node).toLowerCase();
+        value = nlcstToString(node).toLowerCase();
 
         /* If the following word matches a known elision... */
         if (EXPRESSION_ELISION_ENGLISH_AFFIX.test(value)) {
@@ -372,7 +349,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
             value === 'n' && index < length - 2 &&
             siblings[index + 2].type === 'PunctuationNode' &&
             EXPRESSION_APOSTROPHE.test(
-                tokenToString(siblings[index + 2])
+                nlcstToString(siblings[index + 2])
             )
         ) {
             /* Remove the apostrophe from parent. */
