@@ -4,14 +4,19 @@
 
 ## Installation
 
-NPM:
+npm:
 ```sh
 $ npm install parse-english
 ```
 
-Component.js:
+Component:
 ```sh
 $ component install wooorm/parse-english
+```
+
+Bower:
+```sh
+$ bower install parse-english
 ```
 
 ## Usage
