@@ -85,4 +85,4 @@ On a MacBook Air, it parser about 3 large books, 60 big articles, or 6,146 parag
 
 ## License
 
-  MIT
+MIT © Titus Wormer
