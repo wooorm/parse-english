@@ -1,4 +1,20 @@
 
+n.n.n / 2014-09-29
+==================
+
+ * Update parse-latin to 0.2.0-rc.1
+ * Refactor API
+ * Add nlcst-to-string as a dependency
+ * Remove browser test
+ * Remove `npm update npm` from travis
+ * Update Installation in docs
+ * Update copyright in Readme.md
+ * Remove testling
+ * Fix property order in component.json, package.json, bower.json
+ * Add nlcst-to-string as a dependency
+ * Update .gitignore, .npmignore
+ * Update eslint to 0.8.0
+
 0.1.2 / 2014-09-05
 ==================
 
