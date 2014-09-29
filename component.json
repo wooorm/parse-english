@@ -10,9 +10,10 @@
     "parser"
   ],
   "dependencies": {
-    "wooorm/parse-latin": "^0.1.3"
+    "wooorm/parse-latin": "^0.1.3",
+    "wooorm/nlcst-to-string": "^0.0.2"
   },
-  "scripts" : [
+  "scripts": [
     "index.js"
   ],
   "license": "MIT"
