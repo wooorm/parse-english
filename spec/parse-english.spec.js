@@ -10854,6 +10854,31 @@ describe('Elision', function () {
         }));
     });
 
+    it('should treat `\'cause` as one word', function () {
+        var root = parser.tokenizeParagraph(
+            '\'Cause it is!'
+        ).children[0].children[0];
+
+        assert(JSON.stringify(root) === JSON.stringify({
+            'type' : 'WordNode',
+            'children' : [
+                {
+                    'type' : 'PunctuationNode',
+                    'children' : [
+                        {
+                            'type' : 'TextNode',
+                            'value' : '\''
+                        }
+                    ]
+                },
+                {
+                    'type' : 'TextNode',
+                    'value' : 'Cause'
+                }
+            ]
+        }));
+    });
+
     it('should treat `\'n\'` as one word', function () {
         var root = parser.tokenizeParagraph(
             'Rock \'n\' Roll!'

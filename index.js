@@ -252,9 +252,10 @@ EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
          * - 'im > him;
          * - 'er > her;
          * - 'em > them.
+         * - 'cause > because.
          */
 
-        'im|er|em|' +
+        'im|er|em|cause|' +
 
         /**
          * Includes:
