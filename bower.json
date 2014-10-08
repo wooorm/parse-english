@@ -10,8 +10,8 @@
     "parser"
   ],
   "dependencies": {
-    "nlcst-to-string": "^0.0.2",
-    "parse-latin": "^0.2.0-rc.1"
+    "nlcst-to-string": "^0.1.0",
+    "parse-latin": "^0.2.0-rc.2"
   },
   "repository": {
     "type": "git",

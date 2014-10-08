@@ -10,8 +10,8 @@
     "parser"
   ],
   "dependencies": {
-    "wooorm/nlcst-to-string": "^0.0.2",
-    "wooorm/parse-latin": "^0.2.0-rc.1"
+    "wooorm/nlcst-to-string": "^0.1.0",
+    "wooorm/parse-latin": "^0.2.0-rc.2"
   },
   "repository": "wooorm/parse-english",
   "scripts": [
