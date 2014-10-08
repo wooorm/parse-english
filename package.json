@@ -28,11 +28,12 @@
   "scripts": {
     "test": "node_modules/.bin/_mocha --reporter spec --check-leaks -u exports spec/parse-english.spec.js",
     "test-travis": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha --report lcovonly -- --reporter spec --check-leaks -u exports spec/parse-english.spec.js",
-    "lint": "npm run-script lint-api && npm run-script lint-test && npm run-script lint-benchmark && npm run-script lint-style",
+    "lint": "npm run-script lint-api && npm run-script lint-script && npm run-script lint-test && npm run-script lint-benchmark && npm run-script lint-style",
     "lint-api": "node_modules/.bin/eslint index.js --env node --env browser --rule 'quotes: [2, single], consistent-return: false'",
     "lint-test": "node_modules/.bin/eslint spec/parse-english.spec.js --env node --env mocha --rule 'quotes: [2, single], no-loop-func: false'",
     "lint-benchmark": "node_modules/.bin/eslint benchmark/index.js --env node --global suite,set,bench --rule 'quotes: [2, single]'",
-    "lint-style": "node_modules/.bin/jscs index.js benchmark/index.js spec/parse-english.spec.js --reporter=inline",
+    "lint-script": "node_modules/.bin/eslint script/generate-fixture.js --env node --rule 'quotes: [2, single]'",
+    "lint-style": "node_modules/.bin/jscs index.js benchmark/index.js script/generate-fixture.js spec/parse-english.spec.js --reporter=inline",
     "coverage": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- -- spec/parse-english.spec.js",
     "benchmark": "node_modules/.bin/matcha",
     "make": "npm run-script lint && npm run-script coverage"
