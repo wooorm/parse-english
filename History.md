@@ -1,4 +1,18 @@
 
+n.n.n / 2014-10-08
+==================
+
+ * Refactor indent in .jscs.json
+ * Add NLCST to package keywords
+ * Refactor Readme.md
+ * Refactor benchmark
+ * Update .gitignore, .npmignore, bower ignore
+ * Refactor test
+ * Move spec to new `test` directory
+ * Add script to generate fixtures
+ * Update nlcst-to-string, parse-latin
+ * Add support for `because` elision: ‘cause
+
 0.2.0-rc.1 / 2014-09-29
 ==================
 
