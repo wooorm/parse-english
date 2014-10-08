@@ -1,0 +1,295 @@
+{
+  "type": "ParagraphNode",
+  "children": [
+    {
+      "type": "SentenceNode",
+      "children": [
+        {
+          "type": "WordNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "Survey"
+            }
+          ]
+        },
+        {
+          "type": "PunctuationNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "WhiteSpaceNode",
+      "children": [
+        {
+          "type": "TextNode",
+          "value": " "
+        }
+      ]
+    },
+    {
+      "type": "SentenceNode",
+      "children": [
+        {
+          "type": "PunctuationNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "("
+            }
+          ]
+        },
+        {
+          "type": "WordNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "Reaffirms"
+            }
+          ]
+        },
+        {
+          "type": "PunctuationNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": ")"
+            }
+          ]
+        },
+        {
+          "type": "PunctuationNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "WhiteSpaceNode",
+      "children": [
+        {
+          "type": "TextNode",
+          "value": " "
+        }
+      ]
+    },
+    {
+      "type": "SentenceNode",
+      "children": [
+        {
+          "type": "WordNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "Test"
+            }
+          ]
+        },
+        {
+          "type": "PunctuationNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "WhiteSpaceNode",
+      "children": [
+        {
+          "type": "TextNode",
+          "value": " "
+        }
+      ]
+    },
+    {
+      "type": "SentenceNode",
+      "children": [
+        {
+          "type": "WordNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "The"
+            }
+          ]
+        },
+        {
+          "type": "WhiteSpaceNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": " "
+            }
+          ]
+        },
+        {
+          "type": "WordNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "5th"
+            }
+          ]
+        },
+        {
+          "type": "WhiteSpaceNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": " "
+            }
+          ]
+        },
+        {
+          "type": "WordNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "Ave"
+            },
+            {
+              "type": "PunctuationNode",
+              "children": [
+                {
+                  "type": "TextNode",
+                  "value": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "WhiteSpaceNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": " "
+            }
+          ]
+        },
+        {
+          "type": "WordNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "Top"
+            }
+          ]
+        },
+        {
+          "type": "WhiteSpaceNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": " "
+            }
+          ]
+        },
+        {
+          "type": "WordNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "of"
+            }
+          ]
+        },
+        {
+          "type": "WhiteSpaceNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": " "
+            }
+          ]
+        },
+        {
+          "type": "WordNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "the"
+            }
+          ]
+        },
+        {
+          "type": "WhiteSpaceNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": " "
+            }
+          ]
+        },
+        {
+          "type": "WordNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "Retail"
+            }
+          ]
+        },
+        {
+          "type": "WhiteSpaceNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": " "
+            }
+          ]
+        },
+        {
+          "type": "WordNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "Rent"
+            }
+          ]
+        },
+        {
+          "type": "WhiteSpaceNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": " "
+            }
+          ]
+        },
+        {
+          "type": "WordNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "Heap"
+            }
+          ]
+        },
+        {
+          "type": "PunctuationNode",
+          "children": [
+            {
+              "type": "TextNode",
+              "value": "."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

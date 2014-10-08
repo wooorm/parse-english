@@ -19,11 +19,14 @@
   },
   "author": "Titus Wormer <tituswormer@gmail.com>",
   "devDependencies": {
+    "chalk": "^0.5.1",
+    "diff": "^1.0.0",
     "eslint": "^0.8.0",
     "istanbul": "^0.3.0",
     "jscs": "^1.5.8",
     "matcha": "^0.5.0",
-    "mocha": "^1.21.0"
+    "mocha": "^1.21.0",
+    "nlcst-test": "^0.1.0"
   },
   "scripts": {
     "test": "node_modules/.bin/_mocha --reporter spec --check-leaks -u exports test/index.js",
@@ -36,6 +39,7 @@
     "lint-style": "node_modules/.bin/jscs index.js benchmark/index.js script/generate-fixture.js test/index.js --reporter=inline",
     "coverage": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- -- test/index.js",
     "benchmark": "node_modules/.bin/matcha",
+    "fixture": "node script/generate-fixture",
     "make": "npm run-script lint && npm run-script coverage"
   }
 }

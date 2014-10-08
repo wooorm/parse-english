@@ -30,10 +30,10 @@ parameters = process.argv.splice(2);
 
 if (parameters.length < 2) {
     console.log('Usage:');
-    console.log('  npm run fixture name document');
+    console.log('  npm run fixture name document [method]');
 } else {
     filepath = 'test/fixture/' + parameters[0] + '.json';
-    nlcst = english.parse(parameters[1]);
+    nlcst = english[parameters[2] || 'parse'](parameters[1]);
 
     /**
      * Write fixture.
