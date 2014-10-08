@@ -24,11 +24,14 @@
     ".*",
     "*.log",
     "*.md",
+    "benchmark/",
+    "build/",
+    "components/",
+    "coverage/",
+    "node_modules/",
+    "script/",
+    "test/",
     "component.json",
-    "package.json",
-    "coverage",
-    "node_modules",
-    "benchmark",
-    "spec"
+    "package.json"
   ]
 }
