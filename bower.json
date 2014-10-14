@@ -25,13 +25,13 @@
     ".*",
     "*.log",
     "*.md",
-    "benchmark/",
     "build/",
     "components/",
     "coverage/",
     "node_modules/",
     "script/",
     "test/",
+    "benchmark.js",
     "component.json",
     "package.json"
   ]
