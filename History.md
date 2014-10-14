@@ -1,4 +1,12 @@
 
+n.n.n / 2014-10-14
+==================
+
+ * Update .npmignore, bower ignore
+ * Move `benchmark/` to `benchmark.js`
+ * Update parse-latin
+ * Fix typo in Readme.md
+
 0.2.0-rc.2 / 2014-10-08
 ==================
 
