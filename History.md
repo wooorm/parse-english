@@ -1,5 +1,5 @@
 
-n.n.n / 2014-10-14
+0.2.0 / 2014-10-14
 ==================
 
  * Update .npmignore, bower ignore
