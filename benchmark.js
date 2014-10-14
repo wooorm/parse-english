@@ -6,7 +6,7 @@
 
 var ParseEnglish;
 
-ParseEnglish = require('..');
+ParseEnglish = require('./');
 
 /**
  * Fixtures.
