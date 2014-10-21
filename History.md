@@ -1,4 +1,11 @@
 
+n.n.n / 2014-10-21
+==================
+
+ * Add SymbolNode support to API
+ * Update fixtures for SymbolNode
+ * Update parse-latin, nlcst-test
+
 0.2.0 / 2014-10-14
 ==================
 
