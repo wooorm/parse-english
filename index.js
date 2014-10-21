@@ -189,7 +189,7 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
     node = children[children.length - 1];
 
     if (
-        !node || node.type !== 'PunctuationNode' ||
+        !node ||
         nlcstToString(node) !== '.'
     ) {
         return;
@@ -296,7 +296,10 @@ function mergeEnglishElisionExceptions(child, index, parent) {
         length = siblings.length,
         node, value;
 
-    if (child.type !== 'PunctuationNode') {
+    if (
+        child.type !== 'PunctuationNode' &&
+        child.type !== 'SymbolNode'
+    ) {
         return;
     }
 
@@ -403,7 +406,6 @@ function mergeEnglishElisionExceptions(child, index, parent) {
         } else if (
             value === 'n' &&
             index < length - 2 &&
-            siblings[index + 2].type === 'PunctuationNode' &&
             EXPRESSION_APOSTROPHE.test(
                 nlcstToString(siblings[index + 2])
             )
