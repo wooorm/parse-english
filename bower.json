@@ -12,7 +12,7 @@
   ],
   "dependencies": {
     "nlcst-to-string": "^0.1.0",
-    "parse-latin": "^0.2.0"
+    "parse-latin": "^0.3.0-rc.1"
   },
   "repository": {
     "type": "git",

@@ -12,7 +12,7 @@
   ],
   "dependencies": {
     "nlcst-to-string": "^0.1.0",
-    "parse-latin": "^0.2.0"
+    "parse-latin": "^0.3.0-rc.1"
   },
   "repository": {
     "type": "git",
@@ -27,7 +27,7 @@
     "jscs": "^1.5.8",
     "matcha": "^0.5.0",
     "mocha": "^1.21.0",
-    "nlcst-test": "^0.1.0"
+    "nlcst-test": "^0.2.0"
   },
   "scripts": {
     "test": "node_modules/.bin/_mocha --reporter spec --check-leaks -u exports test/index.js",
