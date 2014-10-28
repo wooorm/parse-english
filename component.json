@@ -1,6 +1,6 @@
 {
   "name": "parse-english",
-  "version": "0.3.0-rc.1",
+  "version": "0.3.0",
   "description": "English (natural language) parser",
   "license": "MIT",
   "keywords": [
