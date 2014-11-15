@@ -1,4 +1,15 @@
 
+n.n.n / 2014-11-15
+==================
+
+ * Refactor module
+ * Add fixture for non-elision slashes
+ * Add flat badges to `Readme.md`
+ * Fix plugin mechanism for changes in parse-latin
+ * Fix incorrect fixtures
+ * Update parse-latin
+ * Update matcha
+
 0.3.0 / 2014-10-28
 ==================
 
