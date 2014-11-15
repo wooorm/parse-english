@@ -1,0 +1,79 @@
+{
+  "type": "RootNode",
+  "children": [
+    {
+      "type": "ParagraphNode",
+      "children": [
+        {
+          "type": "SentenceNode",
+          "children": [
+            {
+              "type": "WordNode",
+              "children": [
+                {
+                  "type": "TextNode",
+                  "value": "Let"
+                },
+                {
+                  "type": "PunctuationNode",
+                  "value": "'"
+                },
+                {
+                  "type": "TextNode",
+                  "value": "s"
+                }
+              ]
+            },
+            {
+              "type": "WhiteSpaceNode",
+              "value": " "
+            },
+            {
+              "type": "WordNode",
+              "children": [
+                {
+                  "type": "TextNode",
+                  "value": "meet"
+                }
+              ]
+            },
+            {
+              "type": "WhiteSpaceNode",
+              "value": " "
+            },
+            {
+              "type": "WordNode",
+              "children": [
+                {
+                  "type": "TextNode",
+                  "value": "with"
+                }
+              ]
+            },
+            {
+              "type": "PunctuationNode",
+              "value": "/"
+            },
+            {
+              "type": "WhiteSpaceNode",
+              "value": " "
+            },
+            {
+              "type": "WordNode",
+              "children": [
+                {
+                  "type": "TextNode",
+                  "value": "Eric"
+                }
+              ]
+            },
+            {
+              "type": "PunctuationNode",
+              "value": "."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

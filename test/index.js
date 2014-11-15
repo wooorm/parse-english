@@ -500,4 +500,11 @@ describe('Elision', function () {
             'Let\'s meet w/ Eric.'
         );
     });
+
+    it('should NOT treat the slash in`with/` as one word', function () {
+        describeFixture(
+            'elision-non-with',
+            'Let\'s meet with/ Eric.'
+        );
+    });
 });
