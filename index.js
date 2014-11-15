@@ -480,3 +480,15 @@ parserPrototype.tokenizeParagraphPlugins =
  */
 
 module.exports = ParseEnglish;
+
+/**
+ * Expose `ParseLatin.modifier` on `ParseEnglish`.
+ */
+
+ParseEnglish.modifier = Parser.modifier;
+
+/**
+ * Expose `ParseLatin.plugin` on `ParseEnglish`.
+ */
+
+ParseEnglish.plugin = Parser.plugin;
