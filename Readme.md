@@ -1,4 +1,4 @@
-# parse-english [![Build Status](https://img.shields.io/travis/wooorm/parse-english.svg)](https://travis-ci.org/wooorm/parse-english) [![Coverage Status](https://img.shields.io/coveralls/wooorm/parse-english.svg)](https://coveralls.io/r/wooorm/parse-english?branch=master) [![Code Climate](http://img.shields.io/codeclimate/github/wooorm/parse-english.svg)](https://codeclimate.com/github/wooorm/parse-english)
+# parse-english [![Build Status](https://img.shields.io/travis/wooorm/parse-english.svg?style=flat)](https://travis-ci.org/wooorm/parse-english) [![Coverage Status](https://img.shields.io/coveralls/wooorm/parse-english.svg?style=flat)](https://coveralls.io/r/wooorm/parse-english?branch=master)
 
 An English language parser producing [NLCST](https://github.com/wooorm/nlcst) nodes.
 
