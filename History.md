@@ -1,5 +1,5 @@
 
-n.n.n / 2014-11-15
+0.4.0-rc.2 / 2014-11-15
 ==================
 
  * Add `plugin` and `modifier` factories to exports
