@@ -81,22 +81,17 @@
                 {
                   "type": "TextNode",
                   "value": "Alta"
+                },
+                {
+                  "type": "PunctuationNode",
+                  "value": "."
                 }
               ]
             },
             {
-              "type": "PunctuationNode",
-              "value": "."
-            }
-          ]
-        },
-        {
-          "type": "WhiteSpaceNode",
-          "value": " "
-        },
-        {
-          "type": "SentenceNode",
-          "children": [
+              "type": "WhiteSpaceNode",
+              "value": " "
+            },
             {
               "type": "WordNode",
               "children": [
