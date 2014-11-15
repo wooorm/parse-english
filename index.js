@@ -218,7 +218,7 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
 
     parent.children.splice(index + 1, 1);
 
-    return index > 0 ? index - 1 : 0;
+    return index - 1;
 }
 
 /**
@@ -467,13 +467,15 @@ ParseEnglish.prototype = parserPrototype;
  * Add modifiers to `parser`.
  */
 
-parserPrototype.tokenizeSentenceModifiers.unshift(
-    mergeEnglishElisionExceptions
-);
+parserPrototype.tokenizeSentencePlugins =
+    [Parser.plugin(mergeEnglishElisionExceptions)].concat(
+        parserPrototype.tokenizeSentencePlugins
+    );
 
-parserPrototype.tokenizeParagraphModifiers.unshift(
-    mergeEnglishPrefixExceptions
-);
+parserPrototype.tokenizeParagraphPlugins =
+    [Parser.modifier(mergeEnglishPrefixExceptions)].concat(
+        parserPrototype.tokenizeParagraphPlugins
+    );
 
 /**
  * Expose `ParseEnglish`.
