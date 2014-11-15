@@ -21,9 +21,9 @@ var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX,
     EXPRESSION_APOSTROPHE;
 
 /**
- * Blacklist of case-insensitive abbreviations containing
- * full stop characters that should not be treated as
- * terminal sentence markers.
+ * Match a blacklisted (case-insensitive) abbreviation
+ * which when followed by a full-stop does not depict
+ * a sentence terminal marker.
  */
 
 EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
@@ -70,9 +70,9 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
 );
 
 /**
- * Blacklist of case-sensitive abbreviations containing
- * full stop characters that should not be treated as
- * terminal sentence markers.
+ * Match a blacklisted (case-sensitive) abbreviation
+ * which when followed by a full-stop does not depict
+ * a sentence terminal marker.
  */
 
 EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
@@ -165,65 +165,8 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
 );
 
 /**
- * Merge a sentence into its next sentence, when the sentence ends with
- * a certain word.
- *
- * @param {Object} child
- * @param {number} index
- * @param {Object} parent
- * @return {undefined|number}
- */
-
-function mergeEnglishPrefixExceptions(child, index, parent) {
-    var children = child.children,
-        node;
-
-    if (
-        !children ||
-        !children.length ||
-        index === parent.children.length - 1
-    ) {
-        return;
-    }
-
-    node = children[children.length - 1];
-
-    if (
-        !node ||
-        nlcstToString(node) !== '.'
-    ) {
-        return;
-    }
-
-    node = children[children.length - 2];
-
-    if (!node || node.type !== 'WordNode') {
-        return;
-    }
-
-    if (!(
-        EXPRESSION_ABBREVIATION_ENGLISH_PREFIX.test(
-            nlcstToString(node).toLowerCase()
-        ) ||
-        EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE.test(
-            nlcstToString(node)
-        )
-    )) {
-        return;
-    }
-
-    child.children = children.concat(
-        parent.children[index + 1].children
-    );
-
-    parent.children.splice(index + 1, 1);
-
-    return index - 1;
-}
-
-/**
- * Blacklist of common word-parts which when followed by
- * an apostrophe depict elision.
+ * Match a blacklisted word which when followed by
+ * an apostrophe depicts elision.
  */
 
 EXPRESSION_ELISION_ENGLISH_PREFIX = new RegExp(
@@ -240,8 +183,8 @@ EXPRESSION_ELISION_ENGLISH_PREFIX = new RegExp(
 );
 
 /**
- * Blacklist of common word-parts which when preceded by
- * an apostrophe depict elision.
+ * Match a blacklisted word which when preceded by
+ * an apostrophe depicts elision.
  */
 
 EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
@@ -283,18 +226,74 @@ EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
 EXPRESSION_APOSTROPHE = /^['\u2019]$/;
 
 /**
- * Merge an apostrophe depicting elision into its surrounding word.
+ * Merge a sentence into its next sentence,
+ * when the sentence ends with a certain word.
  *
- * @param {Object} child
+ * @param {NLCSTNode} child
  * @param {number} index
- * @param {Object} parent
+ * @param {NLCSTParagraphNode} parent
+ * @return {undefined|number}
+ */
+
+function mergeEnglishPrefixExceptions(child, index, parent) {
+    var children,
+        node,
+        prev,
+        prevValue;
+
+    children = child.children;
+
+    if (
+        children &&
+        children.length &&
+        index !== parent.children.length - 1
+    ) {
+        prev = children[children.length - 2];
+        node = children[children.length - 1];
+
+        if (
+            node &&
+            prev &&
+            prev.type === 'WordNode' &&
+            nlcstToString(node) === '.'
+        ) {
+            prevValue = nlcstToString(prev);
+
+            if (
+                EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE.test(
+                    prevValue
+                ) ||
+                EXPRESSION_ABBREVIATION_ENGLISH_PREFIX.test(
+                    prevValue.toLowerCase()
+                )
+            ) {
+                child.children = children.concat(
+                    parent.children[index + 1].children
+                );
+
+                parent.children.splice(index + 1, 1);
+
+                return index - 1;
+            }
+        }
+    }
+}
+
+/**
+ * Merge an apostrophe depicting elision into
+ * its surrounding word.
+ *
+ * @param {NLCSTNode} child
+ * @param {number} index
+ * @param {NLCSTSentenceNode} parent
  * @return {undefined}
  */
 
 function mergeEnglishElisionExceptions(child, index, parent) {
-    var siblings = parent.children,
-        length = siblings.length,
-        node, value;
+    var siblings,
+        length,
+        node,
+        value;
 
     if (
         child.type !== 'PunctuationNode' &&
@@ -303,135 +302,134 @@ function mergeEnglishElisionExceptions(child, index, parent) {
         return;
     }
 
+    siblings = parent.children;
+
+    length = siblings.length;
+
     value = nlcstToString(child);
 
     /**
      * Match abbreviation of `with`, `w/`
      */
 
-    if (
-        value === '/' &&
-        index !== 0 &&
-        nlcstToString(siblings[index - 1]).toLowerCase() === 'w'
-    ) {
-        /**
-         * Remove the slash from parent.
-         */
+    if (value === '/') {
+        if (
+            index !== 0 &&
+            nlcstToString(siblings[index - 1]).toLowerCase() === 'w'
+        ) {
+            /**
+             * Remove the slash from parent.
+             */
 
-        siblings.splice(index, 1);
+            siblings.splice(index, 1);
 
-        /**
-         * Append the slash into the children of the
-         * previous node.
-         */
+            /**
+             * Append the slash into the children of the
+             * previous node.
+             */
 
-        siblings[index - 1].children.push(child);
+            siblings[index - 1].children.push(child);
+        }
+    } else if (EXPRESSION_APOSTROPHE.test(value)) {
+       /**
+        * If two preceding (the first white space and the
+        * second a word), and one following (white space)
+        * nodes exist...
+        */
 
-        return;
-    }
-
-    if (!EXPRESSION_APOSTROPHE.test(value)) {
-        return;
-    }
-
-    /**
-     * If two preceding (the first white space and the
-     * second a word), and one following (white space)
-     * nodes exist...
-     */
-
-    if (
-        index > 2 && index < length - 1 &&
-        siblings[index - 1].type === 'WordNode' &&
-        siblings[index - 2].type === 'WhiteSpaceNode' &&
-        siblings[index + 1].type === 'WhiteSpaceNode'
-    ) {
         node = siblings[index - 1];
 
         if (
-            EXPRESSION_ELISION_ENGLISH_PREFIX.test(
-                nlcstToString(node).toLowerCase()
-            )
+            index > 2 &&
+            index < length - 1 &&
+            node.type === 'WordNode' &&
+            siblings[index - 2].type === 'WhiteSpaceNode' &&
+            siblings[index + 1].type === 'WhiteSpaceNode'
         ) {
-            /**
-             * Remove the apostrophe from parent.
-             */
+            if (
+               EXPRESSION_ELISION_ENGLISH_PREFIX.test(
+                   nlcstToString(node).toLowerCase()
+               )
+            ) {
+               /**
+                * Remove the apostrophe from parent.
+                */
 
-            siblings.splice(index, 1);
+               siblings.splice(index, 1);
 
-            /**
-             * Append the apostrophe into the children of
-             * node.
-             */
+               /**
+                * Append the apostrophe into the children of
+                * node.
+                */
 
-            node.children.push(child);
+               node.children.push(child);
 
-            return;
+               return;
+            }
         }
-    }
-
-    /**
-     * If a following word exists, and the preceding node
-     * is not a word...
-     */
-
-    if (
-        index < length - 1 &&
-        siblings[index + 1].type === 'WordNode' && (
-            index === 0 ||
-            siblings[index - 1].type !== 'WordNode'
-        )
-    ) {
-        node = siblings[index + 1];
-        value = nlcstToString(node).toLowerCase();
-
-        if (EXPRESSION_ELISION_ENGLISH_AFFIX.test(value)) {
-            /**
-             * Remove the apostrophe from parent.
-             */
-
-            siblings.splice(index, 1);
-
-            /**
-             * Prepend the apostrophe into the children of
-             * node.
-             */
-
-            node.children = [child].concat(node.children);
 
         /**
-         * If both preceded and followed by an apostrophe,
-         * and the word is `n`...
+         * If a following word exists, and the preceding node
+         * is not a word...
          */
-        } else if (
-            value === 'n' &&
-            index < length - 2 &&
-            EXPRESSION_APOSTROPHE.test(
-                nlcstToString(siblings[index + 2])
+
+        if (
+            index < length - 1 &&
+            siblings[index + 1].type === 'WordNode' && (
+                index === 0 ||
+                siblings[index - 1].type !== 'WordNode'
             )
         ) {
+            node = siblings[index + 1];
+            value = nlcstToString(node).toLowerCase();
+
+            if (EXPRESSION_ELISION_ENGLISH_AFFIX.test(value)) {
+                /**
+                 * Remove the apostrophe from parent.
+                 */
+
+                siblings.splice(index, 1);
+
+                /**
+                 * Prepend the apostrophe into the children of
+                 * node.
+                 */
+
+                node.children = [child].concat(node.children);
+
             /**
-             * Remove the apostrophe from parent.
+             * If both preceded and followed by an apostrophe,
+             * and the word is `n`...
              */
+            } else if (
+                value === 'n' &&
+                index < length - 2 &&
+                EXPRESSION_APOSTROPHE.test(
+                    nlcstToString(siblings[index + 2])
+                )
+            ) {
+                /**
+                 * Remove the apostrophe from parent.
+                 */
 
-            siblings.splice(index, 1);
+                siblings.splice(index, 1);
 
-            /**
-             * Prepend the preceding apostrophe and append
-             * the into the following apostrophe into
-             * the children of node.
-             */
+                /**
+                 * Prepend the preceding apostrophe and append
+                 * the into the following apostrophe into
+                 * the children of node.
+                 */
 
-            node.children = [child].concat(
-                node.children, siblings.splice(index + 1, 1)
-            );
+                node.children = [child].concat(
+                    node.children, siblings.splice(index + 1, 1)
+                );
+            }
         }
     }
 }
 
 /**
- * Contains the functions needed to tokenize natural
- * English language into a syntax tree.
+ * Transform English natural language into an NLCST-tree.
  *
  * @constructor
  */
