@@ -1,4 +1,14 @@
 
+n.n.n / 2014-12-05
+==================
+
+ * Update benchmark results in `Readme.md`
+ * Update useage example in `Readme.md`
+ * Refactor npm script targets in `package.json`
+ * Add link to personal website to copyright in `Readme.md`
+ * Fix incorrect executive rights on `test/index.js`
+ * Update eslint
+
 0.4.0 / 2014-11-20
 ==================
 
