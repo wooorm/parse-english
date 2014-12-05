@@ -32,15 +32,15 @@
   "scripts": {
     "test": "node_modules/.bin/_mocha --reporter spec --check-leaks -u exports test/index.js",
     "test-travis": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha --report lcovonly -- --reporter spec --check-leaks -u exports test/index.js",
-    "lint": "npm run-script lint-api && npm run-script lint-script && npm run-script lint-test && npm run-script lint-benchmark && npm run-script lint-style",
+    "coverage": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- -- test/index.js",
     "lint-api": "node_modules/.bin/eslint index.js --rule 'consistent-return: false'",
     "lint-test": "node_modules/.bin/eslint test/index.js --env mocha",
     "lint-benchmark": "node_modules/.bin/eslint benchmark.js --global suite,set,bench",
     "lint-script": "node_modules/.bin/eslint script/generate-fixture.js",
     "lint-style": "node_modules/.bin/jscs index.js benchmark.js script/generate-fixture.js test/index.js --reporter=inline",
-    "coverage": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- -- test/index.js",
-    "benchmark": "node_modules/.bin/matcha benchmark.js",
+    "lint": "npm run lint-api && npm run lint-script && npm run lint-test && npm run lint-benchmark && npm run lint-style",
+    "make": "npm run lint && npm run coverage",
     "fixture": "node script/generate-fixture",
-    "make": "npm run-script lint && npm run-script coverage"
+    "benchmark": "node_modules/.bin/matcha benchmark.js"
   }
 }
