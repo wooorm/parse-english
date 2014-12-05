@@ -34,19 +34,120 @@ english.parse(
   'Mr. Henry Brown: A hapless but friendly City of London worker.'
 );
 /*
- * ˅ Object
- *      type: "RootNode"
- *    ˅ children: Array[1]
- *       ˅ 0: Object
- *            type: "ParagraphNode"
- *          ˅ children: Array[1]
- *             ˅ 0: Object
- *                  type: "SentenceNode"
- *                ˃ children: Array[24]
- *             ˃ __proto__: Array
- *          ˃ __proto__: Object
- *       ˃ __proto__: Array
- *    ˃ __proto__: Object
+ * Object
+ * ├─ type: "RootNode"
+ * └─ children: Array[1]
+ *    └─ 0: Object
+ *          ├─ type: "ParagraphNode"
+ *          └─ children: Array[1]
+ *             └─ 0: Object
+ *                   ├─ type: "SentenceNode"
+ *                   └─ children: Array[23]
+ *                      ├─ 0: Object
+ *                      |     ├─ type: "WordNode"
+ *                      |     └─ children: Array[2]
+ *                      |        ├─ 0: Object
+ *                      |        |     ├─ type: "TextNode"
+ *                      |        |     └─ value: "Mr"
+ *                      |        └─ 1: Object
+ *                      |              ├─ type: "PunctuationNode"
+ *                      |              └─ value: "."
+ *                      ├─ 1: Object
+ *                      |     ├─ type: "WhiteSpaceNode"
+ *                      |     └─ value: " "
+ *                      ├─ 2: Object
+ *                      |     ├─ type: "WordNode"
+ *                      |     └─ children: Array[1]
+ *                      |        └─ 0: Object
+ *                      |              ├─ type: "TextNode"
+ *                      |              └─ value: "Henry"
+ *                      ├─ 3: Object
+ *                      |     ├─ type: "WhiteSpaceNode"
+ *                      |     └─ value: " "
+ *                      ├─ 4: Object
+ *                      |     ├─ type: "WordNode"
+ *                      |     └─ children: Array[1]
+ *                      |        └─ 0: Object
+ *                      |              ├─ type: "TextNode"
+ *                      |              └─ value: "Brown"
+ *                      ├─ 5: Object
+ *                      |     ├─ type: "PunctuationNode"
+ *                      |     └─ value: ":"
+ *                      ├─ 6: Object
+ *                      |     ├─ type: "WhiteSpaceNode"
+ *                      |     └─ value: " "
+ *                      ├─ 7: Object
+ *                      |     ├─ type: "WordNode"
+ *                      |     └─ children: Array[1]
+ *                      |        └─ 0: Object
+ *                      |              ├─ type: "TextNode"
+ *                      |              └─ value: "A"
+ *                      ├─ 8: Object
+ *                      |     ├─ type: "WhiteSpaceNode"
+ *                      |     └─ value: " "
+ *                      ├─ 9: Object
+ *                      |     ├─ type: "WordNode"
+ *                      |     └─ children: Array[1]
+ *                      |        └─ 0: Object
+ *                      |              ├─ type: "TextNode"
+ *                      |              └─ value: "hapless"
+ *                      ├─ 10: Object
+ *                      |      ├─ type: "WhiteSpaceNode"
+ *                      |      └─ value: " "
+ *                      ├─ 11: Object
+ *                      |      ├─ type: "WordNode"
+ *                      |      └─ children: Array[1]
+ *                      |         └─ 0: Object
+ *                      |               ├─ type: "TextNode"
+ *                      |               └─ value: "but"
+ *                      ├─ 12: Object
+ *                      |      ├─ type: "WhiteSpaceNode"
+ *                      |      └─ value: " "
+ *                      ├─ 13: Object
+ *                      |      ├─ type: "WordNode"
+ *                      |      └─ children: Array[1]
+ *                      |         └─ 0: Object
+ *                      |               ├─ type: "TextNode"
+ *                      |               └─ value: "friendly"
+ *                      ├─ 14: Object
+ *                      |      ├─ type: "WhiteSpaceNode"
+ *                      |      └─ value: " "
+ *                      ├─ 15: Object
+ *                      |      ├─ type: "WordNode"
+ *                      |      └─ children: Array[1]
+ *                      |         └─ 0: Object
+ *                      |               ├─ type: "TextNode"
+ *                      |               └─ value: "City"
+ *                      ├─ 16: Object
+ *                      |      ├─ type: "WhiteSpaceNode"
+ *                      |      └─ value: " "
+ *                      ├─ 17: Object
+ *                      |      ├─ type: "WordNode"
+ *                      |      └─ children: Array[1]
+ *                      |         └─ 0: Object
+ *                      |               ├─ type: "TextNode"
+ *                      |               └─ value: "of"
+ *                      ├─ 18: Object
+ *                      |      ├─ type: "WhiteSpaceNode"
+ *                      |      └─ value: " "
+ *                      ├─ 19: Object
+ *                      |      ├─ type: "WordNode"
+ *                      |      └─ children: Array[1]
+ *                      |         └─ 0: Object
+ *                      |               ├─ type: "TextNode"
+ *                      |               └─ value: "London"
+ *                      ├─ 20: Object
+ *                      |      ├─ type: "WhiteSpaceNode"
+ *                      |      └─ value: " "
+ *                      ├─ 21: Object
+ *                      |      ├─ type: "WordNode"
+ *                      |      └─ children: Array[1]
+ *                      |         └─ 0: Object
+ *                      |               ├─ type: "TextNode"
+ *                      |               └─ value: "worker"
+ *                      └─ 22: Object
+ *                             ├─ type: "PunctuationNode"
+ *                             └─ value: "."
  */
 ````
 
