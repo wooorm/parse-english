@@ -95,4 +95,4 @@ On a MacBook Air, it parses about 2 large books per second.
 
 ## License
 
-MIT © Titus Wormer
+MIT © [Titus Wormer](http://wooorm.com)
