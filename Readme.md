@@ -180,9 +180,9 @@ On a MacBook Air, it parses about 2 large books per second.
 
 ```
              english.parse(document);
-  1,861 op/s » A paragraph (5 sentences, 100 words)
-    233 op/s » A section (10 paragraphs)
-     22 op/s » An article (10 sections)
+  1,726 op/s » A paragraph (5 sentences, 100 words)
+    213 op/s » A section (10 paragraphs)
+     20 op/s » An article (10 sections)
       2 op/s » A (large) book (10 articles)
 ```
 
