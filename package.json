@@ -22,7 +22,7 @@
   "devDependencies": {
     "chalk": "^0.5.0",
     "diff": "^1.0.0",
-    "eslint": "^0.9.0",
+    "eslint": "^0.10.0",
     "istanbul": "^0.3.0",
     "jscs": "^1.0.0",
     "matcha": "^0.6.0",
