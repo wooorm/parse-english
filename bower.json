@@ -10,10 +10,6 @@
     "language",
     "parser"
   ],
-  "dependencies": {
-    "nlcst-to-string": "^0.1.0",
-    "parse-latin": "^0.4.0"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/wooorm/parse-english.git"
