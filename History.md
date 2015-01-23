@@ -1,4 +1,28 @@
 
+n.n.n / 2015-01-23
+==================
+
+  * Add UMD as an installation method in `Readme.md`
+  * Add `index.js` to bower ignore
+  * Remove bower dependencies due to UMD build
+  * Add `parse-english.js` to bowers `main` instead of `index.js`
+  * Add `parse-english.js`, `parse-english.min.js`
+  * Add `parse-english.js`, `parse-english.min.js` to `.npmignore`
+  * Add `postbuild` npm script target to mangle build
+  * Add `build`, `prepublish` npm script target
+  * Add esmangle as a dev-dependency
+  * Add browserify as a dev-dependency
+  * Update copyright notice in `LICENSE` to include 2015
+  * Add link to whole license in `Readme.md`
+  * Add Duo as an instalation method in `Readme.md`
+  * Add links to installation methods in `Readme.md`
+  * Refactor fences code blocks in `Readme.md`
+  * Refactor to adhere to strict jsdoc style
+  * Add jscs-jsdoc configuration to `.jscs.json`
+  * Add jscs-jsdoc as a dev-dependency
+  * Refactor `package.json` for changes in npm
+  * Update eslint
+
 0.4.1 / 2014-12-05
 ==================
 
