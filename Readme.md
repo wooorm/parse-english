@@ -5,23 +5,26 @@ An English language parser producing [NLCST](https://github.com/wooorm/nlcst) no
 ## Installation
 
 npm:
-```sh
+
+```bash
 $ npm install parse-english
 ```
 
 Component:
-```sh
+
+```bash
 $ component install wooorm/parse-english
 ```
 
 Bower:
-```sh
+
+```bash
 $ bower install parse-english
 ```
 
 ## Usage
 
-````js
+```javascript
 var ParseEnglish = require('parse-english'),
     english = new ParseEnglish();
 
@@ -149,7 +152,7 @@ english.parse(
  *                             ├─ type: "PunctuationNode"
  *                             └─ value: "."
  */
-````
+```
 
 ## API
 
@@ -170,15 +173,9 @@ Support includes:
 
 ## Benchmark
 
-Run the benchmark yourself:
-
-```sh
-$ npm run benchmark
-```
-
 On a MacBook Air, it parses about 2 large books per second.
 
-```
+```text
              english.parse(document);
   1,726 op/s » A paragraph (5 sentences, 100 words)
     213 op/s » A section (10 paragraphs)
