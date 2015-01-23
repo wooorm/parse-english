@@ -22,6 +22,12 @@ $ component install wooorm/parse-english
 $ bower install parse-english
 ```
 
+[Duo](http://duojs.org/#getting-started):
+
+```javascript
+var ParseEnglish = require('wooorm/parse-english');
+```
+
 ## Usage
 
 ```javascript
