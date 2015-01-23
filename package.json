@@ -46,6 +46,8 @@
     "lint": "npm run lint-api && npm run lint-script && npm run lint-test && npm run lint-benchmark && npm run lint-style",
     "make": "npm run lint && npm run test-coverage",
     "fixture": "node script/generate-fixture",
+    "build": "browserify index.js -s ParseEnglish > parse-english.js",
+    "prepublish": "npm run build",
     "benchmark": "matcha benchmark.js"
   }
 }
