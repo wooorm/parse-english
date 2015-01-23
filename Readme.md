@@ -28,6 +28,15 @@ $ bower install parse-english
 var ParseEnglish = require('wooorm/parse-english');
 ```
 
+Browser globals/AMD builds are also available: both [normal](parse-english.js) and [minified](parse-english.min.js):
+
+```html
+<script src="path/to/parse-english.js"></script>
+<script>
+  var parser = new ParseEnglish();
+</script>
+```
+
 ## Usage
 
 ```javascript
