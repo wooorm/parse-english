@@ -1,6 +1,6 @@
 'use strict';
 
-/**
+/*
  * Dependencies.
  */
 
@@ -10,7 +10,7 @@ var Parser,
 Parser = require('parse-latin');
 nlcstToString = require('nlcst-to-string');
 
-/**
+/*
  * Constants.
  */
 
@@ -20,7 +20,7 @@ var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX,
     EXPRESSION_ELISION_ENGLISH_PREFIX,
     EXPRESSION_APOSTROPHE;
 
-/**
+/*
  * Match a blacklisted (case-insensitive) abbreviation
  * which when followed by a full-stop does not depict
  * a sentence terminal marker.
@@ -28,7 +28,7 @@ var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX,
 
 EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
     '^(' +
-        /**
+        /*
          * Business Abbreviations:
          *
          * Incorporation, Limited company.
@@ -36,7 +36,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
 
         'inc|ltd|' +
 
-        /**
+        /*
          * English unit abbreviations:
          * - Note that *Metric abbreviations* do not use
          *   full stops.
@@ -51,7 +51,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
         'bbls?|cu|doz|fl|ft|gal|gr|gro|in|kt|lbs?|mi|oz|pt|qt|sq|tbsp|' +
         'tsp|yds?|' +
 
-        /**
+        /*
          * Abbreviations of time references:
          *
          * seconds, minutes, hours, Monday, Tuesday, *, Wednesday,
@@ -63,13 +63,13 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
         'sec|min|hr|mon|tue|tues|wed|thu|thurs|fri|sat|sun|jan|feb|mar|' +
         'apr|jun|jul|aug|sep|sept|oct|nov|dec' +
     ')$'
-    /**
+    /*
      * NOTE! There's no `i` flag here because the value to
      * test against should be all lowercase!
      */
 );
 
-/**
+/*
  * Match a blacklisted (case-sensitive) abbreviation
  * which when followed by a full-stop does not depict
  * a sentence terminal marker.
@@ -77,7 +77,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
 
 EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
     '^(' +
-        /**
+        /*
          * Social:
          *
          * Mister, Mistress, Mistress, woman, Mademoiselle, Madame, Monsieur,
@@ -86,7 +86,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
 
         'Mr|Mrs|Miss|Ms|Mss|Mses|Mlle|Mme|M|Messrs|Mmes|Jr|Sr|Snr|' +
 
-        /**
+        /*
          * Rank and academic:
          *
          * Doctor, Magister, Attorney, Profesor, Honourable, Reverend,
@@ -96,7 +96,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
 
         'Dr|Mgr|Atty|Prof|Hon|Rev|Fr|Msgr|Sr|Br|St|Pres|Supt|Rep|Sen|' +
 
-        /**
+        /*
          * Rank and military:
          *
          * Governor, Ambassador, Treasurer, Secretary, Admiral, Brigadier,
@@ -106,7 +106,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
 
         'Gov|Amb|Treas|Sec|Amd|Brig|Gen|Cdr|Col|Capt|Lt|Maj|Sgt|Po|Wo|Ph|' +
 
-        /**
+        /*
          * Common geographical abbreviations:
          *
          * Avenue, Boulevard, Mountain, Road, Building, National, *, Route, *,
@@ -117,7 +117,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
         'Ave|Blvd|Mt|Rd|Bldgs?|Nat|Natl|Rt|Rte|Co|Pk|Sq|Dr|Pt|St|' +
         'Ft|Pen|Terr|Hwy|Fwy|Pkwy|' +
 
-        /**
+        /*
          * American state abbreviations:
          *
          * Alabama, Arizona, Arkansas, California, *, Colorado, *,
@@ -134,7 +134,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
         'Nebr|Nev|Mex|Dak|Okla|Ok|Ore|Penna|Penn|Pa|Tenn|Tex|Ut|Vt|Va|' +
         'Wash|Wis|Wisc|Wyo|' +
 
-        /**
+        /*
          * Canadian province abbreviations:
          *
          * Alberta, Manitoba, Ontario, Quebec, *, Saskatchewan,
@@ -143,7 +143,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
 
         'Alta|Man|Ont|Qu\u00E9|Que|Sask|Yuk|' +
 
-        /**
+        /*
          * English county abbreviations:
          *
          * Bedfordshire, Berkshire, Buckinghamshire, Cambridgeshire,
@@ -164,14 +164,14 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
     ')$'
 );
 
-/**
+/*
  * Match a blacklisted word which when followed by
  * an apostrophe depicts elision.
  */
 
 EXPRESSION_ELISION_ENGLISH_PREFIX = new RegExp(
     '^(' +
-        /**
+        /*
          * Includes:
          *
          * - o' > of;
@@ -182,14 +182,14 @@ EXPRESSION_ELISION_ENGLISH_PREFIX = new RegExp(
     ')$'
 );
 
-/**
+/*
  * Match a blacklisted word which when preceded by
  * an apostrophe depicts elision.
  */
 
 EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
     '^(' +
-        /**
+        /*
          * Includes:
          *
          * - 'im > him;
@@ -200,7 +200,7 @@ EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
 
         'im|er|em|cause|' +
 
-        /**
+        /*
          * Includes:
          *
          * - 'twas > it was;
@@ -210,7 +210,7 @@ EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
 
         'twas|tis|twere|' +
 
-        /**
+        /*
          * Matches groups of year, optionally followed
          * by an `s`.
          */
@@ -219,7 +219,7 @@ EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
     ')$'
 );
 
-/**
+/*
  * Match one apostrophe.
  */
 
@@ -232,9 +232,8 @@ EXPRESSION_APOSTROPHE = /^['\u2019]$/;
  * @param {NLCSTNode} child
  * @param {number} index
  * @param {NLCSTParagraphNode} parent
- * @return {undefined|number}
+ * @return {number?}
  */
-
 function mergeEnglishPrefixExceptions(child, index, parent) {
     var children,
         node,
@@ -286,9 +285,7 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
  * @param {NLCSTNode} child
  * @param {number} index
  * @param {NLCSTSentenceNode} parent
- * @return {undefined}
  */
-
 function mergeEnglishElisionExceptions(child, index, parent) {
     var siblings,
         length,
@@ -308,7 +305,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
 
     value = nlcstToString(child);
 
-    /**
+    /*
      * Match abbreviation of `with`, `w/`
      */
 
@@ -317,13 +314,13 @@ function mergeEnglishElisionExceptions(child, index, parent) {
             index !== 0 &&
             nlcstToString(siblings[index - 1]).toLowerCase() === 'w'
         ) {
-            /**
+            /*
              * Remove the slash from parent.
              */
 
             siblings.splice(index, 1);
 
-            /**
+            /*
              * Append the slash into the children of the
              * previous node.
              */
@@ -331,7 +328,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
             siblings[index - 1].children.push(child);
         }
     } else if (EXPRESSION_APOSTROPHE.test(value)) {
-       /**
+       /*
         * If two preceding (the first white space and the
         * second a word), and one following (white space)
         * nodes exist...
@@ -351,13 +348,13 @@ function mergeEnglishElisionExceptions(child, index, parent) {
                    nlcstToString(node).toLowerCase()
                )
             ) {
-               /**
+               /*
                 * Remove the apostrophe from parent.
                 */
 
                siblings.splice(index, 1);
 
-               /**
+               /*
                 * Append the apostrophe into the children of
                 * node.
                 */
@@ -368,7 +365,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
             }
         }
 
-        /**
+        /*
          * If a following word exists, and the preceding node
          * is not a word...
          */
@@ -384,20 +381,20 @@ function mergeEnglishElisionExceptions(child, index, parent) {
             value = nlcstToString(node).toLowerCase();
 
             if (EXPRESSION_ELISION_ENGLISH_AFFIX.test(value)) {
-                /**
+                /*
                  * Remove the apostrophe from parent.
                  */
 
                 siblings.splice(index, 1);
 
-                /**
+                /*
                  * Prepend the apostrophe into the children of
                  * node.
                  */
 
                 node.children = [child].concat(node.children);
 
-            /**
+            /*
              * If both preceded and followed by an apostrophe,
              * and the word is `n`...
              */
@@ -408,13 +405,13 @@ function mergeEnglishElisionExceptions(child, index, parent) {
                     nlcstToString(siblings[index + 2])
                 )
             ) {
-                /**
+                /*
                  * Remove the apostrophe from parent.
                  */
 
                 siblings.splice(index, 1);
 
-                /**
+                /*
                  * Prepend the preceding apostrophe and append
                  * the into the following apostrophe into
                  * the children of node.
@@ -431,11 +428,10 @@ function mergeEnglishElisionExceptions(child, index, parent) {
 /**
  * Transform English natural language into an NLCST-tree.
  *
- * @constructor
+ * @constructor {ParseEnglish}
  */
-
 function ParseEnglish() {
-    /**
+    /*
      * TODO: This should later be removed (when this change bubbles
      * through to dependants)
      */
@@ -447,12 +443,15 @@ function ParseEnglish() {
     Parser.apply(this, arguments);
 }
 
-/**
+/*
  * Inherit from `ParseLatin`.
  */
 
 var parserPrototype;
 
+/**
+ * Constructor to create a `ParseEnglish` prototype.
+ */
 function ParserPrototype () {}
 
 ParserPrototype.prototype = Parser.prototype;
@@ -461,7 +460,7 @@ parserPrototype = new ParserPrototype();
 
 ParseEnglish.prototype = parserPrototype;
 
-/**
+/*
  * Add modifiers to `parser`.
  */
 
@@ -475,19 +474,19 @@ parserPrototype.tokenizeParagraphPlugins =
         parserPrototype.tokenizeParagraphPlugins
     );
 
-/**
+/*
  * Expose `ParseEnglish`.
  */
 
 module.exports = ParseEnglish;
 
-/**
+/*
  * Expose `ParseLatin.modifier` on `ParseEnglish`.
  */
 
 ParseEnglish.modifier = Parser.modifier;
 
-/**
+/*
  * Expose `ParseLatin.plugin` on `ParseEnglish`.
  */
 

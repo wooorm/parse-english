@@ -1,6 +1,6 @@
 'use strict';
 
-/**
+/*
  * Dependencies.
  */
 
@@ -16,7 +16,7 @@ nlcstTest = require('nlcst-test');
 chalk = require('chalk');
 diff = require('diff');
 
-/**
+/*
  * `ParseEnglish`.
  */
 
@@ -31,7 +31,6 @@ english = new ParseEnglish();
  * @param {string} name - Filename of fixture.
  * @param {string} document - Source to validate.
  */
-
 function describeFixture(name, document, method) {
     var nlcst,
         fixture,
@@ -67,7 +66,7 @@ function describeFixture(name, document, method) {
     }
 }
 
-/**
+/*
  * Tests.
  */
 
@@ -86,7 +85,7 @@ describe('ParseEnglish', function () {
 
 describe('Abbreviations: Geographic', function () {
     it('should NOT treat `Ave.` as a terminal marker', function () {
-        /**
+        /*
          * Note: This paragraph also tests for
          * coverage of early break branches in the
          * `mergeEnglishPrefixExceptions` function.
@@ -468,7 +467,7 @@ describe('Elision', function () {
             'Such as \'the previous.'
         );
 
-        /**
+        /*
          * This is commented out because `parse-latin`
          * always thinks apostrophes at the start of
          * a word are part of that word.

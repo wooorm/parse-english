@@ -1,6 +1,6 @@
 'use strict';
 
-/**
+/*
  * Dependencies.
  */
 
@@ -10,7 +10,7 @@ var ParseEnglish,
 ParseEnglish = require('../');
 fs = require('fs');
 
-/**
+/*
  * `ParseEnglish`.
  */
 
@@ -18,7 +18,7 @@ var english;
 
 english = new ParseEnglish();
 
-/**
+/*
  * Exit with info on too-few parameters.
  */
 
@@ -35,7 +35,7 @@ if (parameters.length < 2) {
     filepath = 'test/fixture/' + parameters[0] + '.json';
     nlcst = english[parameters[2] || 'parse'](parameters[1]);
 
-    /**
+    /*
      * Write fixture.
      */
 
