@@ -1,6 +1,6 @@
 {
   "name": "parse-english",
-  "main": "parse-latin.js",
+  "main": "parse-english.js",
   "description": "English (natural language) parser",
   "license": "MIT",
   "keywords": [
