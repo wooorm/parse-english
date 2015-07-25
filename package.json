@@ -49,7 +49,6 @@
     "fixture": "node script/generate-fixture",
     "build": "browserify index.js -s ParseEnglish > parse-english.js",
     "postbuild": "esmangle parse-english.js > parse-english.min.js",
-    "prepublish": "npm run build",
     "benchmark": "matcha benchmark.js"
   }
 }
