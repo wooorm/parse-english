@@ -1,4 +1,10 @@
 
+0.5.0 / 2015-07-25
+==================
+
+*   Add positional information to nodes ([b38e38e](https://github.com/wooorm/parse-english/commit/b38e38e))
+*   Update parse-latin ([24a2804](https://github.com/wooorm/parse-english/commit/24a2804))
+
 0.4.3 / 2015-06-03
 ==================
 
