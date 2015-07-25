@@ -16,7 +16,9 @@ fs = require('fs');
 
 var english;
 
-english = new ParseEnglish();
+english = new ParseEnglish({
+    'position': true
+});
 
 /*
  * Exit with info on too-few parameters.
