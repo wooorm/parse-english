@@ -19,6 +19,9 @@
     "url": "https://github.com/wooorm/parse-english.git"
   },
   "author": "Titus Wormer <tituswormer@gmail.com>",
+  "files": [
+    "index.js"
+  ],
   "devDependencies": {
     "browserify": "^8.0.0",
     "eslint": "^0.12.0",
