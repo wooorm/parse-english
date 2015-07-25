@@ -12,94 +12,382 @@
               "children": [
                 {
                   "type": "TextNode",
-                  "value": "That"
+                  "value": "That",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 5,
+                      "offset": 4
+                    }
+                  }
                 }
-              ]
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 5,
+                  "offset": 4
+                }
+              }
             },
             {
               "type": "WhiteSpaceNode",
-              "value": " "
+              "value": " ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 5,
+                  "offset": 4
+                },
+                "end": {
+                  "line": 1,
+                  "column": 6,
+                  "offset": 5
+                }
+              }
             },
             {
               "type": "WordNode",
               "children": [
                 {
                   "type": "PunctuationNode",
-                  "value": "'"
+                  "value": "'",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 6,
+                      "offset": 5
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 7,
+                      "offset": 6
+                    }
+                  }
                 },
                 {
                   "type": "TextNode",
-                  "value": "70s"
+                  "value": "70s",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 7,
+                      "offset": 6
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 10,
+                      "offset": 9
+                    }
+                  }
                 }
-              ]
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 6,
+                  "offset": 5
+                },
+                "end": {
+                  "line": 1,
+                  "column": 10,
+                  "offset": 9
+                }
+              }
             },
             {
               "type": "WhiteSpaceNode",
-              "value": " "
+              "value": " ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 10,
+                  "offset": 9
+                },
+                "end": {
+                  "line": 1,
+                  "column": 11,
+                  "offset": 10
+                }
+              }
             },
             {
               "type": "WordNode",
               "children": [
                 {
                   "type": "TextNode",
-                  "value": "Show"
+                  "value": "Show",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 11,
+                      "offset": 10
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 15,
+                      "offset": 14
+                    }
+                  }
                 }
-              ]
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 11,
+                  "offset": 10
+                },
+                "end": {
+                  "line": 1,
+                  "column": 15,
+                  "offset": 14
+                }
+              }
             },
             {
               "type": "PunctuationNode",
-              "value": ","
+              "value": ",",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 15,
+                  "offset": 14
+                },
+                "end": {
+                  "line": 1,
+                  "column": 16,
+                  "offset": 15
+                }
+              }
             },
             {
               "type": "WhiteSpaceNode",
-              "value": " "
+              "value": " ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 16,
+                  "offset": 15
+                },
+                "end": {
+                  "line": 1,
+                  "column": 17,
+                  "offset": 16
+                }
+              }
             },
             {
               "type": "WordNode",
               "children": [
                 {
                   "type": "TextNode",
-                  "value": "that"
+                  "value": "that",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 17,
+                      "offset": 16
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 21,
+                      "offset": 20
+                    }
+                  }
                 }
-              ]
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 17,
+                  "offset": 16
+                },
+                "end": {
+                  "line": 1,
+                  "column": 21,
+                  "offset": 20
+                }
+              }
             },
             {
               "type": "WhiteSpaceNode",
-              "value": " "
+              "value": " ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 21,
+                  "offset": 20
+                },
+                "end": {
+                  "line": 1,
+                  "column": 22,
+                  "offset": 21
+                }
+              }
             },
             {
               "type": "WordNode",
               "children": [
                 {
                   "type": "PunctuationNode",
-                  "value": "’"
+                  "value": "’",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 22,
+                      "offset": 21
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 23,
+                      "offset": 22
+                    }
+                  }
                 },
                 {
                   "type": "TextNode",
-                  "value": "70s"
+                  "value": "70s",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 23,
+                      "offset": 22
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 26,
+                      "offset": 25
+                    }
+                  }
                 }
-              ]
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 22,
+                  "offset": 21
+                },
+                "end": {
+                  "line": 1,
+                  "column": 26,
+                  "offset": 25
+                }
+              }
             },
             {
               "type": "WhiteSpaceNode",
-              "value": " "
+              "value": " ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 26,
+                  "offset": 25
+                },
+                "end": {
+                  "line": 1,
+                  "column": 27,
+                  "offset": 26
+                }
+              }
             },
             {
               "type": "WordNode",
               "children": [
                 {
                   "type": "TextNode",
-                  "value": "show"
+                  "value": "show",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 27,
+                      "offset": 26
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 31,
+                      "offset": 30
+                    }
+                  }
                 }
-              ]
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 27,
+                  "offset": 26
+                },
+                "end": {
+                  "line": 1,
+                  "column": 31,
+                  "offset": 30
+                }
+              }
             },
             {
               "type": "PunctuationNode",
-              "value": "."
+              "value": ".",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 31,
+                  "offset": 30
+                },
+                "end": {
+                  "line": 1,
+                  "column": 32,
+                  "offset": 31
+                }
+              }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 32,
+              "offset": 31
+            }
+          }
         }
-      ]
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 32,
+          "offset": 31
+        }
+      }
     }
-  ]
+  ],
+  "position": {
+    "start": {
+      "line": 1,
+      "column": 1,
+      "offset": 0
+    },
+    "end": {
+      "line": 1,
+      "column": 32,
+      "offset": 31
+    }
+  }
 }

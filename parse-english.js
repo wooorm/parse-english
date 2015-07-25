@@ -239,6 +239,7 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
     var children,
         node,
         prev,
+        next,
         prevValue;
 
     children = child.children;
@@ -267,9 +268,17 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
                     prevValue.toLowerCase()
                 )
             ) {
-                child.children = children.concat(
-                    parent.children[index + 1].children
-                );
+                next = parent.children[index + 1];
+
+                child.children = children.concat(next.children);
+
+                /*
+                 * Update position.
+                 */
+
+                if (child.position && next.position) {
+                    child.position.end = next.position.end;
+                }
 
                 parent.children.splice(index + 1, 1);
 
@@ -291,6 +300,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
     var siblings,
         length,
         node,
+        other,
         value;
 
     if (
@@ -311,10 +321,9 @@ function mergeEnglishElisionExceptions(child, index, parent) {
      */
 
     if (value === '/') {
-        if (
-            index !== 0 &&
-            nlcstToString(siblings[index - 1]).toLowerCase() === 'w'
-        ) {
+        node = siblings[index - 1];
+
+        if (node && nlcstToString(node).toLowerCase() === 'w') {
             /*
              * Remove the slash from parent.
              */
@@ -326,7 +335,15 @@ function mergeEnglishElisionExceptions(child, index, parent) {
              * previous node.
              */
 
-            siblings[index - 1].children.push(child);
+            node.children.push(child);
+
+            /*
+             * Update position.
+             */
+
+            if (node.position && child.position) {
+                node.position.end = child.position.end;
+            }
         }
     } else if (EXPRESSION_APOSTROPHE.test(value)) {
        /*
@@ -342,28 +359,33 @@ function mergeEnglishElisionExceptions(child, index, parent) {
             index < length - 1 &&
             node.type === 'WordNode' &&
             siblings[index - 2].type === 'WhiteSpaceNode' &&
-            siblings[index + 1].type === 'WhiteSpaceNode'
+            siblings[index + 1].type === 'WhiteSpaceNode' &&
+            EXPRESSION_ELISION_ENGLISH_PREFIX.test(
+                nlcstToString(node).toLowerCase()
+            )
         ) {
-            if (
-               EXPRESSION_ELISION_ENGLISH_PREFIX.test(
-                   nlcstToString(node).toLowerCase()
-               )
-            ) {
-               /*
-                * Remove the apostrophe from parent.
-                */
+            /*
+             * Remove the apostrophe from parent.
+             */
 
-               siblings.splice(index, 1);
+            siblings.splice(index, 1);
 
-               /*
-                * Append the apostrophe into the children of
-                * node.
-                */
+            /*
+             * Append the apostrophe into the children of
+             * node.
+             */
 
-               node.children.push(child);
+            node.children.push(child);
 
-               return;
+            /*
+             * Update position.
+             */
+
+            if (node.position && child.position) {
+                node.position.end = child.position.end;
             }
+
+            return;
         }
 
         /*
@@ -372,8 +394,9 @@ function mergeEnglishElisionExceptions(child, index, parent) {
          */
 
         if (
-            index < length - 1 &&
-            siblings[index + 1].type === 'WordNode' && (
+            index !== length - 1 &&
+            siblings[index + 1].type === 'WordNode' &&
+            (
                 index === 0 ||
                 siblings[index - 1].type !== 'WordNode'
             )
@@ -395,6 +418,14 @@ function mergeEnglishElisionExceptions(child, index, parent) {
 
                 node.children = [child].concat(node.children);
 
+                /*
+                 * Update position.
+                 */
+
+                if (node.position && child.position) {
+                    node.position.start = child.position.start;
+                }
+
             /*
              * If both preceded and followed by an apostrophe,
              * and the word is `n`...
@@ -406,11 +437,14 @@ function mergeEnglishElisionExceptions(child, index, parent) {
                     nlcstToString(siblings[index + 2])
                 )
             ) {
+                other = siblings[index + 2];
+
                 /*
                  * Remove the apostrophe from parent.
                  */
 
                 siblings.splice(index, 1);
+                siblings.splice(index + 1, 1);
 
                 /*
                  * Prepend the preceding apostrophe and append
@@ -418,9 +452,23 @@ function mergeEnglishElisionExceptions(child, index, parent) {
                  * the children of node.
                  */
 
-                node.children = [child].concat(
-                    node.children, siblings.splice(index + 1, 1)
-                );
+                node.children = [child].concat(node.children, other);
+
+                /*
+                 * Update position.
+                 */
+
+                if (node.position) {
+                    /* istanbul ignore else */
+                    if (child.position) {
+                        node.position.start = child.position.start;
+                    }
+
+                    /* istanbul ignore else */
+                    if (other.position) {
+                        node.position.end = other.position.end;
+                    }
+                }
             }
         }
     }

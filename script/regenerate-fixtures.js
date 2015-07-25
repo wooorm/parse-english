@@ -20,7 +20,7 @@ nlcstToString = require('nlcst-to-string');
 var english;
 
 english = new ParseEnglish({
-    'position': false
+    'position': true
 });
 
 /*

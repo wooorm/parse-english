@@ -1,28 +1,57 @@
 'use strict';
 
+/* eslint-env mocha */
+
 /*
  * Dependencies.
  */
 
 var ParseEnglish,
     assert,
-    nlcstTest,
-    chalk,
-    diff;
+    nlcstTest;
 
 ParseEnglish = require('..');
 assert = require('assert');
 nlcstTest = require('nlcst-test');
-chalk = require('chalk');
-diff = require('diff');
 
 /*
  * `ParseEnglish`.
  */
 
-var english;
+var english,
+    englishPosition;
 
 english = new ParseEnglish();
+englishPosition = new ParseEnglish({
+    'position': true
+});
+
+/**
+ * Clone `object` but omit positional information.
+ *
+ * @param {Object|Array} object - Object to clone.
+ * @return {Object|Array} - `object`, without positional
+ *   information.
+ */
+function clean(object) {
+    var key,
+        clone,
+        value;
+
+    clone = 'length' in object ? [] : {};
+
+    for (key in object) {
+        value = object[key];
+
+        if (key === 'position') {
+            continue;
+        }
+
+        clone[key] = typeof object[key] === 'object' ? clean(value) : value;
+    }
+
+    return clone;
+}
 
 /**
  * Utility to test if a given document is both a valid
@@ -32,38 +61,20 @@ english = new ParseEnglish();
  * @param {string} document - Source to validate.
  */
 function describeFixture(name, document, method) {
-    var nlcst,
-        fixture,
-        difference;
+    var nlcstA,
+        nlcstB,
+        fixture;
 
-    nlcst = english[method || 'parse'](document);
+    nlcstA = english[method || 'parse'](document);
+    nlcstB = englishPosition[method || 'parse'](document);
 
-    nlcstTest(nlcst);
+    nlcstTest(nlcstA);
+    nlcstTest(nlcstB);
 
     fixture = require('./fixture/' + name);
 
-    try {
-        assert(JSON.stringify(nlcst) === JSON.stringify(fixture));
-    } catch (exception) {
-        /* istanbul ignore next */
-        difference = diff.diffLines(
-            JSON.stringify(fixture, 0, 2), JSON.stringify(nlcst, 0, 2)
-        );
-
-        /* istanbul ignore next */
-        difference.forEach(function (change) {
-            var colour;
-
-            colour = change.added ?
-                'green' :
-                change.removed ? 'red' : 'dim';
-
-            process.stderr.write(chalk[colour](change.value));
-        });
-
-        /* istanbul ignore next */
-        throw exception;
-    }
+    assert.deepEqual(nlcstA, clean(fixture));
+    assert.deepEqual(nlcstB, fixture);
 }
 
 /*
