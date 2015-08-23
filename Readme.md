@@ -1,41 +1,20 @@
-# parse-english [![Build Status](https://img.shields.io/travis/wooorm/parse-english.svg?style=flat)](https://travis-ci.org/wooorm/parse-english) [![Coverage Status](https://img.shields.io/coveralls/wooorm/parse-english.svg?style=flat)](https://coveralls.io/r/wooorm/parse-english?branch=master)
+# parse-english [![Build Status](https://img.shields.io/travis/wooorm/parse-english.svg)](https://travis-ci.org/wooorm/parse-english) [![Coverage Status](https://img.shields.io/codecov/c/github/wooorm/parse-english.svg)](https://codecov.io/github/wooorm/parse-english)
 
-An English language parser producing [NLCST](https://github.com/wooorm/nlcst) nodes.
+An English language parser producing [NLCST](https://github.com/wooorm/nlcst)
+nodes.
 
 ## Installation
 
 [npm](https://docs.npmjs.com/cli/install):
 
 ```bash
-$ npm install parse-english
+npm install parse-english
 ```
 
-[Component.js](https://github.com/componentjs/component):
-
-```bash
-$ component install wooorm/parse-english
-```
-
-[Bower](http://bower.io/#install-packages):
-
-```bash
-$ bower install parse-english
-```
-
-[Duo](http://duojs.org/#getting-started):
-
-```javascript
-var ParseEnglish = require('wooorm/parse-english');
-```
-
-Browser globals/AMD builds are also available: both [normal](parse-english.js) and [minified](parse-english.min.js):
-
-```html
-<script src="path/to/parse-english.js"></script>
-<script>
-  var parser = new ParseEnglish();
-</script>
-```
+**parse-english** is also available for [bower](http://bower.io/#install-packages),
+[component](https://github.com/componentjs/component), and
+[duo](http://duojs.org/#getting-started), and as an AMD, CommonJS, and globals
+module, [uncompressed](parse-english.js) and [compressed](parse-english.min.js).
 
 ## Usage
 
@@ -171,40 +150,28 @@ english.parse(
 
 ## API
 
-**parse-english** exposes the same [API as parse-latin](https://github.com/wooorm/parse-latin#api "ParseLatin API"), but returns results better suited for English natural language.
+**parse-english** exposes the same [API as parse-latin](https://github.com/wooorm/parse-latin#api),
+but returns results better suited for English natural language.
 
 Support includes:
 
-* Unit abbreviations (tsp., tbsp., oz., ft., and more);
-* Time references (sec., min., tues., thu., feb., and more);
-* Business Abbreviations (Inc. and Ltd);
-* Social titles (Mr., Mmes., Sr., and more);
-* Rank and academic titles (Dr., Rep., Gen., Prof., Pres., and more);
-* Geographical abbreviations (Ave., Blvd., Ft., Hwy., and more);
-* American state abbreviations (Ala., Minn., La., Tex., and more);
-* Canadian province abbreviations (Alta., Qué., Yuk., and more);
-* English county abbreviations (Beds., Leics., Shrops., and more);
-* Common elision (omission of letters) (’n’, ’o, ’em, ’twas, ’80s, and more).
-
-## Benchmark
-
-On a MacBook Air, it parses about 2 large books per second.
-
-```text
-             english.parse(document);
-  1,726 op/s » A paragraph (5 sentences, 100 words)
-    213 op/s » A section (10 paragraphs)
-     20 op/s » An article (10 sections)
-      2 op/s » A (large) book (10 articles)
-```
+*   Unit abbreviations (tsp., tbsp., oz., ft., and more);
+*   Time references (sec., min., tues., thu., feb., and more);
+*   Business Abbreviations (Inc. and Ltd);
+*   Social titles (Mr., Mmes., Sr., and more);
+*   Rank and academic titles (Dr., Rep., Gen., Prof., Pres., and more);
+*   Geographical abbreviations (Ave., Blvd., Ft., Hwy., and more);
+*   American state abbreviations (Ala., Minn., La., Tex., and more);
+*   Canadian province abbreviations (Alta., Qué., Yuk., and more);
+*   English county abbreviations (Beds., Leics., Shrops., and more);
+*   Common elision (omission of letters) (’n’, ’o, ’em, ’twas, ’80s, and more).
 
 ## Related
 
-- [nlcst](https://github.com/wooorm/nlcst)
-- [parse-latin](https://github.com/wooorm/parse-latin)
-- [parse-english](https://github.com/wooorm/parse-english)
-- [retext](https://github.com/wooorm/retext)
-- [textom](https://github.com/wooorm/textom)
+*   [nlcst](https://github.com/wooorm/nlcst)
+*   [retext](https://github.com/wooorm/retext)
+*   [parse-latin](https://github.com/wooorm/parse-latin)
+*   [parse-dutch](https://github.com/wooorm/parse-dutch)
 
 ## License
 

@@ -1,25 +1,28 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.ParseEnglish=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.ParseEnglish = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-english
+ * @fileoverview English (natural language) parser.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var Parser,
-    nlcstToString;
-
-Parser = require('parse-latin');
-nlcstToString = require('nlcst-to-string');
+var Parser = require('parse-latin');
+var nlcstToString = require('nlcst-to-string');
+var visitChildren = require('unist-util-visit-children');
+var modifyChildren = require('unist-util-modify-children');
 
 /*
  * Constants.
  */
-
-var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX,
-    EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE,
-    EXPRESSION_ELISION_ENGLISH_AFFIX,
-    EXPRESSION_ELISION_ENGLISH_PREFIX,
-    EXPRESSION_APOSTROPHE;
 
 /*
  * Match a blacklisted (case-insensitive) abbreviation
@@ -27,7 +30,7 @@ var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX,
  * a sentence terminal marker.
  */
 
-EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
+var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
     '^(' +
         /*
          * Business Abbreviations:
@@ -76,7 +79,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
  * a sentence terminal marker.
  */
 
-EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
+var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
     '^(' +
         /*
          * Social:
@@ -170,7 +173,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
  * an apostrophe depicts elision.
  */
 
-EXPRESSION_ELISION_ENGLISH_PREFIX = new RegExp(
+var EXPRESSION_ELISION_ENGLISH_PREFIX = new RegExp(
     '^(' +
         /*
          * Includes:
@@ -188,7 +191,7 @@ EXPRESSION_ELISION_ENGLISH_PREFIX = new RegExp(
  * an apostrophe depicts elision.
  */
 
-EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
+var EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
     '^(' +
         /*
          * Includes:
@@ -224,25 +227,23 @@ EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
  * Match one apostrophe.
  */
 
-EXPRESSION_APOSTROPHE = /^['\u2019]$/;
+var EXPRESSION_APOSTROPHE = /^['\u2019]$/;
 
 /**
  * Merge a sentence into its next sentence,
  * when the sentence ends with a certain word.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTParagraphNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTParagraphNode} parent - Parent of `child`.
  * @return {number?}
  */
 function mergeEnglishPrefixExceptions(child, index, parent) {
-    var children,
-        node,
-        prev,
-        next,
-        prevValue;
-
-    children = child.children;
+    var children = child.children;
+    var prev;
+    var node;
+    var prevValue;
+    var next;
 
     if (
         children &&
@@ -292,16 +293,16 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
  * Merge an apostrophe depicting elision into
  * its surrounding word.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTSentenceNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTSentenceNode} parent - Parent of `child`.
  */
 function mergeEnglishElisionExceptions(child, index, parent) {
-    var siblings,
-        length,
-        node,
-        other,
-        value;
+    var siblings;
+    var length;
+    var value;
+    var node;
+    var other;
 
     if (
         child.type !== 'PunctuationNode' &&
@@ -479,14 +480,9 @@ function mergeEnglishElisionExceptions(child, index, parent) {
  *
  * @constructor {ParseEnglish}
  */
-function ParseEnglish() {
-    /*
-     * TODO: This should later be removed (when this change bubbles
-     * through to dependants)
-     */
-
+function ParseEnglish(options) {
     if (!(this instanceof ParseEnglish)) {
-        return new ParseEnglish();
+        return new ParseEnglish(options);
     }
 
     Parser.apply(this, arguments);
@@ -514,12 +510,12 @@ ParseEnglish.prototype = parserPrototype;
  */
 
 parserPrototype.tokenizeSentencePlugins =
-    [Parser.plugin(mergeEnglishElisionExceptions)].concat(
+    [visitChildren(mergeEnglishElisionExceptions)].concat(
         parserPrototype.tokenizeSentencePlugins
     );
 
 parserPrototype.tokenizeParagraphPlugins =
-    [Parser.modifier(mergeEnglishPrefixExceptions)].concat(
+    [modifyChildren(mergeEnglishPrefixExceptions)].concat(
         parserPrototype.tokenizeParagraphPlugins
     );
 
@@ -529,40 +525,142 @@ parserPrototype.tokenizeParagraphPlugins =
 
 module.exports = ParseEnglish;
 
-/*
- * Expose `ParseLatin.modifier` on `ParseEnglish`.
+},{"nlcst-to-string":3,"parse-latin":4,"unist-util-modify-children":25,"unist-util-visit-children":26}],2:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2015 Titus Wormer
+ * @license MIT
+ * @module array-iterate
+ * @fileoverview `forEach` with the possibility to change the next position.
  */
 
-ParseEnglish.modifier = Parser.modifier;
-
-/*
- * Expose `ParseLatin.plugin` on `ParseEnglish`.
- */
-
-ParseEnglish.plugin = Parser.plugin;
-
-},{"nlcst-to-string":2,"parse-latin":3}],2:[function(require,module,exports){
 'use strict';
+
+/* eslint-env commonjs */
+
+/*
+ * Methods.
+ */
+
+var has = Object.prototype.hasOwnProperty;
+
+/**
+ * Callback given to `iterate`.
+ *
+ * @callback iterate~callback
+ * @this {*} - `context`, when given to `iterate`.
+ * @param {*} value - Current iteration.
+ * @param {number} index - Position of `value` in `values`.
+ * @param {{length: number}} values - Currently iterated over.
+ * @return {number?} - Position to go to next.
+ */
+
+/**
+ * `Array#forEach()` with the possibility to change
+ * the next position.
+ *
+ * @param {{length: number}} values - Values.
+ * @param {arrayIterate~callback} callback - Callback given to `iterate`.
+ * @param {*?} [context] - Context object to use when invoking `callback`.
+ */
+function iterate(values, callback, context) {
+    var index = -1;
+    var result;
+
+    if (!values) {
+        throw new Error(
+            'TypeError: Iterate requires that |this| ' +
+            'not be ' + values
+        );
+    }
+
+    if (!has.call(values, 'length')) {
+        throw new Error(
+            'TypeError: Iterate requires that |this| ' +
+            'has a `length`'
+        );
+    }
+
+    if (typeof callback !== 'function') {
+        throw new Error(
+            'TypeError: callback must be a function'
+        );
+    }
+
+    /*
+     * The length might change, so we do not cache it.
+     */
+
+    while (++index < values.length) {
+        /*
+         * Skip missing values.
+         */
+
+        if (!(index in values)) {
+            continue;
+        }
+
+        result = callback.call(context, values[index], index, values);
+
+        /*
+         * If `callback` returns a `number`, move `index` over to
+         * `number`.
+         */
+
+        if (typeof result === 'number') {
+            /*
+             * Make sure that negative numbers do not
+             * break the loop.
+             */
+
+            if (result < 0) {
+                index = 0;
+            }
+
+            index = result - 1;
+        }
+    }
+}
+
+/*
+ * Expose.
+ */
+
+module.exports = iterate;
+
+},{}],3:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module nlcst:to-string
+ * @fileoverview Transform an NLCST node into a string.
+ */
+
+'use strict';
+
+/* eslint-env commonjs */
 
 /**
  * Stringify an NLCST node.
  *
- * @param {NLCSTNode} nlcst
- * @return {string}
+ * @param {NLCSTNode|Array.<NLCSTNode>} node - Node to to
+ *   stringify.
+ * @return {string} - Stringified `node`.
  */
-function nlcstToString(nlcst) {
-    var values,
-        length,
-        children;
+function nlcstToString(node) {
+    var values;
+    var length;
+    var children;
 
-    if (typeof nlcst.value === 'string') {
-        return nlcst.value;
+    if (typeof node.value === 'string') {
+        return node.value;
     }
 
-    children = nlcst.children;
+    children = 'length' in node ? node : node.children;
     length = children.length;
 
-    /**
+    /*
      * Shortcut: This is pretty common, and a small performance win.
      */
 
@@ -580,17 +678,30 @@ function nlcstToString(nlcst) {
 }
 
 /*
- * Expose `nlcstToString`.
+ * Expose.
  */
 
 module.exports = nlcstToString;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin
+ * @fileoverview Latin-script (natural language) parser.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 module.exports = require('./lib/parse-latin');
 
-},{"./lib/parse-latin":6}],4:[function(require,module,exports){
+},{"./lib/parse-latin":6}],5:[function(require,module,exports){
+/* This module is generated by `script/build-expressions.js` */
+'use strict'
+/* eslint-env commonjs */
 module.exports = {
     'affixSymbol': /^([\)\]\}\u0F3B\u0F3D\u169C\u2046\u207E\u208E\u2309\u230B\u232A\u2769\u276B\u276D\u276F\u2771\u2773\u2775\u27C6\u27E7\u27E9\u27EB\u27ED\u27EF\u2984\u2986\u2988\u298A\u298C\u298E\u2990\u2992\u2994\u2996\u2998\u29D9\u29DB\u29FD\u2E23\u2E25\u2E27\u2E29\u3009\u300B\u300D\u300F\u3011\u3015\u3017\u3019\u301B\u301E\u301F\uFD3E\uFE18\uFE36\uFE38\uFE3A\uFE3C\uFE3E\uFE40\uFE42\uFE44\uFE48\uFE5A\uFE5C\uFE5E\uFF09\uFF3D\uFF5D\uFF60\uFF63]|["'\xBB\u2019\u201D\u203A\u2E03\u2E05\u2E0A\u2E0D\u2E1D\u2E21]|[!\.\?\u2026\u203D])\1*$/,
     'newLine': /^(\r?\n|\r)+$/,
@@ -605,84 +716,25 @@ module.exports = {
     'whiteSpace': /^(?:[\t-\r \x85\xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000])+$/
 };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin
+ * @fileoverview Latin-script (natural language) parser.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var iterate;
-
-iterate = require('array-iterate');
-
-/**
- * Pass the context as the third argument to `callback`.
- *
- * @param {function(Object, number, Object): number|undefined} callback
- * @return {function(Object, number)}
- */
-function wrapperFactory(callback) {
-    return function (value, index) {
-        return callback(value, index, this);
-    };
-}
-
-/**
- * Turns `callback` into a ``iterator'' accepting a parent.
- *
- * see ``array-iterate'' for more info.
- *
- * @param {function(Object, number, Object): number|undefined} callback
- * @return {function(NLCSTParent)}
- */
-function iteratorFactory(callback) {
-    return function (parent) {
-        return iterate(parent.children, callback, parent);
-    };
-}
-
-/**
- * Turns `callback` into a ``iterator'' accepting a parent.
- *
- * see ``array-iterate'' for more info.
- *
- * @param {function(Object, number, Object): number|undefined} callback
- * @return {function(Object)}
- */
-function modifierFactory(callback) {
-    return iteratorFactory(wrapperFactory(callback));
-}
-
-/*
- * Expose `modifierFactory`.
- */
-
-module.exports = modifierFactory;
-
-},{"array-iterate":26}],6:[function(require,module,exports){
-/*!
- * parse-latin
- *
- * Licensed under MIT.
- * Copyright (c) 2014 Titus Wormer <tituswormer@gmail.com>
- */
-
-'use strict';
-
-/*
- * Dependencies.
- */
-
-var createParser,
-    expressions,
-    pluginFactory,
-    modifierFactory;
-
-createParser = require('./parser');
-expressions = require('./expressions');
-pluginFactory = require('./plugin');
-modifierFactory = require('./modifier');
+var createParser = require('./parser');
+var expressions = require('./expressions');
 
 /*
  * == CLASSIFY ===============================================================
@@ -691,11 +743,6 @@ modifierFactory = require('./modifier');
 /*
  * Constants.
  */
-
-var EXPRESSION_TOKEN,
-    EXPRESSION_WORD,
-    EXPRESSION_PUNCTUATION,
-    EXPRESSION_WHITE_SPACE;
 
 /*
  * Match all tokens:
@@ -706,30 +753,30 @@ var EXPRESSION_TOKEN,
  * - One or more of the same character;
  */
 
-EXPRESSION_TOKEN = expressions.token;
+var EXPRESSION_TOKEN = expressions.token;
 
 /*
  * Match a word.
  */
 
-EXPRESSION_WORD = expressions.word;
+var EXPRESSION_WORD = expressions.word;
 
 /*
  * Match a string containing ONLY punctuation.
  */
 
-EXPRESSION_PUNCTUATION = expressions.punctuation;
+var EXPRESSION_PUNCTUATION = expressions.punctuation;
 
 /*
  * Match a string containing ONLY white space.
  */
 
-EXPRESSION_WHITE_SPACE = expressions.whiteSpace;
+var EXPRESSION_WHITE_SPACE = expressions.whiteSpace;
 
 /**
  * Classify a token.
  *
- * @param {string?} value
+ * @param {string?} value - Value to classify.
  * @return {string} - value's type.
  */
 function classify(value) {
@@ -751,16 +798,16 @@ function classify(value) {
 /**
  * Transform a `value` into a list of `NLCSTNode`s.
  *
- * @param {ParseLatin} parser
- * @param {string?} value
+ * @param {ParseLatin} parser - Context.
+ * @param {string?} value - Value to tokenize.
  * @return {Array.<NLCSTNode>}
  */
 function tokenize(parser, value) {
-    var tokens,
-        offset,
-        line,
-        column,
-        match;
+    var tokens;
+    var offset;
+    var line;
+    var column;
+    var match;
 
     if (value === null || value === undefined) {
         value = '';
@@ -820,7 +867,7 @@ function tokenize(parser, value) {
      *   location = new Position(start);
      *   // {start: {line: 1, column: 1}, end: {line: 1, column: 3}}
      *
-     * @param {Object} start
+     * @param {Object} start - Starting position.
      */
     function Position(start) {
         this.start = start;
@@ -871,12 +918,12 @@ function tokenize(parser, value) {
      * @example
      *   update('foo');
      *
-     * @param {string} subvalue
+     * @param {string} subvalue - Eaten value..
      */
     function update(subvalue) {
-        var subvalueLength = subvalue.length,
-            character = -1,
-            lastIndex = -1;
+        var subvalueLength = subvalue.length;
+        var character = -1;
+        var lastIndex = -1;
 
         offset += subvalueLength;
 
@@ -1048,9 +1095,7 @@ function ParseLatin(options) {
  * Quick access to the prototype.
  */
 
-var parseLatinPrototype;
-
-parseLatinPrototype = ParseLatin.prototype;
+var parseLatinPrototype = ParseLatin.prototype;
 
 /*
  * == TOKENIZE ===============================================================
@@ -1072,7 +1117,7 @@ parseLatinPrototype.tokenize = function (value) {
 /**
  * Factory to create a `Text`.
  *
- * @param {string?} type
+ * @param {string} type - Name of text node.
  * @return {function(value): NLCSTText}
  */
 function createTextFactory(type) {
@@ -1158,22 +1203,16 @@ parseLatinPrototype.tokenizeText = createTextFactory('Text');
 /**
  * Run transform plug-ins for `key` on `nodes`.
  *
- * @param {string} key
- * @param {Array.<Node>} nodes
+ * @param {string} key - Unique name.
+ * @param {Array.<Node>} nodes - List of nodes.
  * @return {Array.<Node>} - `nodes`.
  */
 function run(key, nodes) {
-    var wareKey,
-        plugins,
-        index;
-
-    wareKey = key + 'Plugins';
-
-    plugins = this[wareKey];
+    var wareKey = key + 'Plugins';
+    var plugins = this[wareKey];
+    var index = -1;
 
     if (plugins) {
-        index = -1;
-
         while (plugins[++index]) {
             plugins[index](nodes);
         }
@@ -1189,9 +1228,9 @@ function run(key, nodes) {
 parseLatinPrototype.run = run;
 
 /**
- * @param {Function} Constructor
- * @param {string} key
- * @param {function(*): undefined} callback
+ * @param {Function} Constructor - Context.
+ * @param {string} key - Unique name.
+ * @param {function(*): undefined} callback - Wrapped.
  */
 function pluggable(Constructor, key, callback) {
     /**
@@ -1207,7 +1246,7 @@ function pluggable(Constructor, key, callback) {
  * Factory to inject `plugins`. Takes `callback` for
  * the actual inserting.
  *
- * @param {function(Object, string, Array.<Function>)} callback
+ * @param {function(Object, string, Array.<Function>)} callback - Wrapped.
  * @return {function(string, Array.<Function>)}
  */
 function useFactory(callback) {
@@ -1221,10 +1260,8 @@ function useFactory(callback) {
      */
 
     return function (key, plugins) {
-        var self,
-            wareKey;
-
-        self = this;
+        var self = this;
+        var wareKey;
 
         /*
          * Throw if the method is not pluggable.
@@ -1306,15 +1343,12 @@ parseLatinPrototype.useFirst = useFactory(function (context, key, plugins) {
  *
  * @see pluggable
  *
- * @param {string?} value
+ * @param {string?} value - Value to classify as a word.
  * @return {NLCSTWordNode}
  */
 pluggable(ParseLatin, 'tokenizeWord', function (value, eat) {
-    var add,
-        parent;
-
-    add = (eat || noopEat)('');
-    parent = {
+    var add = (eat || noopEat)('');
+    var parent = {
         'type': 'WordNode',
         'children': []
     };
@@ -1430,106 +1464,79 @@ parseLatinPrototype.use('tokenizeRoot', [
  */
 
 /*
- * Expose `ParseLatin`.
+ * Expose.
  */
 
 module.exports = ParseLatin;
 
-/*
- * Expose `pluginFactory` on `ParseLatin` as `plugin`.
- */
-
-ParseLatin.plugin = pluginFactory;
-
-/*
- * Expose `modifierFactory` on `ParseLatin` as `modifier`.
- */
-
-ParseLatin.modifier = modifierFactory;
-
-},{"./expressions":4,"./modifier":5,"./parser":7,"./plugin":8,"./plugin/break-implicit-sentences":9,"./plugin/make-final-white-space-siblings":10,"./plugin/make-initial-white-space-siblings":11,"./plugin/merge-affix-exceptions":12,"./plugin/merge-affix-symbol":13,"./plugin/merge-final-word-symbol":14,"./plugin/merge-initial-lower-case-letter-sentences":15,"./plugin/merge-initial-word-symbol":16,"./plugin/merge-initialisms":17,"./plugin/merge-inner-word-symbol":18,"./plugin/merge-non-word-sentences":19,"./plugin/merge-prefix-exceptions":20,"./plugin/merge-remaining-full-stops":21,"./plugin/merge-words":22,"./plugin/patch-position":23,"./plugin/remove-empty-nodes":24}],7:[function(require,module,exports){
-'use strict';
-
-var tokenizer;
-
-tokenizer = require('./tokenizer');
-
+},{"./expressions":5,"./parser":7,"./plugin/break-implicit-sentences":8,"./plugin/make-final-white-space-siblings":9,"./plugin/make-initial-white-space-siblings":10,"./plugin/merge-affix-exceptions":11,"./plugin/merge-affix-symbol":12,"./plugin/merge-final-word-symbol":13,"./plugin/merge-initial-lower-case-letter-sentences":14,"./plugin/merge-initial-word-symbol":15,"./plugin/merge-initialisms":16,"./plugin/merge-inner-word-symbol":17,"./plugin/merge-non-word-sentences":18,"./plugin/merge-prefix-exceptions":19,"./plugin/merge-remaining-full-stops":20,"./plugin/merge-words":21,"./plugin/patch-position":22,"./plugin/remove-empty-nodes":23}],7:[function(require,module,exports){
 /**
- * Construct a parser based on `options`.
- *
- * @param {Object} options
- * @return {function(string): NLCSTNode}
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:parser
+ * @fileoverview Construct a parser for a given node.
  */
-function parserFactory(options) {
-    var type,
-        delimiter,
-        tokenizerProperty;
 
-    type = options.type;
-    tokenizerProperty = options.tokenizer;
-    delimiter = options.delimiter;
-
-    if (delimiter) {
-        delimiter = tokenizer(options.delimiterType, options.delimiter);
-    }
-
-    return function (value) {
-        var children;
-
-        children = this[tokenizerProperty](value);
-
-        return {
-            'type': type,
-            'children': delimiter ? delimiter(children) : children
-        };
-    };
-}
-
-module.exports = parserFactory;
-
-},{"./tokenizer":25}],8:[function(require,module,exports){
 'use strict';
 
-/**
- * Turns `callback` into a ``plugin'' accepting a parent.
- *
- * @param {function(Object, number, Object)} callback
- * @return {function(NLCSTParent)}
- */
-function pluginFactory(callback) {
-    return function (parent) {
-        var index,
-            children;
-
-        index = -1;
-        children = parent.children;
-
-        while (children[++index]) {
-            callback(children[index], index, parent);
-        }
-    };
-}
-
-/*
- * Expose `pluginFactory`.
- */
-
-module.exports = pluginFactory;
-
-},{}],9:[function(require,module,exports){
-'use strict';
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var nlcstToString,
-    modifier,
-    expressions;
+var tokenizer = require('./tokenizer');
 
-nlcstToString = require('nlcst-to-string');
-modifier = require('../modifier');
-expressions = require('../expressions');
+/**
+ * Construct a parser based on `options`.
+ *
+ * @param {Object} options - Configuration.
+ * @return {function(string): NLCSTNode}
+ */
+function parserFactory(options) {
+    var type = options.type;
+    var tokenizerProperty = options.tokenizer;
+    var delimiter = options.delimiter;
+    var tokenize = delimiter && tokenizer(options.delimiterType, delimiter);
+
+    return function (value) {
+        var children = this[tokenizerProperty](value);
+
+        return {
+            'type': type,
+            'children': tokenize ? tokenize(children) : children
+        };
+    };
+}
+
+/*
+ * Expose.
+ */
+
+module.exports = parserFactory;
+
+},{"./tokenizer":24}],8:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:break-implicit-sentencs
+ * @fileoverview Break a sentence if a white space with
+ *   more than one new-line is found.
+ */
+
+'use strict';
+
+/* eslint-env commonjs */
+
+/*
+ * Dependencies.
+ */
+
+var nlcstToString = require('nlcst-to-string');
+var modifyChildren = require('unist-util-modify-children');
+var expressions = require('../expressions');
 
 /*
  * Constants.
@@ -1537,28 +1544,26 @@ expressions = require('../expressions');
  * - Two or more new line characters.
  */
 
-var EXPRESSION_MULTI_NEW_LINE;
-
-EXPRESSION_MULTI_NEW_LINE = expressions.newLineMulti;
+var EXPRESSION_MULTI_NEW_LINE = expressions.newLineMulti;
 
 /**
  * Break a sentence if a white space with more
  * than one new-line is found.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTParagraphNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTParagraphNode} parent - Parent of `child`.
  * @return {undefined}
  */
 function breakImplicitSentences(child, index, parent) {
-    var children,
-        position,
-        length,
-        tail,
-        head,
-        end,
-        insertion,
-        node;
+    var children;
+    var position;
+    var length;
+    var tail;
+    var head;
+    var end;
+    var insertion;
+    var node;
 
     if (child.type !== 'SentenceNode') {
         return;
@@ -1566,9 +1571,12 @@ function breakImplicitSentences(child, index, parent) {
 
     children = child.children;
 
-    length = children.length;
+    /*
+     * Ignore first and last child.
+     */
 
-    position = -1;
+    length = children.length - 1;
+    position = 0;
 
     while (++position < length) {
         node = children[position];
@@ -1611,33 +1619,39 @@ function breakImplicitSentences(child, index, parent) {
  * Expose `breakImplicitSentences` as a plugin.
  */
 
-module.exports = modifier(breakImplicitSentences);
+module.exports = modifyChildren(breakImplicitSentences);
 
-},{"../expressions":4,"../modifier":5,"nlcst-to-string":2}],10:[function(require,module,exports){
+},{"../expressions":5,"nlcst-to-string":3,"unist-util-modify-children":25}],9:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:make-final-white-space-siblings
+ * @fileoverview Make final white-space siblings.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var modifier;
-
-modifier = require('../modifier');
+var modifyChildren = require('unist-util-modify-children');
 
 /**
  * Move white space ending a paragraph up, so they are
  * the siblings of paragraphs.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTParent} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTParent} parent - Parent of `child`.
  * @return {undefined|number}
  */
 function makeFinalWhiteSpaceSiblings(child, index, parent) {
-    var children,
-        prev;
-
-    children = child.children;
+    var children = child.children;
+    var prev;
 
     if (
         children &&
@@ -1663,32 +1677,38 @@ function makeFinalWhiteSpaceSiblings(child, index, parent) {
  * Expose `makeFinalWhiteSpaceSiblings` as a modifier.
  */
 
-module.exports = modifier(makeFinalWhiteSpaceSiblings);
+module.exports = modifyChildren(makeFinalWhiteSpaceSiblings);
 
-},{"../modifier":5}],11:[function(require,module,exports){
+},{"unist-util-modify-children":25}],10:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:make-initial-white-space-siblings
+ * @fileoverview Make initial white-space siblings.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var plugin;
-
-plugin = require('../plugin');
+var visitChildren = require('unist-util-visit-children');
 
 /**
  * Move white space starting a sentence up, so they are
  * the siblings of sentences.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTParent} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTParent} parent - Parent of `child`.
  */
 function makeInitialWhiteSpaceSiblings(child, index, parent) {
-    var children,
-        next;
-
-    children = child.children;
+    var children = child.children;
+    var next;
 
     if (
         children &&
@@ -1708,38 +1728,44 @@ function makeInitialWhiteSpaceSiblings(child, index, parent) {
  * Expose `makeInitialWhiteSpaceSiblings` as a plugin.
  */
 
-module.exports = plugin(makeInitialWhiteSpaceSiblings);
+module.exports = visitChildren(makeInitialWhiteSpaceSiblings);
 
-},{"../plugin":8}],12:[function(require,module,exports){
+},{"unist-util-visit-children":26}],11:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:merge-affix-exceptions
+ * @fileoverview Merge a sentence into its previous
+ *   sentence, when the sentence starts with a comma.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var nlcstToString,
-    modifier;
-
-nlcstToString = require('nlcst-to-string');
-modifier = require('../modifier');
+var nlcstToString = require('nlcst-to-string');
+var modifyChildren = require('unist-util-modify-children');
 
 /**
  * Merge a sentence into its previous sentence, when
  * the sentence starts with a comma.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTParagraphNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTParagraphNode} parent - Parent of `child`.
  * @return {undefined|number}
  */
 function mergeAffixExceptions(child, index, parent) {
-    var children,
-        node,
-        position,
-        previousChild,
-        value;
-
-    children = child.children;
+    var children = child.children;
+    var node;
+    var position;
+    var value;
+    var previousChild;
 
     if (!children || !children.length || index === 0) {
         return;
@@ -1792,22 +1818,30 @@ function mergeAffixExceptions(child, index, parent) {
  * Expose `mergeAffixExceptions` as a modifier.
  */
 
-module.exports = modifier(mergeAffixExceptions);
+module.exports = modifyChildren(mergeAffixExceptions);
 
-},{"../modifier":5,"nlcst-to-string":2}],13:[function(require,module,exports){
+},{"nlcst-to-string":3,"unist-util-modify-children":25}],12:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:merge-affix-symbol
+ * @fileoverview Move certain punctuation following a
+ *   terminal marker (thus in the next sentence) to the
+ *   previous sentence.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var nlcstToString,
-    modifier,
-    expressions;
-
-nlcstToString = require('nlcst-to-string');
-modifier = require('../modifier');
-expressions = require('../expressions');
+var nlcstToString = require('nlcst-to-string');
+var modifyChildren = require('unist-util-modify-children');
+var expressions = require('../expressions');
 
 /*
  * Constants.
@@ -1818,27 +1852,23 @@ expressions = require('../expressions');
  *   terminal marker.
  */
 
-var EXPRESSION_AFFIX_SYMBOL;
-
-EXPRESSION_AFFIX_SYMBOL = expressions.affixSymbol;
+var EXPRESSION_AFFIX_SYMBOL = expressions.affixSymbol;
 
 /**
  * Move certain punctuation following a terminal
  * marker (thus in the next sentence) to the
  * previous sentence.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTParagraphNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTParagraphNode} parent - Parent of `child`.
  * @return {undefined|number}
  */
 function mergeAffixSymbol(child, index, parent) {
-    var children,
-        prev,
-        first,
-        second;
-
-    children = child.children;
+    var children = child.children;
+    var first;
+    var second;
+    var prev;
 
     if (
         children &&
@@ -1883,34 +1913,41 @@ function mergeAffixSymbol(child, index, parent) {
  * Expose `mergeAffixSymbol` as a modifier.
  */
 
-module.exports = modifier(mergeAffixSymbol);
+module.exports = modifyChildren(mergeAffixSymbol);
 
-},{"../expressions":4,"../modifier":5,"nlcst-to-string":2}],14:[function(require,module,exports){
+},{"../expressions":5,"nlcst-to-string":3,"unist-util-modify-children":25}],13:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:merge-final-word-symbol
+ * @fileoverview Merge certain symbols into their preceding word.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var nlcstToString,
-    modifier;
-
-nlcstToString = require('nlcst-to-string');
-modifier = require('../modifier');
+var nlcstToString = require('nlcst-to-string');
+var modifyChildren = require('unist-util-modify-children');
 
 /**
  * Merge certain punctuation marks into their
  * preceding words.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTSentenceNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTSentenceNode} parent - Parent of `child`.
  * @return {undefined|number}
  */
 function mergeFinalWordSymbol(child, index, parent) {
-    var children,
-        prev,
-        next;
+    var children;
+    var prev;
+    var next;
 
     if (
         index !== 0 &&
@@ -1970,22 +2007,30 @@ function mergeFinalWordSymbol(child, index, parent) {
  * Expose `mergeFinalWordSymbol` as a modifier.
  */
 
-module.exports = modifier(mergeFinalWordSymbol);
+module.exports = modifyChildren(mergeFinalWordSymbol);
 
-},{"../modifier":5,"nlcst-to-string":2}],15:[function(require,module,exports){
+},{"nlcst-to-string":3,"unist-util-modify-children":25}],14:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:merge-initial-lower-case-letter-sentences
+ * @fileoverview Merge a sentence into its previous
+ *   sentence, when the sentence starts with a lower case
+ *   letter.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var nlcstToString,
-    modifier,
-    expressions;
-
-nlcstToString = require('nlcst-to-string');
-modifier = require('../modifier');
-expressions = require('../expressions');
+var nlcstToString = require('nlcst-to-string');
+var modifyChildren = require('unist-util-modify-children');
+var expressions = require('../expressions');
 
 /*
  * Constants.
@@ -1993,27 +2038,23 @@ expressions = require('../expressions');
  * - Initial lowercase letter.
  */
 
-var EXPRESSION_LOWER_INITIAL;
-
-EXPRESSION_LOWER_INITIAL = expressions.lowerInitial;
+var EXPRESSION_LOWER_INITIAL = expressions.lowerInitial;
 
 /**
  * Merge a sentence into its previous sentence, when
  * the sentence starts with a lower case letter.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTParagraphNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTParagraphNode} parent - Parent of `child`.
  * @return {undefined|number}
  */
 function mergeInitialLowerCaseLetterSentences(child, index, parent) {
-    var siblings,
-        children,
-        position,
-        node,
-        prev;
-
-    children = child.children;
+    var children = child.children;
+    var position;
+    var node;
+    var siblings;
+    var prev;
 
     if (
         children &&
@@ -2068,33 +2109,40 @@ function mergeInitialLowerCaseLetterSentences(child, index, parent) {
  * Expose `mergeInitialLowerCaseLetterSentences` as a modifier.
  */
 
-module.exports = modifier(mergeInitialLowerCaseLetterSentences);
+module.exports = modifyChildren(mergeInitialLowerCaseLetterSentences);
 
-},{"../expressions":4,"../modifier":5,"nlcst-to-string":2}],16:[function(require,module,exports){
+},{"../expressions":5,"nlcst-to-string":3,"unist-util-modify-children":25}],15:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:merge-initial-word-symbol
+ * @fileoverview Merge certain symbols into their next word.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var nlcstToString,
-    modifier;
-
-nlcstToString = require('nlcst-to-string');
-modifier = require('../modifier');
+var nlcstToString = require('nlcst-to-string');
+var modifyChildren = require('unist-util-modify-children');
 
 /**
  * Merge certain punctuation marks into their
  * following words.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTSentenceNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTSentenceNode} parent - Parent of `child`.
  * @return {undefined|number}
  */
 function mergeInitialWordSymbol(child, index, parent) {
-    var children,
-        next;
+    var children;
+    var next;
 
     if (
         (
@@ -2162,22 +2210,28 @@ function mergeInitialWordSymbol(child, index, parent) {
  * Expose `mergeInitialWordSymbol` as a modifier.
  */
 
-module.exports = modifier(mergeInitialWordSymbol);
+module.exports = modifyChildren(mergeInitialWordSymbol);
 
-},{"../modifier":5,"nlcst-to-string":2}],17:[function(require,module,exports){
+},{"nlcst-to-string":3,"unist-util-modify-children":25}],16:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:merge-initialisms
+ * @fileoverview Merge initialisms.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var nlcstToString,
-    modifier,
-    expressions;
-
-nlcstToString = require('nlcst-to-string');
-modifier = require('../modifier');
-expressions = require('../expressions');
+var nlcstToString = require('nlcst-to-string');
+var modifyChildren = require('unist-util-modify-children');
+var expressions = require('../expressions');
 
 /*
  * Constants.
@@ -2185,27 +2239,25 @@ expressions = require('../expressions');
  * - Numbers.
  */
 
-var EXPRESSION_NUMERICAL;
-
-EXPRESSION_NUMERICAL = expressions.numerical;
+var EXPRESSION_NUMERICAL = expressions.numerical;
 
 /**
  * Merge initialisms.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTSentenceNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTSentenceNode} parent - Parent of `child`.
  * @return {undefined|number}
  */
 function mergeInitialisms(child, index, parent) {
-    var siblings,
-        prev,
-        children,
-        length,
-        position,
-        otherChild,
-        isAllDigits,
-        value;
+    var siblings;
+    var prev;
+    var children;
+    var length;
+    var position;
+    var otherChild;
+    var isAllDigits;
+    var value;
 
     if (
         index !== 0 &&
@@ -2290,22 +2342,29 @@ function mergeInitialisms(child, index, parent) {
  * Expose `mergeInitialisms` as a modifier.
  */
 
-module.exports = modifier(mergeInitialisms);
+module.exports = modifyChildren(mergeInitialisms);
 
-},{"../expressions":4,"../modifier":5,"nlcst-to-string":2}],18:[function(require,module,exports){
+},{"../expressions":5,"nlcst-to-string":3,"unist-util-modify-children":25}],17:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:merge-inner-word-symbol
+ * @fileoverview Merge words joined by certain punctuation
+ *   marks.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var nlcstToString,
-    modifier,
-    expressions;
-
-nlcstToString = require('nlcst-to-string');
-modifier = require('../modifier');
-expressions = require('../expressions');
+var nlcstToString = require('nlcst-to-string');
+var modifyChildren = require('unist-util-modify-children');
+var expressions = require('../expressions');
 
 /*
  * Constants.
@@ -2313,26 +2372,24 @@ expressions = require('../expressions');
  * - Symbols part of surrounding words.
  */
 
-var EXPRESSION_INNER_WORD_SYMBOL;
-
-EXPRESSION_INNER_WORD_SYMBOL = expressions.wordSymbolInner;
+var EXPRESSION_INNER_WORD_SYMBOL = expressions.wordSymbolInner;
 
 /**
- * Merge two words surrounding certain punctuation marks.
+ * Merge words joined by certain punctuation marks.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTSentenceNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTSentenceNode} parent - Parent of `child`.
  * @return {undefined|number}
  */
 function mergeInnerWordSymbol(child, index, parent) {
-    var siblings,
-        sibling,
-        prev,
-        last,
-        position,
-        tokens,
-        queue;
+    var siblings;
+    var sibling;
+    var prev;
+    var last;
+    var position;
+    var tokens;
+    var queue;
 
     if (
         index !== 0 &&
@@ -2429,36 +2486,43 @@ function mergeInnerWordSymbol(child, index, parent) {
  * Expose `mergeInnerWordSymbol` as a modifier.
  */
 
-module.exports = modifier(mergeInnerWordSymbol);
+module.exports = modifyChildren(mergeInnerWordSymbol);
 
-},{"../expressions":4,"../modifier":5,"nlcst-to-string":2}],19:[function(require,module,exports){
+},{"../expressions":5,"nlcst-to-string":3,"unist-util-modify-children":25}],18:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:merge-non-word-sentences
+ * @fileoverview Merge a sentence into the following
+ *   sentence, when the sentence does not contain word
+ *   tokens.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var modifier;
-
-modifier = require('../modifier');
+var modifyChildren = require('unist-util-modify-children');
 
 /**
  * Merge a sentence into the following sentence, when
  * the sentence does not contain word tokens.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTParagraphNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTParagraphNode} parent - Parent of `child`.
  * @return {undefined|number}
  */
 function mergeNonWordSentences(child, index, parent) {
-    var children,
-        position,
-        prev,
-        next;
-
-    children = child.children;
-    position = -1;
+    var children = child.children;
+    var position = -1;
+    var prev;
+    var next;
 
     while (children[++position]) {
         if (children[position].type === 'WordNode') {
@@ -2519,20 +2583,28 @@ function mergeNonWordSentences(child, index, parent) {
  * Expose `mergeNonWordSentences` as a modifier.
  */
 
-module.exports = modifier(mergeNonWordSentences);
+module.exports = modifyChildren(mergeNonWordSentences);
 
-},{"../modifier":5}],20:[function(require,module,exports){
+},{"unist-util-modify-children":25}],19:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:merge-prefix-exceptions
+ * @fileoverview Merge a sentence into its next sentence,
+ *   when the sentence ends with a certain word.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var nlcstToString,
-    modifier;
-
-nlcstToString = require('nlcst-to-string');
-modifier = require('../modifier');
+var nlcstToString = require('nlcst-to-string');
+var modifyChildren = require('unist-util-modify-children');
 
 /*
  * Constants.
@@ -2542,9 +2614,7 @@ modifier = require('../modifier');
  *   case-insensitive abbreviation.
  */
 
-var EXPRESSION_ABBREVIATION_PREFIX;
-
-EXPRESSION_ABBREVIATION_PREFIX = new RegExp(
+var EXPRESSION_ABBREVIATION_PREFIX = new RegExp(
     '^(' +
         '[0-9]+|' +
         '[a-z]|' +
@@ -2570,17 +2640,15 @@ EXPRESSION_ABBREVIATION_PREFIX = new RegExp(
  * Merge a sentence into its next sentence, when the
  * sentence ends with a certain word.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTParagraphNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTParagraphNode} parent - Parent of `child`.
  * @return {undefined|number}
  */
 function mergePrefixExceptions(child, index, parent) {
-    var children,
-        node,
-        next;
-
-    children = child.children;
+    var children = child.children;
+    var node;
+    var next;
 
     if (
         children &&
@@ -2630,22 +2698,29 @@ function mergePrefixExceptions(child, index, parent) {
  * Expose `mergePrefixExceptions` as a modifier.
  */
 
-module.exports = modifier(mergePrefixExceptions);
+module.exports = modifyChildren(mergePrefixExceptions);
 
-},{"../modifier":5,"nlcst-to-string":2}],21:[function(require,module,exports){
+},{"nlcst-to-string":3,"unist-util-modify-children":25}],20:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:merge-remaining-full-stops
+ * @fileoverview Merge non-terminal-marker full stops into
+ *   previous or next adjacent words.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var nlcstToString,
-    plugin,
-    expressions;
-
-nlcstToString = require('nlcst-to-string');
-plugin = require('../plugin');
-expressions = require('../expressions');
+var nlcstToString = require('nlcst-to-string');
+var visitChildren = require('unist-util-visit-children');
+var expressions = require('../expressions');
 
 /*
  * Constants.
@@ -2655,30 +2730,23 @@ expressions = require('../expressions');
  *   case-insensitive abbreviation.
  */
 
-var EXPRESSION_TERMINAL_MARKER;
-
-EXPRESSION_TERMINAL_MARKER = expressions.terminalMarker;
+var EXPRESSION_TERMINAL_MARKER = expressions.terminalMarker;
 
 /**
  * Merge non-terminal-marker full stops into
  * the previous word (if available), or the next
  * word (if available).
  *
- * @param {NLCSTNode} child
+ * @param {NLCSTNode} child - Node.
  */
 function mergeRemainingFullStops(child) {
-    var children,
-        position,
-        grandchild,
-        prev,
-        next,
-        nextNext,
-        hasFoundDelimiter;
-
-    children = child.children;
-    position = children.length;
-
-    hasFoundDelimiter = false;
+    var children = child.children;
+    var position = children.length;
+    var hasFoundDelimiter = false;
+    var grandchild;
+    var prev;
+    var next;
+    var nextNext;
 
     while (children[--position]) {
         grandchild = children[position];
@@ -2796,16 +2864,26 @@ function mergeRemainingFullStops(child) {
  * Expose `mergeRemainingFullStops` as a plugin.
  */
 
-module.exports = plugin(mergeRemainingFullStops);
+module.exports = visitChildren(mergeRemainingFullStops);
 
-},{"../expressions":4,"../plugin":8,"nlcst-to-string":2}],22:[function(require,module,exports){
+},{"../expressions":5,"nlcst-to-string":3,"unist-util-visit-children":26}],21:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:merge-words
+ * @fileoverview Merge adjacent words.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var modifier = require('../modifier');
+var modifyChildren = require('unist-util-modify-children');
 
 /**
  * Merge multiple words. This merges the children of
@@ -2813,14 +2891,14 @@ var modifier = require('../modifier');
  * naturally by parse-latin, but might happen when
  * custom tokens were passed in.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTSentenceNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTSentenceNode} parent - Parent of `child`.
  * @return {undefined|number}
  */
 function mergeFinalWordSymbol(child, index, parent) {
-    var siblings = parent.children,
-        next;
+    var siblings = parent.children;
+    var next;
 
     if (child.type === 'WordNode') {
         next = siblings[index + 1];
@@ -2860,16 +2938,27 @@ function mergeFinalWordSymbol(child, index, parent) {
  * Expose `mergeFinalWordSymbol` as a modifier.
  */
 
-module.exports = modifier(mergeFinalWordSymbol);
+module.exports = modifyChildren(mergeFinalWordSymbol);
 
-},{"../modifier":5}],23:[function(require,module,exports){
+},{"unist-util-modify-children":25}],22:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:patch-position
+ * @fileoverview Patch `position` on a parent node based
+ *   on its first and last child.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var plugin = require('../plugin');
+var visitChildren = require('unist-util-visit-children');
 
 /**
  * Add a `position` object when it does not yet exist
@@ -2887,7 +2976,7 @@ function patch(node) {
  * Patch the position on a parent node based on its first
  * and last child.
  *
- * @param {NLCSTNode} child
+ * @param {NLCSTNode} child - Node.
  */
 function patchPosition(child, index, node) {
     var siblings = node.children;
@@ -2917,25 +3006,33 @@ function patchPosition(child, index, node) {
  * Expose `patchPosition` as a plugin.
  */
 
-module.exports = plugin(patchPosition);
+module.exports = visitChildren(patchPosition);
 
-},{"../plugin":8}],24:[function(require,module,exports){
+},{"unist-util-visit-children":26}],23:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:plugin:remove-empty-nodes
+ * @fileoverview Remove empty child nodes without children.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var modifier;
-
-modifier = require('../modifier');
+var modifyChildren = require('unist-util-modify-children');
 
 /**
  * Remove empty children.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTParagraphNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTParagraphNode} parent - Parent of `child`.
  * @return {undefined|number}
  */
 function removeEmptyNodes(child, index, parent) {
@@ -2956,54 +3053,56 @@ function removeEmptyNodes(child, index, parent) {
  * Expose `removeEmptyNodes` as a modifier.
  */
 
-module.exports = modifier(removeEmptyNodes);
+module.exports = modifyChildren(removeEmptyNodes);
 
-},{"../modifier":5}],25:[function(require,module,exports){
+},{"unist-util-modify-children":25}],24:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-latin:tokenizer
+ * @fileoverview Tokenize tokens matching an expression as
+ *   a given node-type.
+ */
+
 'use strict';
 
-var nlcstToString;
+/* eslint-env commonjs */
 
-nlcstToString = require('nlcst-to-string');
+/*
+ * Dependencies.
+ */
+
+var nlcstToString = require('nlcst-to-string');
 
 /**
  * Factory to create a tokenizer based on a given
  * `expression`.
  *
- * @param {string} childType
- * @param {RegExp} expression
+ * @param {string} childType - Type of child to tokenize
+ *   as.
+ * @param {RegExp} expression - Expression to use for
+ *   tokenization.
  * @return {function(NLCSTParent): Array.<NLCSTChild>}
  */
 function tokenizerFactory(childType, expression) {
     /**
      * A function which splits
      *
-     * @param {NLCSTParent} node
+     * @param {NLCSTParent} node - Parent node.
      * @return {Array.<NLCSTChild>}
      */
     return function (node) {
-        var children,
-            tokens,
-            type,
-            length,
-            index,
-            lastIndex,
-            start,
-            parent,
-            first,
-            last;
-
-        children = [];
-
-        tokens = node.children;
-        type = node.type;
-
-        length = tokens.length;
-
-        index = -1;
-
-        lastIndex = length - 1;
-
-        start = 0;
+        var children = [];
+        var tokens = node.children;
+        var type = node.type;
+        var length = tokens.length;
+        var index = -1;
+        var lastIndex = length - 1;
+        var start = 0;
+        var first;
+        var last;
+        var parent;
 
         while (++index < length) {
             if (
@@ -3038,94 +3137,157 @@ function tokenizerFactory(childType, expression) {
     };
 }
 
+/*
+ * Expose.
+ */
+
 module.exports = tokenizerFactory;
 
-},{"nlcst-to-string":2}],26:[function(require,module,exports){
+},{"nlcst-to-string":3}],25:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2015 Titus Wormer
+ * @license MIT
+ * @module unist:util:modify-children
+ * @fileoverview Unist utility to modify direct children of a parent.
+ */
+
 'use strict';
 
-/**
- * Cache `hasOwnProperty`.
+/* eslint-env commonjs */
+
+/*
+ * Dependencies.
  */
 
-var has;
-
-has = Object.prototype.hasOwnProperty;
+var iterate = require('array-iterate');
 
 /**
- * `Array#forEach()` with the possibility to change
- * the next position.
+ * Modifier for children of `parent`.
  *
- * @param {{length: number}} values
- * @param {function(*, number, {length: number}): number|undefined} callback
- * @param {*} context
+ * @typedef modifyChildren~callback
+ * @param {Node} child - Current iteration;
+ * @param {number} index - Position of `child` in `parent`;
+ * @param {Node} parent - Parent node of `child`.
+ * @return {number?} - Next position to iterate.
  */
 
-function iterate(values, callback, context) {
-    var index,
-        result;
+/**
+ * Function invoking a bound `fn` for each child of `parent`.
+ *
+ * @typedef modifyChildren~modifier
+ * @param {Node} parent - Node with children.
+ * @throws {Error} - When not given a parent node.
+ */
 
-    if (!values) {
-        throw new Error(
-            'TypeError: Iterate requires that |this| ' +
-            'not be ' + values
-        );
-    }
-
-    if (!has.call(values, 'length')) {
-        throw new Error(
-            'TypeError: Iterate requires that |this| ' +
-            'has a `length`'
-        );
-    }
-
-    if (typeof callback !== 'function') {
-        throw new Error(
-            'TypeError: callback must be a function'
-        );
-    }
-
-    index = -1;
-
-    /**
-     * The length might change, so we do not cache it.
-     */
-
-    while (++index < values.length) {
-        /**
-         * Skip missing values.
-         */
-
-        if (!(index in values)) {
-            continue;
-        }
-
-        result = callback.call(context, values[index], index, values);
-
-        /**
-         * If `callback` returns a `number`, move `index` over to
-         * `number`.
-         */
-
-        if (typeof result === 'number') {
-            /**
-             * Make sure that negative numbers do not
-             * break the loop.
-             */
-
-            if (result < 0) {
-                index = 0;
-            }
-
-            index = result - 1;
-        }
-    }
+/**
+ * Pass the context as the third argument to `callback`.
+ *
+ * @param {modifyChildren~callback} callback - Function to wrap.
+ * @return {function(Node, number): number?} - Intermediate
+ *   version partially aplied version of
+ *   `modifyChildren~modifier`.
+ */
+function wrapperFactory(callback) {
+    return function (value, index) {
+        return callback(value, index, this);
+    };
 }
 
 /**
- * Expose `iterate`.
+ * Turns `callback` into a ``iterator'' accepting a parent.
+ *
+ * see ``array-iterate'' for more info.
+ *
+ * @param {modifyChildren~callback} callback - Function to wrap.
+ * @return {modifyChildren~modifier}
+ */
+function iteratorFactory(callback) {
+    return function (parent) {
+        var children = parent && parent.children;
+
+        if (!children) {
+            throw new Error('Missing children in `parent` for `modifier`');
+        }
+
+        return iterate(children, callback, parent);
+    };
+}
+
+/**
+ * Turns `callback` into a child-modifier accepting a parent.
+ *
+ * See `array-iterate` for more info.
+ *
+ * @param {modifyChildren~callback} callback - Function to wrap.
+ * @return {modifyChildren~modifier} - Wrapped `fn`.
+ */
+function modifierFactory(callback) {
+    return iteratorFactory(wrapperFactory(callback));
+}
+
+/*
+ * Expose.
  */
 
-module.exports = iterate;
+module.exports = modifierFactory;
+
+},{"array-iterate":2}],26:[function(require,module,exports){
+/**
+ * @author Titus Wormer
+ * @copyright 2015 Titus Wormer
+ * @license MIT
+ * @module unist:util:visit-children
+ * @fileoverview Unist utility to visit direct children of a parent.
+ */
+
+'use strict';
+
+/* eslint-env commonjs */
+
+/**
+ * Visitor for children of `parent`.
+ *
+ * @typedef visitChildren~callback
+ * @param {Node} child - Current iteration;
+ * @param {number} index - Position of `child` in `parent`;
+ * @param {Node} parent - Parent node of `child`.
+ */
+
+/**
+ * Function invoking a bound `fn` for each child of `parent`.
+ *
+ * @typedef visitChildren~visitor
+ * @param {Node} parent - Node with children.
+ * @throws {Error} - When not given a parent node.
+ */
+
+/**
+ * Turns `callback` into a child-visitor accepting a parent.
+ *
+ * @param {visitChildren~callback} callback - Function to wrap.
+ * @return {visitChildren~visitor} - Wrapped `fn`.
+ */
+function visitorFactory(callback) {
+    return function (parent) {
+        var index = -1;
+        var children = parent && parent.children;
+
+        if (!children) {
+            throw new Error('Missing children in `parent` for `visitor`');
+        }
+
+        while (++index in children) {
+            callback(children[index], index, parent);
+        }
+    };
+}
+
+/*
+ * Expose.
+ */
+
+module.exports = visitorFactory;
 
 },{}]},{},[1])(1)
 });

@@ -11,8 +11,11 @@
     "parser"
   ],
   "dependencies": {
-    "wooorm/nlcst-to-string": "^0.1.0",
-    "wooorm/parse-latin": "^0.5.1"
+    "wooorm/array-iterate": "^1.0.0",
+    "wooorm/nlcst-to-string": "^1.0.0",
+    "wooorm/parse-latin": "^1.0.0",
+    "wooorm/unist-util-modify-children": "^1.0.0",
+    "wooorm/unist-util-visit-children": "^1.0.0"
   },
   "repository": "wooorm/parse-english",
   "scripts": [

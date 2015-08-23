@@ -1,28 +1,36 @@
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-english:test
+ * @fileoverview Test suite for `parse-english`.
+ */
+
 'use strict';
 
-/* eslint-env mocha */
+/* eslint-env node, mocha */
 
 /*
  * Dependencies.
  */
 
-var ParseEnglish,
-    assert,
-    nlcstTest;
+var assert = require('assert');
+var nlcstTest = require('nlcst-test');
+var ParseEnglish = require('..');
 
-ParseEnglish = require('..');
-assert = require('assert');
-nlcstTest = require('nlcst-test');
+/*
+ * Methods.
+ */
+
+var deepEqual = assert.deepEqual;
 
 /*
  * `ParseEnglish`.
  */
 
-var english,
-    englishPosition;
+var english = new ParseEnglish();
 
-english = new ParseEnglish();
-englishPosition = new ParseEnglish({
+var englishPosition = new ParseEnglish({
     'position': true
 });
 
@@ -34,11 +42,9 @@ englishPosition = new ParseEnglish({
  *   information.
  */
 function clean(object) {
-    var key,
-        clone,
-        value;
-
-    clone = 'length' in object ? [] : {};
+    var clone = 'length' in object ? [] : {};
+    var key;
+    var value;
 
     for (key in object) {
         value = object[key];
@@ -61,20 +67,15 @@ function clean(object) {
  * @param {string} document - Source to validate.
  */
 function describeFixture(name, document, method) {
-    var nlcstA,
-        nlcstB,
-        fixture;
-
-    nlcstA = english[method || 'parse'](document);
-    nlcstB = englishPosition[method || 'parse'](document);
+    var nlcstA = english[method || 'parse'](document);
+    var nlcstB = englishPosition[method || 'parse'](document);
+    var fixture = require('./fixture/' + name);
 
     nlcstTest(nlcstA);
     nlcstTest(nlcstB);
 
-    fixture = require('./fixture/' + name);
-
-    assert.deepEqual(nlcstA, clean(fixture));
-    assert.deepEqual(nlcstB, fixture);
+    deepEqual(nlcstA, clean(fixture));
+    deepEqual(nlcstB, fixture);
 }
 
 /*

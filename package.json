@@ -11,44 +11,49 @@
     "parser"
   ],
   "dependencies": {
-    "nlcst-to-string": "^0.1.0",
-    "parse-latin": "^0.5.1"
+    "array-iterate": "^1.0.0",
+    "nlcst-to-string": "^1.0.0",
+    "parse-latin": "^1.0.0",
+    "unist-util-modify-children": "^1.0.0",
+    "unist-util-visit-children": "^1.0.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wooorm/parse-english.git"
-  },
+  "repository": "wooorm/parse-english",
   "author": "Titus Wormer <tituswormer@gmail.com>",
   "files": [
     "index.js"
   ],
   "devDependencies": {
-    "browserify": "^8.0.0",
-    "eslint": "^0.12.0",
+    "browserify": "^11.0.0",
+    "chalk": "^1.0.0",
+    "eslint": "^1.0.0",
     "esmangle": "^1.0.0",
     "istanbul": "^0.3.0",
-    "jscs": "^1.0.0",
-    "jscs-jsdoc": "^0.4.0",
-    "matcha": "^0.6.0",
+    "jscs": "^2.0.0",
+    "jscs-jsdoc": "^1.0.0",
+    "mdast": "^1.1.0",
+    "mdast-comment-config": "^1.0.0",
+    "mdast-github": "^1.0.0",
+    "mdast-lint": "^1.0.0",
+    "mdast-slug": "^1.0.0",
+    "mdast-validate-links": "^1.0.0",
     "mocha": "^2.0.0",
-    "nlcst-test": "^0.2.0"
+    "nlcst-test": "^0.2.0",
+    "regenerate": "^1.0.0",
+    "unicode-8.0.0": "^0.1.0"
   },
   "scripts": {
-    "test-api": "_mocha --check-leaks test/index.js",
-    "test-coveralls": "istanbul cover _mocha --report lcovonly -- --check-leaks test/index.js",
+    "test-api": "mocha --check-leaks test/index.js",
     "test-coverage": "istanbul cover _mocha -- test/index.js",
-    "test-travis": "npm run test-coveralls",
+    "test-travis": "npm run test-coverage",
     "test": "npm run test-api",
-    "lint-api": "eslint --rule consistent-return:false index.js",
-    "lint-test": "eslint --env mocha test/index.js",
-    "lint-benchmark": "eslint --global suite,set,bench benchmark.js",
-    "lint-script": "eslint script/generate-fixture.js",
-    "lint-style": "jscs --reporter inline index.js benchmark.js script/generate-fixture.js test/index.js",
-    "lint": "npm run lint-api && npm run lint-script && npm run lint-test && npm run lint-benchmark && npm run lint-style",
+    "lint-api": "eslint .",
+    "lint-style": "jscs --reporter inline .",
+    "lint": "npm run lint-api && npm run lint-style",
     "make": "npm run lint && npm run test-coverage",
     "fixture": "node script/generate-fixture",
-    "build": "browserify index.js -s ParseEnglish > parse-english.js",
-    "postbuild": "esmangle parse-english.js > parse-english.min.js",
-    "benchmark": "matcha benchmark.js"
+    "bundle": "browserify index.js -s ParseEnglish > parse-english.js",
+    "postbundle": "esmangle parse-english.js > parse-english.min.js",
+    "build-md": "mdast . --quiet",
+    "build": "npm run build-md && npm run bundle"
   }
 }

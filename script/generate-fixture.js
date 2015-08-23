@@ -1,22 +1,29 @@
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-english:script:generate-fixture
+ * @fileoverview Generate fixtures for `parse-english`.
+ */
+
 'use strict';
+
+/* eslint-env node */
+
+/* eslint-disable no-console */
 
 /*
  * Dependencies.
  */
 
-var ParseEnglish,
-    fs;
-
-ParseEnglish = require('../');
-fs = require('fs');
+var fs = require('fs');
+var ParseEnglish = require('..');
 
 /*
  * `ParseEnglish`.
  */
 
-var english;
-
-english = new ParseEnglish({
+var english = new ParseEnglish({
     'position': true
 });
 
@@ -24,24 +31,21 @@ english = new ParseEnglish({
  * Exit with info on too-few parameters.
  */
 
-var parameters,
-    filepath,
-    nlcst;
-
-parameters = process.argv.splice(2);
+var parameters = process.argv.splice(2);
 
 if (parameters.length < 2) {
     console.log('Usage:');
     console.log('  npm run fixture name document [method]');
-} else {
-    filepath = 'test/fixture/' + parameters[0] + '.json';
-    nlcst = english[parameters[2] || 'parse'](parameters[1]);
-
-    /*
-     * Write fixture.
-     */
-
-    fs.writeFileSync(filepath, JSON.stringify(nlcst, 0, 2));
-
-    console.log('Wrote file to `' + filepath + '`');
+    return;
 }
+
+var filePath = 'test/fixture/' + parameters[0] + '.json';
+var nlcst = english[parameters[2] || 'parse'](parameters[1]);
+
+/*
+ * Write fixture.
+ */
+
+fs.writeFileSync(filePath, JSON.stringify(nlcst, 0, 2) + '\n');
+
+console.log('Wrote file to `' + filePath + '`');

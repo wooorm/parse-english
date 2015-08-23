@@ -1,24 +1,27 @@
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-english
+ * @fileoverview English (natural language) parser.
+ */
+
 'use strict';
+
+/* eslint-env commonjs */
 
 /*
  * Dependencies.
  */
 
-var Parser,
-    nlcstToString;
-
-Parser = require('parse-latin');
-nlcstToString = require('nlcst-to-string');
+var Parser = require('parse-latin');
+var nlcstToString = require('nlcst-to-string');
+var visitChildren = require('unist-util-visit-children');
+var modifyChildren = require('unist-util-modify-children');
 
 /*
  * Constants.
  */
-
-var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX,
-    EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE,
-    EXPRESSION_ELISION_ENGLISH_AFFIX,
-    EXPRESSION_ELISION_ENGLISH_PREFIX,
-    EXPRESSION_APOSTROPHE;
 
 /*
  * Match a blacklisted (case-insensitive) abbreviation
@@ -26,7 +29,7 @@ var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX,
  * a sentence terminal marker.
  */
 
-EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
+var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
     '^(' +
         /*
          * Business Abbreviations:
@@ -75,7 +78,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
  * a sentence terminal marker.
  */
 
-EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
+var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
     '^(' +
         /*
          * Social:
@@ -169,7 +172,7 @@ EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
  * an apostrophe depicts elision.
  */
 
-EXPRESSION_ELISION_ENGLISH_PREFIX = new RegExp(
+var EXPRESSION_ELISION_ENGLISH_PREFIX = new RegExp(
     '^(' +
         /*
          * Includes:
@@ -187,7 +190,7 @@ EXPRESSION_ELISION_ENGLISH_PREFIX = new RegExp(
  * an apostrophe depicts elision.
  */
 
-EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
+var EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
     '^(' +
         /*
          * Includes:
@@ -223,25 +226,23 @@ EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
  * Match one apostrophe.
  */
 
-EXPRESSION_APOSTROPHE = /^['\u2019]$/;
+var EXPRESSION_APOSTROPHE = /^['\u2019]$/;
 
 /**
  * Merge a sentence into its next sentence,
  * when the sentence ends with a certain word.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTParagraphNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTParagraphNode} parent - Parent of `child`.
  * @return {number?}
  */
 function mergeEnglishPrefixExceptions(child, index, parent) {
-    var children,
-        node,
-        prev,
-        next,
-        prevValue;
-
-    children = child.children;
+    var children = child.children;
+    var prev;
+    var node;
+    var prevValue;
+    var next;
 
     if (
         children &&
@@ -291,16 +292,16 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
  * Merge an apostrophe depicting elision into
  * its surrounding word.
  *
- * @param {NLCSTNode} child
- * @param {number} index
- * @param {NLCSTSentenceNode} parent
+ * @param {NLCSTNode} child - Node.
+ * @param {number} index - Position of `child` in `parent`.
+ * @param {NLCSTSentenceNode} parent - Parent of `child`.
  */
 function mergeEnglishElisionExceptions(child, index, parent) {
-    var siblings,
-        length,
-        node,
-        other,
-        value;
+    var siblings;
+    var length;
+    var value;
+    var node;
+    var other;
 
     if (
         child.type !== 'PunctuationNode' &&
@@ -478,14 +479,9 @@ function mergeEnglishElisionExceptions(child, index, parent) {
  *
  * @constructor {ParseEnglish}
  */
-function ParseEnglish() {
-    /*
-     * TODO: This should later be removed (when this change bubbles
-     * through to dependants)
-     */
-
+function ParseEnglish(options) {
     if (!(this instanceof ParseEnglish)) {
-        return new ParseEnglish();
+        return new ParseEnglish(options);
     }
 
     Parser.apply(this, arguments);
@@ -513,12 +509,12 @@ ParseEnglish.prototype = parserPrototype;
  */
 
 parserPrototype.tokenizeSentencePlugins =
-    [Parser.plugin(mergeEnglishElisionExceptions)].concat(
+    [visitChildren(mergeEnglishElisionExceptions)].concat(
         parserPrototype.tokenizeSentencePlugins
     );
 
 parserPrototype.tokenizeParagraphPlugins =
-    [Parser.modifier(mergeEnglishPrefixExceptions)].concat(
+    [modifyChildren(mergeEnglishPrefixExceptions)].concat(
         parserPrototype.tokenizeParagraphPlugins
     );
 
@@ -527,15 +523,3 @@ parserPrototype.tokenizeParagraphPlugins =
  */
 
 module.exports = ParseEnglish;
-
-/*
- * Expose `ParseLatin.modifier` on `ParseEnglish`.
- */
-
-ParseEnglish.modifier = Parser.modifier;
-
-/*
- * Expose `ParseLatin.plugin` on `ParseEnglish`.
- */
-
-ParseEnglish.plugin = Parser.plugin;

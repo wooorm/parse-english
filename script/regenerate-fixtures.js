@@ -1,25 +1,29 @@
 #!/usr/bin/env node
+/**
+ * @author Titus Wormer
+ * @copyright 2014-2015 Titus Wormer
+ * @license MIT
+ * @module parse-english:script:regenerate-fixtures
+ * @fileoverview Re-generate fixtures.
+ */
+
 'use strict';
+
+/* eslint-env node */
 
 /*
  * Dependencies.
  */
 
-var ParseEnglish,
-    fs,
-    nlcstToString;
-
-fs = require('fs');
-ParseEnglish = require('../');
-nlcstToString = require('nlcst-to-string');
+var fs = require('fs');
+var toString = require('nlcst-to-string');
+var ParseEnglish = require('..');
 
 /*
  * Parser.
  */
 
-var english;
-
-english = new ParseEnglish({
+var english = new ParseEnglish({
     'position': true
 });
 
@@ -30,22 +34,16 @@ english = new ParseEnglish({
 fs.readdirSync('test/fixture').filter(function (name) {
     return name.charAt(0) !== '.';
 }).forEach(function (name) {
-    var doc,
-        json,
-        fn,
-        nlcst;
-
-    doc = fs.readFileSync('test/fixture/' + name, 'utf8');
-
-    json = JSON.parse(doc);
-
-    fn = 'tokenize' + json.type.slice(0, json.type.indexOf('Node'));
+    var doc = fs.readFileSync('test/fixture/' + name, 'utf8');
+    var json = JSON.parse(doc);
+    var fn = 'tokenize' + json.type.slice(0, json.type.indexOf('Node'));
+    var nlcst;
 
     if (fn === 'tokenizeRoot') {
         fn = 'parse';
     }
 
-    nlcst = english[fn](nlcstToString(json));
+    nlcst = english[fn](toString(json));
 
-    fs.writeFileSync('test/fixture/' + name, JSON.stringify(nlcst, 0, 2));
+    fs.writeFileSync('test/fixture/' + name, JSON.stringify(nlcst, 0, 2) + '\n');
 });
