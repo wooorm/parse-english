@@ -23,9 +23,7 @@ var ParseEnglish = require('..');
  * `ParseEnglish`.
  */
 
-var english = new ParseEnglish({
-    'position': true
-});
+var english = new ParseEnglish();
 
 /*
  * Exit with info on too-few parameters.

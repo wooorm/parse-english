@@ -23,9 +23,7 @@ var ParseEnglish = require('..');
  * Parser.
  */
 
-var english = new ParseEnglish({
-    'position': true
-});
+var english = new ParseEnglish();
 
 /*
  * Find fixtures.

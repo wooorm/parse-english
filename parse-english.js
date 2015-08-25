@@ -480,9 +480,9 @@ function mergeEnglishElisionExceptions(child, index, parent) {
  *
  * @constructor {ParseEnglish}
  */
-function ParseEnglish(options) {
+function ParseEnglish(file, options) {
     if (!(this instanceof ParseEnglish)) {
-        return new ParseEnglish(options);
+        return new ParseEnglish(file, options);
     }
 
     Parser.apply(this, arguments);

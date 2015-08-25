@@ -13,7 +13,7 @@
   "dependencies": {
     "wooorm/array-iterate": "^1.0.0",
     "wooorm/nlcst-to-string": "^1.0.0",
-    "wooorm/parse-latin": "^1.0.0",
+    "wooorm/parse-latin": "^2.0.0",
     "wooorm/unist-util-modify-children": "^1.0.0",
     "wooorm/unist-util-visit-children": "^1.0.0"
   },
