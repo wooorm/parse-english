@@ -30,8 +30,8 @@ var deepEqual = assert.deepEqual;
 
 var english = new ParseEnglish();
 
-var englishPosition = new ParseEnglish({
-    'position': true
+var englishNoPosition = new ParseEnglish({
+    'position': false
 });
 
 /**
@@ -68,14 +68,14 @@ function clean(object) {
  */
 function describeFixture(name, document, method) {
     var nlcstA = english[method || 'parse'](document);
-    var nlcstB = englishPosition[method || 'parse'](document);
+    var nlcstB = englishNoPosition[method || 'parse'](document);
     var fixture = require('./fixture/' + name);
 
     nlcstTest(nlcstA);
     nlcstTest(nlcstB);
 
-    deepEqual(nlcstA, clean(fixture));
-    deepEqual(nlcstB, fixture);
+    deepEqual(nlcstA, fixture);
+    deepEqual(nlcstB, clean(fixture));
 }
 
 /*

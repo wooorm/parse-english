@@ -1076,19 +1076,28 @@ function noopEat() {
  * Transform Latin-script natural language into
  * an NLCST-tree.
  *
+ * @param {VFile?} file - Virtual file.
+ * @param {Object?} options - Configuration.
  * @constructor {ParseLatin}
  */
-function ParseLatin(options) {
-    /*
-     * TODO: This should later be removed (when this
-     * change bubbles through to dependants).
-     */
+function ParseLatin(file, options) {
+    var position;
 
     if (!(this instanceof ParseLatin)) {
-        return new ParseLatin(options);
+        return new ParseLatin(file, options);
     }
 
-    this.position = Boolean(options && options.position);
+    if (file && file.message) {
+        this.file = file;
+    } else {
+        options = file;
+    }
+
+    position = options && options.position;
+
+    if (position !== null && position !== undefined) {
+        this.position = Boolean(position);
+    }
 }
 
 /*
@@ -1096,6 +1105,12 @@ function ParseLatin(options) {
  */
 
 var parseLatinPrototype = ParseLatin.prototype;
+
+/*
+ * Default position.
+ */
+
+parseLatinPrototype.position = true;
 
 /*
  * == TOKENIZE ===============================================================
@@ -1417,12 +1432,15 @@ pluggable(ParseLatin, 'tokenizeRoot', createParser({
 }));
 
 /**
- * Easy access to the document parser.
+ * Easy access to the document parser. This additionally
+ * supports retext-style invocation: where an instance is
+ * created for each file, and the file is given on
+ * instanciation.
  *
  * @see ParseLatin#tokenizeRoot
  */
 parseLatinPrototype.parse = function (value) {
-    return this.tokenizeRoot(value);
+    return this.tokenizeRoot(this.file ? this.file.toString() : value);
 };
 
 /*
