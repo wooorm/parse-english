@@ -34,16 +34,15 @@ var parameters = process.argv.splice(2);
 if (parameters.length < 2) {
     console.log('Usage:');
     console.log('  npm run fixture name document [method]');
-    return;
+} else {
+    var filePath = 'test/fixture/' + parameters[0] + '.json';
+    var nlcst = english[parameters[2] || 'parse'](parameters[1]);
+
+    /*
+     * Write fixture.
+     */
+
+    fs.writeFileSync(filePath, JSON.stringify(nlcst, 0, 2) + '\n');
+
+    console.log('Wrote file to `' + filePath + '`');
 }
-
-var filePath = 'test/fixture/' + parameters[0] + '.json';
-var nlcst = english[parameters[2] || 'parse'](parameters[1]);
-
-/*
- * Write fixture.
- */
-
-fs.writeFileSync(filePath, JSON.stringify(nlcst, 0, 2) + '\n');
-
-console.log('Wrote file to `' + filePath + '`');

@@ -1,7 +1,7 @@
 {
   "name": "parse-english",
-  "version": "2.0.0",
-  "description": "English (natural language) parser",
+  "version": "3.1.0",
+  "description": "English natural language parser",
   "license": "MIT",
   "keywords": [
     "nlcst",
@@ -10,50 +10,53 @@
     "language",
     "parser"
   ],
-  "dependencies": {
-    "array-iterate": "^1.0.0",
-    "nlcst-to-string": "^1.0.0",
-    "parse-latin": "^2.0.0",
-    "unist-util-modify-children": "^1.0.0",
-    "unist-util-visit-children": "^1.0.0"
-  },
-  "repository": "wooorm/parse-english",
-  "author": "Titus Wormer <tituswormer@gmail.com>",
   "files": [
     "index.js"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wooorm/parse-english.git"
+  },
+  "bugs": "https://github.com/wooorm/parse-english/issues",
+  "author": "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)",
+  "contributors": [
+    "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)"
+  ],
+  "dependencies": {
+    "nlcst-to-string": "^2.0.0",
+    "parse-latin": "^3.1.0",
+    "unist-util-modify-children": "^1.0.0",
+    "unist-util-visit-children": "^1.0.0"
+  },
   "devDependencies": {
-    "browserify": "^12.0.0",
-    "chalk": "^1.0.0",
-    "eslint": "^1.0.0",
-    "esmangle": "^1.0.0",
+    "browserify": "^13.0.1",
+    "bundle-collapser": "^1.2.1",
+    "eslint": "^2.0.0",
+    "esmangle": "^1.0.1",
     "istanbul": "^0.4.0",
-    "jscs": "^2.0.0",
-    "jscs-jsdoc": "^1.0.0",
-    "remark": "^3.0.0",
-    "remark-comment-config": "^2.0.0",
-    "remark-github": "^2.0.0",
-    "remark-lint": "^2.0.0",
-    "remark-slug": "^3.0.0",
-    "remark-validate-links": "^2.0.0",
-    "mocha": "^2.0.0",
-    "nlcst-test": "^0.2.0",
-    "regenerate": "^1.0.0",
-    "unicode-8.0.0": "^0.1.0"
+    "jscs": "^3.0.0",
+    "jscs-jsdoc": "^2.0.0",
+    "nlcst-test": "^0.2.1",
+    "remark-cli": "^1.0.0",
+    "remark-comment-config": "^4.0.0",
+    "remark-github": "^5.0.0",
+    "remark-lint": "^4.0.0",
+    "remark-usage": "^4.0.0",
+    "remark-validate-links": "^4.0.0",
+    "tape": "^4.0.0",
+    "unist-util-inspect": "^4.0.0",
+    "vfile": "^1.4.0"
   },
   "scripts": {
-    "test-api": "mocha --check-leaks test/index.js",
-    "test-coverage": "istanbul cover _mocha -- test/index.js",
-    "test-travis": "npm run test-coverage",
-    "test": "npm run test-api",
+    "build-md": "remark . --quiet --frail",
+    "build-bundle": "browserify index.js -p bundle-collapser/plugin --bare -s ParseEnglish > parse-english.js",
+    "build-mangle": "esmangle parse-english.js > parse-english.min.js",
+    "build": "npm run build-md && npm run build-bundle && npm run build-mangle",
     "lint-api": "eslint .",
     "lint-style": "jscs --reporter inline .",
     "lint": "npm run lint-api && npm run lint-style",
-    "make": "npm run lint && npm run test-coverage",
-    "fixture": "node script/generate-fixture",
-    "bundle": "browserify index.js -s ParseEnglish > parse-english.js",
-    "postbundle": "esmangle parse-english.js > parse-english.min.js",
-    "build-md": "remark . --quiet",
-    "build": "npm run build-md && npm run bundle"
+    "test-api": "node test/index.js",
+    "test-coverage": "istanbul cover test/index.js",
+    "test": "npm run build && npm run lint && npm run test-coverage"
   }
 }

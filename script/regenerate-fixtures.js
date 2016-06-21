@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * @author Titus Wormer
  * @copyright 2014-2015 Titus Wormer
@@ -42,6 +41,7 @@ fs.readdirSync('test/fixture').filter(function (name) {
     }
 
     nlcst = english[fn](toString(json));
+    nlcst = JSON.stringify(nlcst, 0, 2) + '\n';
 
-    fs.writeFileSync('test/fixture/' + name, JSON.stringify(nlcst, 0, 2) + '\n');
+    fs.writeFileSync('test/fixture/' + name, nlcst);
 });

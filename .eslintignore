@@ -1,6 +1,4 @@
-build/
-components/
 coverage/
-build.js
+example.js
 parse-english.js
 parse-english.min.js

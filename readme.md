@@ -1,159 +1,86 @@
-# parse-english [![Build Status](https://img.shields.io/travis/wooorm/parse-english.svg)](https://travis-ci.org/wooorm/parse-english) [![Coverage Status](https://img.shields.io/codecov/c/github/wooorm/parse-english.svg)](https://codecov.io/github/wooorm/parse-english)
+# parse-english [![Build Status][travis-badge]][travis] [![Coverage Status][codecov-badge]][codecov]
 
-An English language parser producing [NLCST](https://github.com/wooorm/nlcst)
-nodes.
+<!--lint disable heading-increment list-item-spacing-->
+
+English language parser for [**retext**][retext] producing
+[**NLCST**][nlcst] nodes.
 
 ## Installation
 
-[npm](https://docs.npmjs.com/cli/install):
+[npm][npm-install]:
 
 ```bash
 npm install parse-english
 ```
 
-**parse-english** is also available for [bower](http://bower.io/#install-packages),
-[component](https://github.com/componentjs/component), and
-[duo](http://duojs.org/#getting-started), and as an AMD, CommonJS, and globals
-module, [uncompressed](parse-english.js) and [compressed](parse-english.min.js).
-
 ## Usage
 
-```javascript
-var ParseEnglish = require('parse-english'),
-    english = new ParseEnglish();
+Dependencies:
 
-/**
- * parse-latin would fail helplessly at the full-stop preceding the
- * capital `H`, and would erroneously parse the following as two
- * sentences.
- */
-english.parse(
-  'Mr. Henry Brown: A hapless but friendly City of London worker.'
+```javascript
+var inspect = require('unist-util-inspect');
+var English = require('parse-english');
+```
+
+Parse:
+
+```javascript
+var tree = new English().parse(
+    'Mr. Henry Brown: A hapless but friendly City of London worker.'
 );
-/*
- * Object
- * ├─ type: "RootNode"
- * └─ children: Array[1]
- *    └─ 0: Object
- *          ├─ type: "ParagraphNode"
- *          └─ children: Array[1]
- *             └─ 0: Object
- *                   ├─ type: "SentenceNode"
- *                   └─ children: Array[23]
- *                      ├─ 0: Object
- *                      |     ├─ type: "WordNode"
- *                      |     └─ children: Array[2]
- *                      |        ├─ 0: Object
- *                      |        |     ├─ type: "TextNode"
- *                      |        |     └─ value: "Mr"
- *                      |        └─ 1: Object
- *                      |              ├─ type: "PunctuationNode"
- *                      |              └─ value: "."
- *                      ├─ 1: Object
- *                      |     ├─ type: "WhiteSpaceNode"
- *                      |     └─ value: " "
- *                      ├─ 2: Object
- *                      |     ├─ type: "WordNode"
- *                      |     └─ children: Array[1]
- *                      |        └─ 0: Object
- *                      |              ├─ type: "TextNode"
- *                      |              └─ value: "Henry"
- *                      ├─ 3: Object
- *                      |     ├─ type: "WhiteSpaceNode"
- *                      |     └─ value: " "
- *                      ├─ 4: Object
- *                      |     ├─ type: "WordNode"
- *                      |     └─ children: Array[1]
- *                      |        └─ 0: Object
- *                      |              ├─ type: "TextNode"
- *                      |              └─ value: "Brown"
- *                      ├─ 5: Object
- *                      |     ├─ type: "PunctuationNode"
- *                      |     └─ value: ":"
- *                      ├─ 6: Object
- *                      |     ├─ type: "WhiteSpaceNode"
- *                      |     └─ value: " "
- *                      ├─ 7: Object
- *                      |     ├─ type: "WordNode"
- *                      |     └─ children: Array[1]
- *                      |        └─ 0: Object
- *                      |              ├─ type: "TextNode"
- *                      |              └─ value: "A"
- *                      ├─ 8: Object
- *                      |     ├─ type: "WhiteSpaceNode"
- *                      |     └─ value: " "
- *                      ├─ 9: Object
- *                      |     ├─ type: "WordNode"
- *                      |     └─ children: Array[1]
- *                      |        └─ 0: Object
- *                      |              ├─ type: "TextNode"
- *                      |              └─ value: "hapless"
- *                      ├─ 10: Object
- *                      |      ├─ type: "WhiteSpaceNode"
- *                      |      └─ value: " "
- *                      ├─ 11: Object
- *                      |      ├─ type: "WordNode"
- *                      |      └─ children: Array[1]
- *                      |         └─ 0: Object
- *                      |               ├─ type: "TextNode"
- *                      |               └─ value: "but"
- *                      ├─ 12: Object
- *                      |      ├─ type: "WhiteSpaceNode"
- *                      |      └─ value: " "
- *                      ├─ 13: Object
- *                      |      ├─ type: "WordNode"
- *                      |      └─ children: Array[1]
- *                      |         └─ 0: Object
- *                      |               ├─ type: "TextNode"
- *                      |               └─ value: "friendly"
- *                      ├─ 14: Object
- *                      |      ├─ type: "WhiteSpaceNode"
- *                      |      └─ value: " "
- *                      ├─ 15: Object
- *                      |      ├─ type: "WordNode"
- *                      |      └─ children: Array[1]
- *                      |         └─ 0: Object
- *                      |               ├─ type: "TextNode"
- *                      |               └─ value: "City"
- *                      ├─ 16: Object
- *                      |      ├─ type: "WhiteSpaceNode"
- *                      |      └─ value: " "
- *                      ├─ 17: Object
- *                      |      ├─ type: "WordNode"
- *                      |      └─ children: Array[1]
- *                      |         └─ 0: Object
- *                      |               ├─ type: "TextNode"
- *                      |               └─ value: "of"
- *                      ├─ 18: Object
- *                      |      ├─ type: "WhiteSpaceNode"
- *                      |      └─ value: " "
- *                      ├─ 19: Object
- *                      |      ├─ type: "WordNode"
- *                      |      └─ children: Array[1]
- *                      |         └─ 0: Object
- *                      |               ├─ type: "TextNode"
- *                      |               └─ value: "London"
- *                      ├─ 20: Object
- *                      |      ├─ type: "WhiteSpaceNode"
- *                      |      └─ value: " "
- *                      ├─ 21: Object
- *                      |      ├─ type: "WordNode"
- *                      |      └─ children: Array[1]
- *                      |         └─ 0: Object
- *                      |               ├─ type: "TextNode"
- *                      |               └─ value: "worker"
- *                      └─ 22: Object
- *                             ├─ type: "PunctuationNode"
- *                             └─ value: "."
- */
+```
+
+Which, when inspecting, yields:
+
+```txt
+RootNode[1] (1:1-1:63, 0-62)
+└─ ParagraphNode[1] (1:1-1:63, 0-62)
+   └─ SentenceNode[23] (1:1-1:63, 0-62)
+      ├─ WordNode[2] (1:1-1:4, 0-3)
+      │  ├─ TextNode: "Mr" (1:1-1:3, 0-2)
+      │  └─ PunctuationNode: "." (1:3-1:4, 2-3)
+      ├─ WhiteSpaceNode: " " (1:4-1:5, 3-4)
+      ├─ WordNode[1] (1:5-1:10, 4-9)
+      │  └─ TextNode: "Henry" (1:5-1:10, 4-9)
+      ├─ WhiteSpaceNode: " " (1:10-1:11, 9-10)
+      ├─ WordNode[1] (1:11-1:16, 10-15)
+      │  └─ TextNode: "Brown" (1:11-1:16, 10-15)
+      ├─ PunctuationNode: ":" (1:16-1:17, 15-16)
+      ├─ WhiteSpaceNode: " " (1:17-1:18, 16-17)
+      ├─ WordNode[1] (1:18-1:19, 17-18)
+      │  └─ TextNode: "A" (1:18-1:19, 17-18)
+      ├─ WhiteSpaceNode: " " (1:19-1:20, 18-19)
+      ├─ WordNode[1] (1:20-1:27, 19-26)
+      │  └─ TextNode: "hapless" (1:20-1:27, 19-26)
+      ├─ WhiteSpaceNode: " " (1:27-1:28, 26-27)
+      ├─ WordNode[1] (1:28-1:31, 27-30)
+      │  └─ TextNode: "but" (1:28-1:31, 27-30)
+      ├─ WhiteSpaceNode: " " (1:31-1:32, 30-31)
+      ├─ WordNode[1] (1:32-1:40, 31-39)
+      │  └─ TextNode: "friendly" (1:32-1:40, 31-39)
+      ├─ WhiteSpaceNode: " " (1:40-1:41, 39-40)
+      ├─ WordNode[1] (1:41-1:45, 40-44)
+      │  └─ TextNode: "City" (1:41-1:45, 40-44)
+      ├─ WhiteSpaceNode: " " (1:45-1:46, 44-45)
+      ├─ WordNode[1] (1:46-1:48, 45-47)
+      │  └─ TextNode: "of" (1:46-1:48, 45-47)
+      ├─ WhiteSpaceNode: " " (1:48-1:49, 47-48)
+      ├─ WordNode[1] (1:49-1:55, 48-54)
+      │  └─ TextNode: "London" (1:49-1:55, 48-54)
+      ├─ WhiteSpaceNode: " " (1:55-1:56, 54-55)
+      ├─ WordNode[1] (1:56-1:62, 55-61)
+      │  └─ TextNode: "worker" (1:56-1:62, 55-61)
+      └─ PunctuationNode: "." (1:62-1:63, 61-62)
 ```
 
 ## API
 
-**parse-english** exposes the same [API as parse-latin](https://github.com/wooorm/parse-latin#api),
-but returns results better suited for English natural language.
+**parse-english** exposes [the same API as **parse-latin**][latin].
 
-Support includes:
+## Algorithm
+
+All of [**parse-latin**][latin] is included, and the following support
+for the English natural language:
 
 *   Unit abbreviations (tsp., tbsp., oz., ft., and more);
 *   Time references (sec., min., tues., thu., feb., and more);
@@ -166,13 +93,28 @@ Support includes:
 *   English county abbreviations (Beds., Leics., Shrops., and more);
 *   Common elision (omission of letters) (’n’, ’o, ’em, ’twas, ’80s, and more).
 
-## Related
-
-*   [nlcst](https://github.com/wooorm/nlcst)
-*   [retext](https://github.com/wooorm/retext)
-*   [parse-latin](https://github.com/wooorm/parse-latin)
-*   [parse-dutch](https://github.com/wooorm/parse-dutch)
-
 ## License
 
-[MIT](LICENSE) © [Titus Wormer](http://wooorm.com)
+[MIT][license] © [Titus Wormer][author]
+
+<!-- Definitions -->
+
+[travis-badge]: https://img.shields.io/travis/wooorm/parse-english.svg
+
+[travis]: https://travis-ci.org/wooorm/parse-english
+
+[codecov-badge]: https://img.shields.io/codecov/c/github/wooorm/parse-english.svg
+
+[codecov]: https://codecov.io/github/wooorm/parse-english
+
+[npm-install]: https://docs.npmjs.com/cli/install
+
+[license]: LICENSE
+
+[author]: http://wooorm.com
+
+[retext]: https://github.com/wooorm/retext
+
+[nlcst]: https://github.com/wooorm/nlcst
+
+[latin]: https://github.com/wooorm/parse-latin
