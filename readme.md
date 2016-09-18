@@ -1,13 +1,11 @@
 # parse-english [![Build Status][travis-badge]][travis] [![Coverage Status][codecov-badge]][codecov]
 
-<!--lint disable heading-increment list-item-spacing-->
-
 English language parser for [**retext**][retext] producing
 [**NLCST**][nlcst] nodes.
 
 ## Installation
 
-[npm][npm-install]:
+[npm][]:
 
 ```bash
 npm install parse-english
@@ -82,16 +80,18 @@ RootNode[1] (1:1-1:63, 0-62)
 All of [**parse-latin**][latin] is included, and the following support
 for the English natural language:
 
-*   Unit abbreviations (tsp., tbsp., oz., ft., and more);
-*   Time references (sec., min., tues., thu., feb., and more);
-*   Business Abbreviations (Inc. and Ltd);
-*   Social titles (Mr., Mmes., Sr., and more);
-*   Rank and academic titles (Dr., Rep., Gen., Prof., Pres., and more);
-*   Geographical abbreviations (Ave., Blvd., Ft., Hwy., and more);
-*   American state abbreviations (Ala., Minn., La., Tex., and more);
-*   Canadian province abbreviations (Alta., Qué., Yuk., and more);
-*   English county abbreviations (Beds., Leics., Shrops., and more);
-*   Common elision (omission of letters) (’n’, ’o, ’em, ’twas, ’80s, and more).
+*   Unit abbreviations (`tsp.`, `tbsp.`, `oz.`, `ft.`, and more);
+*   Time references (`sec.`, `min.`, `tues.`, `thu.`, `feb.`, and more);
+*   Business Abbreviations (`Inc.` and `Ltd.`);
+*   Social titles (`Mr.`, `Mmes.`, `Sr.`, and more);
+*   Rank and academic titles (`Dr.`, `Rep.`, `Gen.`, `Prof.`, `Pres.`,
+    and more);
+*   Geographical abbreviations (`Ave.`, `Blvd.`, `Ft.`, `Hwy.`, and more);
+*   American state abbreviations (`Ala.`, `Minn.`, `La.`, `Tex.`, and more);
+*   Canadian province abbreviations (`Alta.`, `Qué.`, `Yuk.`, and more);
+*   English county abbreviations (`Beds.`, `Leics.`, `Shrops.`, and more);
+*   Common elision (omission of letters) (`’n’`, `’o`, `’em`, `’twas`,
+    `’80s`, and more).
 
 ## License
 
@@ -107,7 +107,7 @@ for the English natural language:
 
 [codecov]: https://codecov.io/github/wooorm/parse-english
 
-[npm-install]: https://docs.npmjs.com/cli/install
+[npm]: https://docs.npmjs.com/cli/install
 
 [license]: LICENSE
 
