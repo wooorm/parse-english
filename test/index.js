@@ -6,6 +6,7 @@ var path = require('path');
 var test = require('tape');
 var nlcstTest = require('nlcst-test');
 var VFile = require('vfile');
+var removePosition = require('unist-util-remove-position');
 var ParseEnglish = require('..');
 
 /* `ParseEnglish`. */
@@ -630,24 +631,5 @@ function describeFixture(t, name, doc, method) {
   nlcstTest(nlcstB);
 
   t.deepEqual(nlcstA, fixture, 'should match w/ position');
-  t.deepEqual(nlcstB, clean(fixture), 'should match w/o position');
-}
-
-/* Clone `object` but omit positional information. */
-function clean(object) {
-  var clone = 'length' in object ? [] : {};
-  var key;
-  var value;
-
-  for (key in object) {
-    value = object[key];
-
-    if (key === 'position') {
-      continue;
-    }
-
-    clone[key] = typeof object[key] === 'object' ? clean(value) : value;
-  }
-
-  return clone;
+  t.deepEqual(nlcstB, removePosition(fixture, true), 'should match w/o position');
 }

@@ -36,6 +36,7 @@
     "remark-cli": "^2.0.0",
     "remark-preset-wooorm": "^1.0.0",
     "tape": "^4.0.0",
+    "unist-util-remove-position": "^1.1.0",
     "vfile": "^2.0.0",
     "xo": "^0.17.0"
   },
