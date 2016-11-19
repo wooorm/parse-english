@@ -13,22 +13,14 @@ npm install parse-english
 
 ## Usage
 
-Dependencies:
-
 ```javascript
 var inspect = require('unist-util-inspect');
 var English = require('parse-english');
+
+console.log(inspect(new English().parse('Mr. Henry Brown: A hapless but friendly City of London worker.')));
 ```
 
-Parse:
-
-```javascript
-var tree = new English().parse(
-    'Mr. Henry Brown: A hapless but friendly City of London worker.'
-);
-```
-
-Which, when inspecting, yields:
+Yields:
 
 ```txt
 RootNode[1] (1:1-1:63, 0-62)
