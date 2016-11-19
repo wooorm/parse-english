@@ -1,8 +1,7 @@
 language: node_js
 node_js:
-- '0.11'
-- '5.0'
-- '6.0'
+- '4.0'
+- '7.0'
 sudo: false
 after_script: bash <(curl -s https://codecov.io/bash)
 deploy:
@@ -12,7 +11,7 @@ deploy:
       secure: Lfe0LcI5FxaX3nbC1OH9GfECXVHU39KDyj35JUnJa+v1hRow6UMBUWZAqb7vqvggNtemTfGQu07BhHtSiOBMMUGf4tfph236NZqF0YsQ++sIq15R7+EsHodi0oA0GwR0FSQpXdUjFty0f4G9iFxLp0utF6i/WpVhh0qo5vhrcnw=
     on:
       tags: true
-      node: '5.0'
+      node: '4.0'
   - provider: releases
     api_key:
       secure: G8lU3nSrwWiCJPV7OyRfEtDbayvGxAUwW+GzOuoK87vxclz7qk4FL4CIzKTj6AlkQlNJPhG5byDwEoZbYd2XFkrM+Y+O5dDSzAyuHv5Hs54zyUisSc9tyZ/jcXqNGZo5GnxuqbRkS5JKv/e8731f9NeZO/+jvLeMf3OqmgyJgYo=
@@ -21,4 +20,4 @@ deploy:
       - "parse-english.min.js"
     on:
       tags: true
-      node: '6.0'
+      node: '7.0'
