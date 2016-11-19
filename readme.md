@@ -1,4 +1,4 @@
-# parse-english [![Build Status][travis-badge]][travis] [![Coverage Status][codecov-badge]][codecov]
+# parse-english [![Build Status][travis-badge]][travis] [![Coverage Status][codecov-badge]][codecov] [![Chat][chat-badge]][chat]
 
 English language parser for [**retext**][retext] producing
 [**NLCST**][nlcst] nodes.
@@ -106,6 +106,10 @@ for the English natural language:
 [codecov-badge]: https://img.shields.io/codecov/c/github/wooorm/parse-english.svg
 
 [codecov]: https://codecov.io/github/wooorm/parse-english
+
+[chat-badge]: https://img.shields.io/gitter/room/wooorm/retext.svg
+
+[chat]: https://gitter.im/wooorm/retext
 
 [npm]: https://docs.npmjs.com/cli/install
 
