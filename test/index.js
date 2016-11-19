@@ -1,14 +1,8 @@
-/**
- * @author Titus Wormer
- * @copyright 2014-2015 Titus Wormer
- * @license MIT
- * @module parse-english:test
- * @fileoverview Test suite for `parse-english`.
- */
-
 'use strict';
 
 /* Dependencies. */
+var fs = require('fs');
+var path = require('path');
 var test = require('tape');
 var nlcstTest = require('nlcst-test');
 var VFile = require('vfile');
@@ -24,9 +18,8 @@ test('ParseEnglish', function (t) {
 
   t.ok(new ParseEnglish() instanceof ParseEnglish, 'should instantiate');
 
-  /* eslint-disable babel/new-cap */
+  // eslint-disable-next-line new-cap
   t.ok(ParseEnglish() instanceof ParseEnglish, 'should instantiate (#2)');
-  /* eslint-enable babel/new-cap */
 
   t.equal(new ParseEnglish().position, true, 'should set `position`');
 
@@ -626,18 +619,12 @@ test('Elision', function (t) {
   t.end();
 });
 
-/**
- * Utility to test if a given document is both a valid
- * node, and matches a fixture.
- *
- * @param {string} name - Filename of fixture.
- * @param {string} document - Source to validate.
- * @param {string} method - Method to use.
- */
+/* Utility to test if a given document is both a valid
+ * node, and matches a fixture. */
 function describeFixture(t, name, doc, method) {
   var nlcstA = english[method || 'parse'](doc);
   var nlcstB = englishNoPosition[method || 'parse'](doc);
-  var fixture = require('./fixture/' + name);
+  var fixture = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixture', name + '.json')));
 
   nlcstTest(nlcstA);
   nlcstTest(nlcstB);
@@ -646,13 +633,7 @@ function describeFixture(t, name, doc, method) {
   t.deepEqual(nlcstB, clean(fixture), 'should match w/o position');
 }
 
-/**
- * Clone `object` but omit positional information.
- *
- * @param {Object|Array} object - Object to clone.
- * @return {Object|Array} - `object`, without positional
- *   information.
- */
+/* Clone `object` but omit positional information. */
 function clean(object) {
   var clone = 'length' in object ? [] : {};
   var key;

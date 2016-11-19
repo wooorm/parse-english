@@ -1,11 +1,3 @@
-/**
- * @author Titus Wormer
- * @copyright 2014 Titus Wormer
- * @license MIT
- * @module parse-english
- * @fileoverview English natural language parser.
- */
-
 'use strict';
 
 /* Dependencies. */
@@ -33,13 +25,7 @@ proto.tokenizeParagraphPlugins = [
   modifyChildren(mergeEnglishPrefixExceptions)
 ].concat(proto.tokenizeParagraphPlugins);
 
-/**
- * Transform English natural language into an NLCST-tree.
- *
- * @param {VFile} file - Virtual file.
- * @param {Object?} [options] - Configuration.
- * @constructor {ParseEnglish}
- */
+/* Transform English natural language into an NLCST-tree. */
 function ParseEnglish(file, options) {
   if (!(this instanceof ParseEnglish)) {
     return new ParseEnglish(file, options);
@@ -189,15 +175,8 @@ var EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
 /* Match one apostrophe. */
 var EXPRESSION_APOSTROPHE = /^['\u2019]$/;
 
-/**
- * Merge a sentence into its next sentence,
- * when the sentence ends with a certain word.
- *
- * @param {NLCSTNode} child - Node.
- * @param {number} index - Position of `child` in `parent`.
- * @param {NLCSTParagraphNode} parent - Parent of `child`.
- * @return {number?} - Next index.
- */
+/* Merge a sentence into its next sentence,
+ * when the sentence ends with a certain word. */
 function mergeEnglishPrefixExceptions(child, index, parent) {
   var children = child.children;
   var prev;
@@ -207,7 +186,7 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
 
   if (
     children &&
-    children.length &&
+    children.length !== 0 &&
     index !== parent.children.length - 1
   ) {
     prev = children[children.length - 2];
@@ -242,14 +221,8 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
   }
 }
 
-/**
- * Merge an apostrophe depicting elision into
- * its surrounding word.
- *
- * @param {NLCSTNode} child - Node.
- * @param {number} index - Position of `child` in `parent`.
- * @param {NLCSTSentenceNode} parent - Parent of `child`.
- */
+/* Merge an apostrophe depicting elision into
+ * its surrounding word. */
 function mergeEnglishElisionExceptions(child, index, parent) {
   var siblings;
   var length;
@@ -257,10 +230,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
   var node;
   var other;
 
-  if (
-    child.type !== 'PunctuationNode' &&
-    child.type !== 'SymbolNode'
-  ) {
+  if (child.type !== 'PunctuationNode' && child.type !== 'SymbolNode') {
     return;
   }
 
