@@ -26,7 +26,7 @@
     "unist-util-visit-children": "^1.0.0"
   },
   "devDependencies": {
-    "browserify": "^13.0.1",
+    "browserify": "^14.0.0",
     "bundle-collapser": "^1.2.1",
     "esmangle": "^1.0.1",
     "is-hidden": "^1.0.1",
