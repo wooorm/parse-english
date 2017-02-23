@@ -11,7 +11,8 @@ var ParseEnglish = require('..');
 
 /* `ParseEnglish`. */
 var english = new ParseEnglish();
-var englishNoPosition = new ParseEnglish({position: false});
+var englishNoPosition = new ParseEnglish();
+englishNoPosition.position = false;
 
 /* Tests. */
 test('ParseEnglish', function (t) {
@@ -23,18 +24,6 @@ test('ParseEnglish', function (t) {
   t.ok(ParseEnglish() instanceof ParseEnglish, 'should instantiate (#2)');
 
   t.equal(new ParseEnglish().position, true, 'should set `position`');
-
-  t.equal(
-    new ParseEnglish({position: true}).position,
-    true,
-    'should support `position: true`'
-  );
-
-  t.equal(
-    new ParseEnglish({position: false}).position,
-    false,
-    'should support `position: false`'
-  );
 
   t.deepEqual(
     new ParseEnglish(new VFile('Alpha bravo charlie')).parse(),

@@ -26,9 +26,9 @@ proto.tokenizeParagraphPlugins = [
 ].concat(proto.tokenizeParagraphPlugins);
 
 /* Transform English natural language into an NLCST-tree. */
-function ParseEnglish(file, options) {
+function ParseEnglish(doc, file) {
   if (!(this instanceof ParseEnglish)) {
-    return new ParseEnglish(file, options);
+    return new ParseEnglish(doc, file);
   }
 
   Parser.apply(this, arguments);
