@@ -65,25 +65,25 @@ RootNode[1] (1:1-1:63, 0-62)
 
 ## API
 
-**parse-english** exposes [the same API as **parse-latin**][latin].
+`parse-english` exposes [the same API as `parse-latin`][latin].
 
 ## Algorithm
 
-All of [**parse-latin**][latin] is included, and the following support
+All of [`parse-latin`][latin] is included, and the following support
 for the English natural language:
 
-*   Unit abbreviations (`tsp.`, `tbsp.`, `oz.`, `ft.`, and more);
-*   Time references (`sec.`, `min.`, `tues.`, `thu.`, `feb.`, and more);
-*   Business Abbreviations (`Inc.` and `Ltd.`);
-*   Social titles (`Mr.`, `Mmes.`, `Sr.`, and more);
+*   Unit abbreviations (`tsp.`, `tbsp.`, `oz.`, `ft.`, and more)
+*   Time references (`sec.`, `min.`, `tues.`, `thu.`, `feb.`, and more)
+*   Business Abbreviations (`Inc.` and `Ltd.`)
+*   Social titles (`Mr.`, `Mmes.`, `Sr.`, and more)
 *   Rank and academic titles (`Dr.`, `Rep.`, `Gen.`, `Prof.`, `Pres.`,
-    and more);
-*   Geographical abbreviations (`Ave.`, `Blvd.`, `Ft.`, `Hwy.`, and more);
-*   American state abbreviations (`Ala.`, `Minn.`, `La.`, `Tex.`, and more);
-*   Canadian province abbreviations (`Alta.`, `Qué.`, `Yuk.`, and more);
-*   English county abbreviations (`Beds.`, `Leics.`, `Shrops.`, and more);
+    and more)
+*   Geographical abbreviations (`Ave.`, `Blvd.`, `Ft.`, `Hwy.`, and more)
+*   American state abbreviations (`Ala.`, `Minn.`, `La.`, `Tex.`, and more)
+*   Canadian province abbreviations (`Alta.`, `Qué.`, `Yuk.`, and more)
+*   English county abbreviations (`Beds.`, `Leics.`, `Shrops.`, and more)
 *   Common elision (omission of letters) (`’n’`, `’o`, `’em`, `’twas`,
-    `’80s`, and more).
+    `’80s`, and more)
 
 ## License
 
