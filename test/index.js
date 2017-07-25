@@ -1,6 +1,5 @@
 'use strict';
 
-/* Dependencies. */
 var fs = require('fs');
 var path = require('path');
 var test = require('tape');
@@ -9,12 +8,10 @@ var VFile = require('vfile');
 var removePosition = require('unist-util-remove-position');
 var ParseEnglish = require('..');
 
-/* `ParseEnglish`. */
 var english = new ParseEnglish();
 var englishNoPosition = new ParseEnglish();
 englishNoPosition.position = false;
 
-/* Tests. */
 test('ParseEnglish', function (t) {
   t.equal(typeof ParseEnglish, 'function', 'should be a `function`');
 

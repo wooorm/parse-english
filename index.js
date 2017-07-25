@@ -1,12 +1,10 @@
 'use strict';
 
-/* Dependencies. */
 var Parser = require('parse-latin');
 var nlcstToString = require('nlcst-to-string');
 var visitChildren = require('unist-util-visit-children');
 var modifyChildren = require('unist-util-modify-children');
 
-/* Expose `ParseEnglish`. */
 module.exports = ParseEnglish;
 
 /* Inherit from `ParseLatin`. */
