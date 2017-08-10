@@ -17,7 +17,9 @@ npm install parse-english
 var inspect = require('unist-util-inspect');
 var English = require('parse-english');
 
-console.log(inspect(new English().parse('Mr. Henry Brown: A hapless but friendly City of London worker.')));
+var tree = new English().parse('Mr. Henry Brown: A hapless but friendly City of London worker.');
+
+console.log(inspect(tree));
 ```
 
 Yields:
