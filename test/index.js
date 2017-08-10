@@ -31,6 +31,15 @@ test('ParseEnglish', function (t) {
   t.end();
 });
 
+test('Abbreviations: at sentence end', function (t) {
+  t.test('should NOT treat `Ave.` as a terminal marker', function (st) {
+    describeFixture(st, 'abbrev-final', 'Send it to 7th Ave.');
+    st.end();
+  });
+
+  t.end();
+});
+
 test('Abbreviations: Geographic', function (t) {
   t.test('should NOT treat `Ave.` as a terminal marker', function (st) {
     /* Note: This paragraph also tests for

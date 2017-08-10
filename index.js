@@ -38,7 +38,7 @@ function ParserPrototype() {}
 /* Match a blacklisted (case-insensitive) abbreviation
  * which when followed by a full-stop does not depict
  * a sentence terminal marker. */
-var ABBREVIATION_PREFIX = new RegExp(
+var ABBREVIATION = new RegExp(
   '^(' +
     /* Business Abbreviations:
      * Incorporation, Limited company. */
@@ -74,7 +74,7 @@ var ABBREVIATION_PREFIX = new RegExp(
 /* Match a blacklisted (case-sensitive) abbreviation
  * which when followed by a full-stop does not depict
  * a sentence terminal marker. */
-var ABBREVIATION_PREFIX_SENSITIVE = new RegExp(
+var ABBREVIATION_SENSITIVE = new RegExp(
   '^(' +
     /* Social:
      * Mister, Mistress, Mistress, woman, Mademoiselle, Madame, Monsieur,
@@ -175,35 +175,39 @@ var APOSTROPHE = /^['\u2019]$/;
 
 /* Merge a sentence into its next sentence,
  * when the sentence ends with a certain word. */
-function mergeEnglishPrefixExceptions(child, index, parent) {
-  var children = child.children;
-  var prev;
-  var node;
-  var prevValue;
+function mergeEnglishPrefixExceptions(sentence, index, paragraph) {
+  var children = sentence.children;
+  var period = children[children.length - 1];
+  var word = children[children.length - 2];
+  var value;
   var next;
 
-  if (children && children.length !== 0 && index !== parent.children.length - 1) {
-    prev = children[children.length - 2];
-    node = children[children.length - 1];
+  if (period && toString(period) === '.' && word && word.type === 'WordNode') {
+    value = toString(word);
 
-    if (node && prev && prev.type === 'WordNode' && toString(node) === '.') {
-      prevValue = toString(prev);
+    if (ABBREVIATION.test(lower(value)) || ABBREVIATION_SENSITIVE.test(value)) {
+      /* Merge period into abbreviation. */
+      word.children.push(period);
+      children.pop();
 
-      if (
-        ABBREVIATION_PREFIX_SENSITIVE.test(prevValue) ||
-        ABBREVIATION_PREFIX.test(prevValue.toLowerCase())
-      ) {
-        next = parent.children[index + 1];
+      if (period.position && word.position) {
+        word.position.end = period.position.end;
+      }
 
-        child.children = children.concat(next.children);
+      /* Merge sentences. */
+      next = paragraph.children[index + 1];
+
+      if (next) {
+        sentence.children = children.concat(next.children);
+
+        paragraph.children.splice(index + 1, 1);
 
         /* Update position. */
-        if (child.position && next.position) {
-          child.position.end = next.position.end;
+        if (next.position && sentence.position) {
+          sentence.position.end = next.position.end;
         }
 
-        parent.children.splice(index + 1, 1);
-
+        /* Next, iterate over the current node again. */
         return index - 1;
       }
     }
@@ -212,62 +216,62 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
 
 /* Merge an apostrophe depicting elision into
  * its surrounding word. */
-function mergeEnglishElisionExceptions(child, index, parent) {
+function mergeEnglishElisionExceptions(child, index, sentence) {
   var siblings;
+  var sibling;
+  var other;
   var length;
   var value;
-  var node;
-  var other;
 
   if (child.type !== 'PunctuationNode' && child.type !== 'SymbolNode') {
     return;
   }
 
-  siblings = parent.children;
+  siblings = sentence.children;
   length = siblings.length;
   value = toString(child);
 
   /* Match abbreviation of `with`, `w/` */
   if (value === '/') {
-    node = siblings[index - 1];
+    sibling = siblings[index - 1];
 
-    if (node && toString(node).toLowerCase() === 'w') {
-      /* Remove the slash from parent. */
+    if (sibling && lower(toString(sibling)) === 'w') {
+      /* Remove the slash from the sentence. */
       siblings.splice(index, 1);
 
       /* Append the slash into the children of the
        * previous node. */
-      node.children.push(child);
+      sibling.children.push(child);
 
       /* Update position. */
-      if (node.position && child.position) {
-        node.position.end = child.position.end;
+      if (sibling.position && child.position) {
+        sibling.position.end = child.position.end;
       }
     }
   } else if (APOSTROPHE.test(value)) {
     /* If two preceding (the first white space and the
      * second a word), and one following (white space)
      * nodes exist... */
-    node = siblings[index - 1];
+    sibling = siblings[index - 1];
 
     if (
       index > 2 &&
       index < length - 1 &&
-      node.type === 'WordNode' &&
+      sibling.type === 'WordNode' &&
       siblings[index - 2].type === 'WhiteSpaceNode' &&
       siblings[index + 1].type === 'WhiteSpaceNode' &&
-      ELISION_PREFIX.test(toString(node).toLowerCase())
+      ELISION_PREFIX.test(lower(toString(sibling)))
     ) {
-      /* Remove the apostrophe from parent. */
+      /* Remove the apostrophe from the sentence. */
       siblings.splice(index, 1);
 
       /* Append the apostrophe into the children of
        * node. */
-      node.children.push(child);
+      sibling.children.push(child);
 
       /* Update position. */
-      if (node.position && child.position) {
-        node.position.end = child.position.end;
+      if (sibling.position && child.position) {
+        sibling.position.end = child.position.end;
       }
 
       return;
@@ -280,20 +284,20 @@ function mergeEnglishElisionExceptions(child, index, parent) {
       siblings[index + 1].type === 'WordNode' &&
       (index === 0 || siblings[index - 1].type !== 'WordNode')
     ) {
-      node = siblings[index + 1];
-      value = toString(node).toLowerCase();
+      sibling = siblings[index + 1];
+      value = lower(toString(sibling));
 
       if (ELISION_AFFIX.test(value)) {
-        /* Remove the apostrophe from parent. */
+        /* Remove the apostrophe from the sentence. */
         siblings.splice(index, 1);
 
         /* Prepend the apostrophe into the children of
          * node. */
-        node.children = [child].concat(node.children);
+        sibling.children = [child].concat(sibling.children);
 
         /* Update position. */
-        if (node.position && child.position) {
-          node.position.start = child.position.start;
+        if (sibling.position && child.position) {
+          sibling.position.start = child.position.start;
         }
       /* If both preceded and followed by an apostrophe,
        * and the word is `n`... */
@@ -304,28 +308,32 @@ function mergeEnglishElisionExceptions(child, index, parent) {
       ) {
         other = siblings[index + 2];
 
-        /* Remove the apostrophe from parent. */
+        /* Remove the apostrophe from the sentence. */
         siblings.splice(index, 1);
         siblings.splice(index + 1, 1);
 
         /* Prepend the preceding apostrophe and append
          * the into the following apostrophe into
          * the children of node. */
-        node.children = [child].concat(node.children, other);
+        sibling.children = [child].concat(sibling.children, other);
 
         /* Update position. */
-        if (node.position) {
+        if (sibling.position) {
           /* istanbul ignore else */
           if (child.position) {
-            node.position.start = child.position.start;
+            sibling.position.start = child.position.start;
           }
 
           /* istanbul ignore else */
           if (other.position) {
-            node.position.end = other.position.end;
+            sibling.position.end = other.position.end;
           }
         }
       }
     }
   }
+}
+
+function lower(value) {
+  return value.toLowerCase();
 }
