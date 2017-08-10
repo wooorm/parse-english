@@ -113,6 +113,6 @@ for the English natural language:
 
 [retext]: https://github.com/wooorm/retext
 
-[nlcst]: https://github.com/wooorm/nlcst
+[nlcst]: https://github.com/syntax-tree/nlcst
 
 [latin]: https://github.com/wooorm/parse-latin
