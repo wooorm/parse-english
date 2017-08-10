@@ -1,7 +1,7 @@
 'use strict';
 
 var Parser = require('parse-latin');
-var nlcstToString = require('nlcst-to-string');
+var toString = require('nlcst-to-string');
 var visitChildren = require('unist-util-visit-children');
 var modifyChildren = require('unist-util-modify-children');
 
@@ -38,7 +38,7 @@ function ParserPrototype() {}
 /* Match a blacklisted (case-insensitive) abbreviation
  * which when followed by a full-stop does not depict
  * a sentence terminal marker. */
-var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
+var ABBREVIATION_PREFIX = new RegExp(
   '^(' +
     /* Business Abbreviations:
      * Incorporation, Limited company. */
@@ -74,7 +74,7 @@ var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX = new RegExp(
 /* Match a blacklisted (case-sensitive) abbreviation
  * which when followed by a full-stop does not depict
  * a sentence terminal marker. */
-var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
+var ABBREVIATION_PREFIX_SENSITIVE = new RegExp(
   '^(' +
     /* Social:
      * Mister, Mistress, Mistress, woman, Mademoiselle, Madame, Monsieur,
@@ -103,7 +103,7 @@ var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
 
     /* American state abbreviations:
      * Alabama, Arizona, Arkansas, California, *, Colorado, *,
-     * Connecticut, Delaware, Florida, Georgia,Idaho, *, Illinois,
+     * Connecticut, Delaware, Florida, Georgia, Idaho, *, Illinois,
      * Indiana, Iowa, Kansas, *, Kentucky, *, Louisiana, Maine, Maryland,
      * Massachusetts, Michigan, Minnesota, Mississippi, Missouri, Montana,
      * Nebraska, *, Nevada, Mexico, Dakota, Oklahoma, *, Oregon,
@@ -138,7 +138,7 @@ var EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE = new RegExp(
 
 /* Match a blacklisted word which when followed by
  * an apostrophe depicts elision. */
-var EXPRESSION_ELISION_ENGLISH_PREFIX = new RegExp(
+var ELISION_PREFIX = new RegExp(
   '^(' +
     /* Includes:
      * - o' > of;
@@ -149,7 +149,7 @@ var EXPRESSION_ELISION_ENGLISH_PREFIX = new RegExp(
 
 /* Match a blacklisted word which when preceded by
  * an apostrophe depicts elision. */
-var EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
+var ELISION_AFFIX = new RegExp(
   '^(' +
     /* Includes:
      * - 'im > him;
@@ -171,7 +171,7 @@ var EXPRESSION_ELISION_ENGLISH_AFFIX = new RegExp(
 );
 
 /* Match one apostrophe. */
-var EXPRESSION_APOSTROPHE = /^['\u2019]$/;
+var APOSTROPHE = /^['\u2019]$/;
 
 /* Merge a sentence into its next sentence,
  * when the sentence ends with a certain word. */
@@ -182,25 +182,16 @@ function mergeEnglishPrefixExceptions(child, index, parent) {
   var prevValue;
   var next;
 
-  if (
-    children &&
-    children.length !== 0 &&
-    index !== parent.children.length - 1
-  ) {
+  if (children && children.length !== 0 && index !== parent.children.length - 1) {
     prev = children[children.length - 2];
     node = children[children.length - 1];
 
-    if (
-      node &&
-      prev &&
-      prev.type === 'WordNode' &&
-      nlcstToString(node) === '.'
-    ) {
-      prevValue = nlcstToString(prev);
+    if (node && prev && prev.type === 'WordNode' && toString(node) === '.') {
+      prevValue = toString(prev);
 
       if (
-        EXPRESSION_ABBREVIATION_ENGLISH_PREFIX_SENSITIVE.test(prevValue) ||
-        EXPRESSION_ABBREVIATION_ENGLISH_PREFIX.test(prevValue.toLowerCase())
+        ABBREVIATION_PREFIX_SENSITIVE.test(prevValue) ||
+        ABBREVIATION_PREFIX.test(prevValue.toLowerCase())
       ) {
         next = parent.children[index + 1];
 
@@ -234,13 +225,13 @@ function mergeEnglishElisionExceptions(child, index, parent) {
 
   siblings = parent.children;
   length = siblings.length;
-  value = nlcstToString(child);
+  value = toString(child);
 
   /* Match abbreviation of `with`, `w/` */
   if (value === '/') {
     node = siblings[index - 1];
 
-    if (node && nlcstToString(node).toLowerCase() === 'w') {
+    if (node && toString(node).toLowerCase() === 'w') {
       /* Remove the slash from parent. */
       siblings.splice(index, 1);
 
@@ -253,7 +244,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
         node.position.end = child.position.end;
       }
     }
-  } else if (EXPRESSION_APOSTROPHE.test(value)) {
+  } else if (APOSTROPHE.test(value)) {
     /* If two preceding (the first white space and the
      * second a word), and one following (white space)
      * nodes exist... */
@@ -265,9 +256,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
       node.type === 'WordNode' &&
       siblings[index - 2].type === 'WhiteSpaceNode' &&
       siblings[index + 1].type === 'WhiteSpaceNode' &&
-      EXPRESSION_ELISION_ENGLISH_PREFIX.test(
-        nlcstToString(node).toLowerCase()
-      )
+      ELISION_PREFIX.test(toString(node).toLowerCase())
     ) {
       /* Remove the apostrophe from parent. */
       siblings.splice(index, 1);
@@ -289,15 +278,12 @@ function mergeEnglishElisionExceptions(child, index, parent) {
     if (
       index !== length - 1 &&
       siblings[index + 1].type === 'WordNode' &&
-      (
-        index === 0 ||
-        siblings[index - 1].type !== 'WordNode'
-      )
+      (index === 0 || siblings[index - 1].type !== 'WordNode')
     ) {
       node = siblings[index + 1];
-      value = nlcstToString(node).toLowerCase();
+      value = toString(node).toLowerCase();
 
-      if (EXPRESSION_ELISION_ENGLISH_AFFIX.test(value)) {
+      if (ELISION_AFFIX.test(value)) {
         /* Remove the apostrophe from parent. */
         siblings.splice(index, 1);
 
@@ -314,7 +300,7 @@ function mergeEnglishElisionExceptions(child, index, parent) {
       } else if (
         value === 'n' &&
         index < length - 2 &&
-        EXPRESSION_APOSTROPHE.test(nlcstToString(siblings[index + 2]))
+        APOSTROPHE.test(toString(siblings[index + 2]))
       ) {
         other = siblings[index + 2];
 

@@ -60,15 +60,15 @@
     "space": true,
     "esnext": false,
     "rules": {
-      "max-lines": "off",
-      "max-depth": "off",
-      "guard-for-in": "off"
+      "max-depth": "off"
     },
     "ignores": [
       "parse-english.js"
     ]
   },
   "remarkConfig": {
-    "plugins": ["preset-wooorm"]
+    "plugins": [
+      "preset-wooorm"
+    ]
   }
 }

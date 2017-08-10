@@ -551,18 +551,14 @@ test('Elision', function (t) {
       'Such as \'the previous.'
     );
 
-    /*
-     * This is commented out because `parse-latin`
+    /* This is commented out because `parse-latin`
      * always thinks apostrophes at the start of
      * a word are part of that word.
-     */
-
-    /*
+     *
      * describeFixture(
-     *     'elision-non-initial-smart',
-     *     'Such as \u2019the previous.'
-     * );
-     */
+     *   'elision-non-initial-smart',
+     *   'Such as \u2019the previous.'
+     * ); */
 
     st.end();
   });
