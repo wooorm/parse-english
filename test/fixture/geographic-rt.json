@@ -237,6 +237,22 @@
                       "offset": 29
                     }
                   }
+                },
+                {
+                  "type": "PunctuationNode",
+                  "value": ".",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 30,
+                      "offset": 29
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 31,
+                      "offset": 30
+                    }
+                  }
                 }
               ],
               "position": {
@@ -244,22 +260,6 @@
                   "line": 1,
                   "column": 28,
                   "offset": 27
-                },
-                "end": {
-                  "line": 1,
-                  "column": 30,
-                  "offset": 29
-                }
-              }
-            },
-            {
-              "type": "PunctuationNode",
-              "value": ".",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 30,
-                  "offset": 29
                 },
                 "end": {
                   "line": 1,

@@ -530,6 +530,22 @@
                       "offset": 54
                     }
                   }
+                },
+                {
+                  "type": "PunctuationNode",
+                  "value": ".",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 55,
+                      "offset": 54
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 56,
+                      "offset": 55
+                    }
+                  }
                 }
               ],
               "position": {
@@ -537,22 +553,6 @@
                   "line": 1,
                   "column": 54,
                   "offset": 53
-                },
-                "end": {
-                  "line": 1,
-                  "column": 55,
-                  "offset": 54
-                }
-              }
-            },
-            {
-              "type": "PunctuationNode",
-              "value": ".",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 55,
-                  "offset": 54
                 },
                 "end": {
                   "line": 1,
