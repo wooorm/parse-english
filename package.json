@@ -10,7 +10,7 @@
     "language",
     "parser"
   ],
-  "repository": "https://github.com/wooorm/parse-english",
+  "repository": "wooorm/parse-english",
   "bugs": "https://github.com/wooorm/parse-english/issues",
   "author": "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)",
   "contributors": [
