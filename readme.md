@@ -14,12 +14,14 @@ npm install parse-english
 ## Usage
 
 ```javascript
-var inspect = require('unist-util-inspect');
-var English = require('parse-english');
+var inspect = require('unist-util-inspect')
+var English = require('parse-english')
 
-var tree = new English().parse('Mr. Henry Brown: A hapless but friendly City of London worker.');
+var tree = new English().parse(
+  'Mr. Henry Brown: A hapless but friendly City of London worker.'
+)
 
-console.log(inspect(tree));
+console.log(inspect(tree))
 ```
 
 Yields:
