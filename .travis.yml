@@ -5,19 +5,12 @@ node_js:
 sudo: false
 after_script: bash <(curl -s https://codecov.io/bash)
 deploy:
-  - provider: npm
-    email: tituswormer@gmail.com
-    api_key:
-      secure: Lfe0LcI5FxaX3nbC1OH9GfECXVHU39KDyj35JUnJa+v1hRow6UMBUWZAqb7vqvggNtemTfGQu07BhHtSiOBMMUGf4tfph236NZqF0YsQ++sIq15R7+EsHodi0oA0GwR0FSQpXdUjFty0f4G9iFxLp0utF6i/WpVhh0qo5vhrcnw=
-    on:
-      tags: true
-      node: '8.0'
-  - provider: releases
-    api_key:
-      secure: G8lU3nSrwWiCJPV7OyRfEtDbayvGxAUwW+GzOuoK87vxclz7qk4FL4CIzKTj6AlkQlNJPhG5byDwEoZbYd2XFkrM+Y+O5dDSzAyuHv5Hs54zyUisSc9tyZ/jcXqNGZo5GnxuqbRkS5JKv/e8731f9NeZO/+jvLeMf3OqmgyJgYo=
-    file:
-      - "parse-english.js"
-      - "parse-english.min.js"
-    on:
-      tags: true
-      node: '8.0'
+  provider: releases
+  api_key:
+    secure: G8lU3nSrwWiCJPV7OyRfEtDbayvGxAUwW+GzOuoK87vxclz7qk4FL4CIzKTj6AlkQlNJPhG5byDwEoZbYd2XFkrM+Y+O5dDSzAyuHv5Hs54zyUisSc9tyZ/jcXqNGZo5GnxuqbRkS5JKv/e8731f9NeZO/+jvLeMf3OqmgyJgYo=
+  file:
+    - "parse-english.js"
+    - "parse-english.min.js"
+  on:
+    tags: true
+    node: '8.0'
