@@ -5,3 +5,4 @@ coverage/
 node_modules/
 parse-english.js
 parse-english.min.js
+yarn.lock
