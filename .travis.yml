@@ -1,11 +1,12 @@
 language: node_js
 node_js:
-- '4.0'
-- '8.0'
+- lts/boron
+- node
 sudo: false
 after_script: bash <(curl -s https://codecov.io/bash)
 deploy:
   provider: releases
+  skip_cleanup: true
   api_key:
     secure: G8lU3nSrwWiCJPV7OyRfEtDbayvGxAUwW+GzOuoK87vxclz7qk4FL4CIzKTj6AlkQlNJPhG5byDwEoZbYd2XFkrM+Y+O5dDSzAyuHv5Hs54zyUisSc9tyZ/jcXqNGZo5GnxuqbRkS5JKv/e8731f9NeZO/+jvLeMf3OqmgyJgYo=
   file:
@@ -13,4 +14,3 @@ deploy:
     - "parse-english.min.js"
   on:
     tags: true
-    node: '8.0'
