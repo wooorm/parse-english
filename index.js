@@ -37,7 +37,7 @@ function ParserPrototype() {}
 
 // Match a blacklisted (case-insensitive) abbreviation which when followed by a
 // full-stop does not depict a sentence terminal marker.
-var ABBREVIATION = new RegExp(
+var abbreviations = new RegExp(
   '^(' +
     // Business Abbreviations: Incorporation, Limited company.
     'inc|ltd|' +
@@ -58,13 +58,13 @@ var ABBREVIATION = new RegExp(
     'sec|min|hr|mon|tue|tues|wed|thu|thurs|fri|sat|sun|jan|feb|mar|' +
     'apr|jun|jul|aug|sep|sept|oct|nov|dec' +
     ')$'
-  // NOTE! There's no `i` flag here because the value to test against should be
+  // Note: There's no `i` flag here because the value to test against should be
   // all lowercase!
 )
 
 // Match a blacklisted (case-sensitive) abbreviation which when followed by a
 // full-stop does not depict a sentence terminal marker.
-var ABBREVIATION_SENSITIVE = new RegExp(
+var abbreviationsSensitive = new RegExp(
   '^(' +
     // Social:
     // Mister, Mistress, Mistress, woman, Mademoiselle, Madame, Monsieur,
@@ -118,7 +118,7 @@ var ABBREVIATION_SENSITIVE = new RegExp(
 
 // Match a blacklisted word which when followed by an apostrophe depicts
 // elision.
-var ELISION_PREFIX = new RegExp(
+var elisionPrefix = new RegExp(
   '^(' +
     // Includes: - o' > of; - ol' > old.
     'o|ol' +
@@ -127,7 +127,7 @@ var ELISION_PREFIX = new RegExp(
 
 // Match a blacklisted word which when preceded by an apostrophe depicts
 // elision.
-var ELISION_AFFIX = new RegExp(
+var elisionAffix = new RegExp(
   '^(' +
     // Includes: 'im > him; 'er > her; 'em > them. 'cause > because.
     'im|er|em|cause|' +
@@ -139,7 +139,7 @@ var ELISION_AFFIX = new RegExp(
 )
 
 // Match one apostrophe.
-var APOSTROPHE = /^['\u2019]$/
+var apostrophe = /^['\u2019]$/
 
 // Merge a sentence into its next sentence, when the sentence ends with a
 // certain word.
@@ -153,7 +153,10 @@ function mergeEnglishPrefixExceptions(sentence, index, paragraph) {
   if (period && toString(period) === '.' && word && word.type === 'WordNode') {
     value = toString(word)
 
-    if (ABBREVIATION.test(lower(value)) || ABBREVIATION_SENSITIVE.test(value)) {
+    if (
+      abbreviations.test(lower(value)) ||
+      abbreviationsSensitive.test(value)
+    ) {
       // Merge period into abbreviation.
       word.children.push(period)
       children.pop()
@@ -214,7 +217,7 @@ function mergeEnglishElisionExceptions(child, index, sentence) {
         sibling.position.end = child.position.end
       }
     }
-  } else if (APOSTROPHE.test(value)) {
+  } else if (apostrophe.test(value)) {
     // If two preceding (the first white space and the second a word), and one
     // following (white space) nodes exist...
     sibling = siblings[index - 1]
@@ -225,7 +228,7 @@ function mergeEnglishElisionExceptions(child, index, sentence) {
       sibling.type === 'WordNode' &&
       siblings[index - 2].type === 'WhiteSpaceNode' &&
       siblings[index + 1].type === 'WhiteSpaceNode' &&
-      ELISION_PREFIX.test(lower(toString(sibling)))
+      elisionPrefix.test(lower(toString(sibling)))
     ) {
       // Remove the apostrophe from the sentence.
       siblings.splice(index, 1)
@@ -250,7 +253,7 @@ function mergeEnglishElisionExceptions(child, index, sentence) {
       sibling = siblings[index + 1]
       value = lower(toString(sibling))
 
-      if (ELISION_AFFIX.test(value)) {
+      if (elisionAffix.test(value)) {
         // Remove the apostrophe from the sentence.
         siblings.splice(index, 1)
 
@@ -266,7 +269,7 @@ function mergeEnglishElisionExceptions(child, index, sentence) {
       } else if (
         value === 'n' &&
         index < length - 2 &&
-        APOSTROPHE.test(toString(siblings[index + 2]))
+        apostrophe.test(toString(siblings[index + 2]))
       ) {
         other = siblings[index + 2]
 
