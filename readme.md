@@ -127,7 +127,7 @@ for the English natural language:
 
 [author]: https://wooorm.com
 
-[retext]: https://github.com/wooorm/retext
+[retext]: https://github.com/retextjs/retext
 
 [nlcst]: https://github.com/syntax-tree/nlcst
 
