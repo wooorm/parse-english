@@ -68,9 +68,7 @@
     "esnext": false,
     "rules": {
       "max-depth": "off",
-      "complexity": "off",
-      "no-var": "off",
-      "prefer-arrow-callback": "off"
+      "complexity": "off"
     },
     "ignores": [
       "parse-english.js"
