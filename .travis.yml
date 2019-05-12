@@ -1,16 +1,16 @@
 language: node_js
 node_js:
-- lts/boron
-- node
+  - lts/dubnium
+  - node
 sudo: false
 after_script: bash <(curl -s https://codecov.io/bash)
 deploy:
   provider: releases
   skip_cleanup: true
   api_key:
-    secure: G8lU3nSrwWiCJPV7OyRfEtDbayvGxAUwW+GzOuoK87vxclz7qk4FL4CIzKTj6AlkQlNJPhG5byDwEoZbYd2XFkrM+Y+O5dDSzAyuHv5Hs54zyUisSc9tyZ/jcXqNGZo5GnxuqbRkS5JKv/e8731f9NeZO/+jvLeMf3OqmgyJgYo=
+    secure: CuuxZLIT7BjhMtNf2OEnhxymCTQF1pa9xCST2dDiEVvf9BAwZLjVmcw1TxmDRLC+E2FTz2nfO+U4EfgKnaDfIIAeGdmGkrBeI7N/b7BJ/yqdRIsI1KC9DIyiUF7OdRGKdZ4ZWmrTP7Ql/9tIHSs5FulWoLg8Er68LTkwB2vXlSo=
   file:
-    - "parse-english.js"
-    - "parse-english.min.js"
+    - 'parse-english.js'
+    - 'parse-english.min.js'
   on:
     tags: true
