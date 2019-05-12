@@ -290,7 +290,7 @@ function mergeEnglishElisionExceptions(child, index, sentence) {
           sibling.position.start = child.position.start
         }
         /* If both preceded and followed by an apostrophe,
-       * and the word is `n`... */
+         * and the word is `n`... */
       } else if (
         value === 'n' &&
         index < length - 2 &&

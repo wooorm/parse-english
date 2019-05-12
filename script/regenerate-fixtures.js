@@ -10,8 +10,7 @@ var English = require('..')
 var root = path.join('test', 'fixture')
 var english = new English()
 
-fs
-  .readdirSync(root)
+fs.readdirSync(root)
   .filter(negate(hidden))
   .forEach(function(name) {
     var doc = fs.readFileSync(path.join(root, name))
