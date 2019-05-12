@@ -1,4 +1,10 @@
-# parse-english [![Build Status][travis-badge]][travis] [![Coverage Status][codecov-badge]][codecov] [![Chat][chat-badge]][chat]
+# parse-english
+
+[![Build][build-badge]][build]
+[![Coverage][coverage-badge]][coverage]
+[![Downloads][downloads-badge]][downloads]
+[![Size][size-badge]][size]
+[![Chat][chat-badge]][chat]
 
 English language parser for [**retext**][retext] producing
 [**NLCST**][nlcst] nodes.
@@ -95,17 +101,25 @@ for the English natural language:
 
 <!-- Definitions -->
 
-[travis-badge]: https://img.shields.io/travis/wooorm/parse-english.svg
+[build-badge]: https://img.shields.io/travis/wooorm/parse-english.svg
 
-[travis]: https://travis-ci.org/wooorm/parse-english
+[build]: https://travis-ci.org/wooorm/parse-english
 
-[codecov-badge]: https://img.shields.io/codecov/c/github/wooorm/parse-english.svg
+[coverage-badge]: https://img.shields.io/codecov/c/github/wooorm/parse-english.svg
 
-[codecov]: https://codecov.io/github/wooorm/parse-english
+[coverage]: https://codecov.io/github/wooorm/parse-english
 
-[chat-badge]: https://img.shields.io/gitter/room/wooorm/retext.svg
+[downloads-badge]: https://img.shields.io/npm/dm/parse-english.svg
 
-[chat]: https://gitter.im/wooorm/retext
+[downloads]: https://www.npmjs.com/package/parse-english
+
+[size-badge]: https://img.shields.io/bundlephobia/minzip/parse-english.svg
+
+[size]: https://bundlephobia.com/result?p=parse-english
+
+[chat-badge]: https://img.shields.io/badge/join%20the%20community-on%20spectrum-7b16ff.svg
+
+[chat]: https://spectrum.chat/unified/retext
 
 [npm]: https://docs.npmjs.com/cli/install
 
