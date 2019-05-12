@@ -42,12 +42,10 @@ test('Abbreviations: at sentence end', function(t) {
 
 test('Abbreviations: Geographic', function(t) {
   t.test('should NOT treat `Ave.` as a terminal marker', function(st) {
-    /* Note: This paragraph also tests for
-     * coverage of early break branches in the
-     * `mergeEnglishPrefixExceptions` function.
-     *
-     * These should probably be tested by running
-     * `ParseLatin` specs. */
+    // Note: This paragraph also tests for coverage of early break branches in
+    // the `mergeEnglishPrefixExceptions` function.
+    //
+    // These should probably be tested by running `ParseLatin` specs.
     describeFixture(
       st,
       'geographic-ave',
@@ -505,14 +503,9 @@ test('Elision', function(t) {
   t.test('should NOT treat other initial apostrophes as word', function(st) {
     describeFixture(st, 'elision-non-initial', "Such as 'the previous.")
 
-    /* This is commented out because `parse-latin`
-     * always thinks apostrophes at the start of
-     * a word are part of that word.
-     *
-     * describeFixture(
-     *   'elision-non-initial-smart',
-     *   'Such as \u2019the previous.'
-     * ); */
+    // This is commented out because `parse-latin` always thinks apostrophes at
+    // the start of a word are part of that word.
+    // describeFixture('elision-non-initial-smart', 'Such as \u2019the previous.')
 
     st.end()
   })
@@ -544,8 +537,8 @@ test('Elision', function(t) {
   t.end()
 })
 
-/* Utility to test if a given document is both a valid
- * node, and matches a fixture. */
+// Utility to test if a given document is both a valid node, and matches a
+// fixture.
 function describeFixture(t, name, doc, method) {
   var nlcstA = english[method || 'parse'](doc)
   var nlcstB = englishNoPosition[method || 'parse'](doc)
