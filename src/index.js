@@ -179,7 +179,7 @@ function highlightJSONNameValuePair(name, json) {
 
   valueNode = highlightJSON(json)
   valueNode.className += ' pair-value'
-  valueNode.setAttribute('data-token-value-name', name)
+  valueNode.dataset.tokenValueName = name
   elementNode.appendChild(valueNode)
 
   return elementNode
@@ -227,7 +227,7 @@ function highlightJSONString(json) {
 
   elementNode.className = 'token string'
 
-  elementNode.setAttribute('data-token-value', json)
+  elementNode.dataset.tokenValue = json
 
   json.replace(escapeRe, function($0, $1, $2) {
     elementNode.appendChild(
