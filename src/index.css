@@ -5,16 +5,22 @@
 
 html {
   font-family: system-ui;
+  background-color: hsl(0, 0%, 95%);
 }
 
 pre,
 code {
-  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+  font-family:
+    SFMono-Regular,
+    Consolas,
+    Liberation Mono,
+    Menlo,
+    Courier,
+    monospace;
 }
 
 body {
   margin: 0;
-  background-color: #f2f2f2;
 }
 
 h1 {
@@ -45,8 +51,11 @@ textarea {
   height: 100%;
   width: 100%;
   background-color: white;
+  color: inherit;
   font-family: inherit;
   font-size: inherit;
+  position: relative;
+  z-index: 1;
 }
 
 code {
@@ -75,16 +84,19 @@ code {
 .number,
 .null,
 .boolean {
+  /* number */
   color: #005cc5;
 }
 
 .escape,
 .separator {
-  color: #d73a49;
+  /* bullet */
+  color: #990073;
 }
 
 .selected {
-  background-color: yellow;
+  /* addition */
+  background-color: #dfd;
 }
 
 .value,
@@ -99,19 +111,19 @@ code {
 }
 
 .object::before {
-  content: "{";
+  content: '{';
 }
 
 .object::after {
-  content: "}";
+  content: '}';
 }
 
 .array::before {
-  content: "[";
+  content: '[';
 }
 
 .array::after {
-  content: "]";
+  content: ']';
 }
 
 .string::before,
@@ -121,10 +133,48 @@ code {
 
 .pair::after,
 .value::after {
-  content: ",";
+  content: ',';
 }
 
 .pair:last-child::after,
 .value:last-child::after {
-  content: "";
+  content: '';
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    background-color: hsl(214, 13%, 7.5%);
+    color: hsl(214, 13%, 95%);
+  }
+
+  code {
+    background-color: hsl(214, 13%, 5%);
+  }
+
+  textarea {
+    background-color: hsl(214, 13%, 10%);
+  }
+
+  .string {
+    /* string */
+    color: #a3be8c;
+  }
+
+  .number,
+  .null,
+  .boolean {
+    /* number */
+    color: #b48ead;
+  }
+
+  .escape,
+  .separator {
+    /* bullet */
+    color: #81a1c1;
+  }
+
+  .selected {
+    /* addition */
+    background-color: rgba(163, 190, 140, 0.5);
+  }
 }
