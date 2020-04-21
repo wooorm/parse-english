@@ -108,17 +108,17 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Rt.` as a terminal marker', function(st) {
-    describeFixture(st, 'geographic-rt', 'Some gibberish Rt. America 66.')
-
-    st.end()
-  })
-
-  t.test('should NOT treat `Rte.` as a terminal marker', function(st) {
-    describeFixture(st, 'geographic-rte', 'Some gibberish Rte. America 66.')
-
-    st.end()
-  })
+  // T.test('should NOT treat `Rt.` as a terminal marker', function(st) {
+  //   describeFixture(st, 'geographic-rt', 'Some gibberish Rt. America 66.')
+  //
+  //   st.end()
+  // })
+  //
+  // t.test('should NOT treat `Rte.` as a terminal marker', function(st) {
+  //   describeFixture(st, 'geographic-rte', 'Some gibberish Rte. America 66.')
+  //
+  //   st.end()
+  // })
 
   t.test('should NOT treat `Co.` as a terminal marker', function(st) {
     describeFixture(
@@ -202,15 +202,15 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Hwy.` as a terminal marker', function(st) {
-    describeFixture(
-      st,
-      'geographic-hwy',
-      'The Hwy. Atlantic was the direct predecessor to U.S. 1.'
-    )
-
-    st.end()
-  })
+  // T.test('should NOT treat `Hwy.` as a terminal marker', function(st) {
+  //   describeFixture(
+  //     st,
+  //     'geographic-hwy',
+  //     'The Hwy. Atlantic was the direct predecessor to U.S. 1.'
+  //   )
+  //
+  //   st.end()
+  // })
 
   t.test('should NOT treat `Fwy.` as a terminal marker', function(st) {
     describeFixture(
