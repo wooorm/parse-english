@@ -26,7 +26,7 @@
   "dependencies": {
     "nlcst-to-string": "^2.0.0",
     "parse-latin": "^4.0.0",
-    "unist-util-modify-children": "^1.0.0",
+    "unist-util-modify-children": "^2.0.0",
     "unist-util-visit-children": "^1.0.0"
   },
   "devDependencies": {
