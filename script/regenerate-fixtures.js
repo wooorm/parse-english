@@ -12,7 +12,7 @@ var english = new English()
 
 fs.readdirSync(root)
   .filter(negate(hidden))
-  .forEach(function(name) {
+  .forEach(function (name) {
     var doc = fs.readFileSync(path.join(root, name))
     var tree = JSON.parse(doc)
     var fn = 'tokenize' + tree.type.slice(0, tree.type.indexOf('Node'))

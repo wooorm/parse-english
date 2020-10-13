@@ -30,22 +30,22 @@
     "unist-util-visit-children": "^1.0.0"
   },
   "devDependencies": {
-    "browserify": "^16.0.0",
+    "browserify": "^17.0.0",
     "is-hidden": "^1.0.0",
     "negate": "^1.0.0",
-    "nlcst-test": "^1.0.0",
+    "nlcst-test": "^2.0.0",
     "nyc": "^15.0.0",
-    "prettier": "^1.0.0",
-    "remark-cli": "^7.0.0",
-    "remark-preset-wooorm": "^6.0.0",
-    "tape": "^4.0.0",
-    "tinyify": "^2.0.0",
-    "unist-util-remove-position": "^2.0.0",
+    "prettier": "^2.0.0",
+    "remark-cli": "^9.0.0-alpha.1",
+    "remark-preset-wooorm": "^8.0.0",
+    "tape": "^5.0.0",
+    "tinyify": "^3.0.0",
+    "unist-util-remove-position": "^3.0.0",
     "vfile": "^4.0.0",
-    "xo": "^0.25.0"
+    "xo": "^0.33.0"
   },
   "scripts": {
-    "format": "remark . -qfo && prettier --write \"**/*.js\" && xo --fix",
+    "format": "remark . -qfo && prettier . -w --loglevel warn && xo --fix",
     "build-bundle": "browserify . -s ParseEnglish -o parse-english.js",
     "build-mangle": "browserify . -s ParseEnglish -p tinyify -o parse-english.min.js",
     "build": "npm run build-bundle && npm run build-mangle",

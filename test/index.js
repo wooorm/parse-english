@@ -12,7 +12,7 @@ var english = new ParseEnglish()
 var englishNoPosition = new ParseEnglish()
 englishNoPosition.position = false
 
-test('ParseEnglish', function(t) {
+test('ParseEnglish', function (t) {
   t.equal(typeof ParseEnglish, 'function', 'should be a `function`')
 
   t.ok(new ParseEnglish() instanceof ParseEnglish, 'should instantiate')
@@ -22,7 +22,7 @@ test('ParseEnglish', function(t) {
 
   t.equal(new ParseEnglish().position, true, 'should set `position`')
 
-  t.deepEqual(
+  t.deepLooseEqual(
     new ParseEnglish(vfile('Alpha bravo charlie')).parse(),
     english.parse('Alpha bravo charlie'),
     'should accept a vfile'
@@ -31,8 +31,8 @@ test('ParseEnglish', function(t) {
   t.end()
 })
 
-test('Abbreviations: at sentence end', function(t) {
-  t.test('should NOT treat `Ave.` as a terminal marker', function(st) {
+test('Abbreviations: at sentence end', function (t) {
+  t.test('should NOT treat `Ave.` as a terminal marker', function (st) {
     describeFixture(st, 'abbrev-final', 'Send it to 7th Ave.')
     st.end()
   })
@@ -40,8 +40,8 @@ test('Abbreviations: at sentence end', function(t) {
   t.end()
 })
 
-test('Abbreviations: Geographic', function(t) {
-  t.test('should NOT treat `Ave.` as a terminal marker', function(st) {
+test('Abbreviations: Geographic', function (t) {
+  t.test('should NOT treat `Ave.` as a terminal marker', function (st) {
     // Note: This paragraph also tests for coverage of early break branches in
     // the `mergeEnglishPrefixExceptions` function.
     //
@@ -56,7 +56,7 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Blvd.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Blvd.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-blvd',
@@ -66,7 +66,7 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Mt.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Mt.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-mt',
@@ -76,19 +76,19 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Rd.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Rd.` as a terminal marker', function (st) {
     describeFixture(st, 'geographic-rd', "It's at Rd. Townmead.")
 
     st.end()
   })
 
-  t.test('should NOT treat `Bldg.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Bldg.` as a terminal marker', function (st) {
     describeFixture(st, 'geographic-bldg', 'Near Bldg. Linchfield')
 
     st.end()
   })
 
-  t.test('should NOT treat `Nat.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Nat.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-nat',
@@ -98,7 +98,7 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Natl.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Natl.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-natl',
@@ -108,19 +108,19 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Rt.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Rt.` as a terminal marker', function (st) {
     describeFixture(st, 'geographic-rt', 'Some gibberish Rt. America 66.')
 
     st.end()
   })
 
-  t.test('should NOT treat `Rte.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Rte.` as a terminal marker', function (st) {
     describeFixture(st, 'geographic-rte', 'Some gibberish Rte. America 66.')
 
     st.end()
   })
 
-  t.test('should NOT treat `Co.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Co.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-co',
@@ -130,7 +130,7 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Pk.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Pk.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-pk',
@@ -140,7 +140,7 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Sq.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Sq.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-sq',
@@ -150,13 +150,13 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Dr.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Dr.` as a terminal marker', function (st) {
     describeFixture(st, 'geographic-dr', 'Continue on Pershing Dr. Greenville.')
 
     st.end()
   })
 
-  t.test('should NOT treat `Pt.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Pt.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-pt',
@@ -166,13 +166,13 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `St.` as a terminal marker', function(st) {
+  t.test('should NOT treat `St.` as a terminal marker', function (st) {
     describeFixture(st, 'geographic-st', 'I used to live on 2nd St. Clinton.')
 
     st.end()
   })
 
-  t.test('should NOT treat `Ft.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Ft.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-ft',
@@ -182,7 +182,7 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Pen.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Pen.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-pen',
@@ -192,7 +192,7 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Terr.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Terr.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-terr',
@@ -202,7 +202,7 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Hwy.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Hwy.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-hwy',
@@ -212,7 +212,7 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Fwy.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Fwy.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-fwy',
@@ -222,7 +222,7 @@ test('Abbreviations: Geographic', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat `Pkwy.` as a terminal marker', function(st) {
+  t.test('should NOT treat `Pkwy.` as a terminal marker', function (st) {
     describeFixture(
       st,
       'geographic-pkwy',
@@ -238,22 +238,23 @@ test('Abbreviations: Geographic', function(t) {
     'Vt|Wash|Wis|Wisc|Wyo'
   )
     .split('|')
-    .forEach(function(state) {
-      t.test('should NOT treat `' + state + '.` as a terminal marker', function(
-        st
-      ) {
-        describeFixture(
-          st,
-          'geographic-state-' + state.toLowerCase(),
-          'I live in ' + state + '. Clinton on 2nd street.'
-        )
+    .forEach(function (state) {
+      t.test(
+        'should NOT treat `' + state + '.` as a terminal marker',
+        function (st) {
+          describeFixture(
+            st,
+            'geographic-state-' + state.toLowerCase(),
+            'I live in ' + state + '. Clinton on 2nd street.'
+          )
 
-        st.end()
-      })
+          st.end()
+        }
+      )
     })
 
-  'Alta|Man|Ont|Qué|Que|Sask|Yuk'.split('|').forEach(function(state) {
-    t.test('should NOT treat `' + state + '.` as a terminal marker', function(
+  'Alta|Man|Ont|Qué|Que|Sask|Yuk'.split('|').forEach(function (state) {
+    t.test('should NOT treat `' + state + '.` as a terminal marker', function (
       st
     ) {
       describeFixture(
@@ -274,10 +275,10 @@ test('Abbreviations: Geographic', function(t) {
     'Worcs|Yorks'
   )
     .split('|')
-    .forEach(function(county) {
+    .forEach(function (county) {
       t.test(
         'should NOT treat `' + county + '.` as a terminal marker',
-        function(st) {
+        function (st) {
           describeFixture(
             st,
             'geographic-state-' + county.toLowerCase(),
@@ -292,35 +293,36 @@ test('Abbreviations: Geographic', function(t) {
   t.end()
 })
 
-test('Abbreviations: Title abbreviations', function(t) {
+test('Abbreviations: Title abbreviations', function (t) {
   ;(
     'Amb|Amd|Atty|Br|Brig|Capt|Cdr|Col|Dr|Fr|Gen|Gov|Hon|Jr|Lt|' +
     'M|Maj|Messrs|Mgr|Miss|Mlle|Mme|Mmes|Mr|Mrs|Ms|Msgr|Ph|Po|' +
     'Pres|Prof|Rep|Rev|Sec|Sen|Sgt|Snr|Sr|St|Supt|Treas|Wo'
   )
     .split('|')
-    .forEach(function(title) {
-      t.test('should NOT treat `' + title + '.` as a terminal marker', function(
-        st
-      ) {
-        describeFixture(
-          st,
-          'title-' + title.toLowerCase(),
-          'You should talk to ' + title + '. Smith.'
-        )
+    .forEach(function (title) {
+      t.test(
+        'should NOT treat `' + title + '.` as a terminal marker',
+        function (st) {
+          describeFixture(
+            st,
+            'title-' + title.toLowerCase(),
+            'You should talk to ' + title + '. Smith.'
+          )
 
-        st.end()
-      })
+          st.end()
+        }
+      )
     })
 
   t.end()
 })
 
-test('Abbreviations: Business', function(t) {
-  'Inc|Ltd'.split('|').forEach(function(abbreviation) {
+test('Abbreviations: Business', function (t) {
+  'Inc|Ltd'.split('|').forEach(function (abbreviation) {
     t.test(
       'should NOT treat `' + abbreviation + '.` as a terminal marker',
-      function(st) {
+      function (st) {
         describeFixture(
           st,
           'business-' + abbreviation.toLowerCase(),
@@ -335,11 +337,11 @@ test('Abbreviations: Business', function(t) {
   t.end()
 })
 
-test('Abbreviations: English unit abbreviations', function(t) {
+test('Abbreviations: English unit abbreviations', function (t) {
   'bbl|cu|doz|fl|oz|ft|gal|gr|gro|in|kt|lb|mi|pt|qt|sq|tbsp|tsp|yd'
     .split('|')
-    .forEach(function(unit) {
-      t.test('should NOT treat `' + unit + '.` as a terminal marker', function(
+    .forEach(function (unit) {
+      t.test('should NOT treat `' + unit + '.` as a terminal marker', function (
         st
       ) {
         describeFixture(
@@ -355,9 +357,9 @@ test('Abbreviations: English unit abbreviations', function(t) {
   t.end()
 })
 
-test('Abbreviations: Time references', function(t) {
-  'sec|min|hr'.split('|').forEach(function(time) {
-    t.test('should NOT treat `' + time + '.` as a terminal marker', function(
+test('Abbreviations: Time references', function (t) {
+  'sec|min|hr'.split('|').forEach(function (time) {
+    t.test('should NOT treat `' + time + '.` as a terminal marker', function (
       st
     ) {
       describeFixture(
@@ -370,8 +372,8 @@ test('Abbreviations: Time references', function(t) {
     })
   })
 
-  'Mon|Tue|Tues|Wed|Thu|Thurs|Fri|Sat|Sun'.split('|').forEach(function(day) {
-    t.test('should NOT treat `' + day + '.` as a terminal marker', function(
+  'Mon|Tue|Tues|Wed|Thu|Thurs|Fri|Sat|Sun'.split('|').forEach(function (day) {
+    t.test('should NOT treat `' + day + '.` as a terminal marker', function (
       st
     ) {
       describeFixture(
@@ -386,31 +388,32 @@ test('Abbreviations: Time references', function(t) {
 
   'Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec'
     .split('|')
-    .forEach(function(month) {
-      t.test('should NOT treat `' + month + '.` as a terminal marker', function(
-        st
-      ) {
-        describeFixture(
-          st,
-          'month-' + month.toLowerCase(),
-          'My birthday is ' + month + '. Giberish.'
-        )
+    .forEach(function (month) {
+      t.test(
+        'should NOT treat `' + month + '.` as a terminal marker',
+        function (st) {
+          describeFixture(
+            st,
+            'month-' + month.toLowerCase(),
+            'My birthday is ' + month + '. Giberish.'
+          )
 
-        st.end()
-      })
+          st.end()
+        }
+      )
     })
 
   t.end()
 })
 
-test('Elision', function(t) {
-  t.test("should treat `o'` as one word", function(st) {
+test('Elision', function (t) {
+  t.test("should treat `o'` as one word", function (st) {
     describeFixture(st, 'elision-final-o', "Lots o' luck, lots o\u2019 luck.")
 
     st.end()
   })
 
-  t.test("should treat `ol'` as one word", function(st) {
+  t.test("should treat `ol'` as one word", function (st) {
     describeFixture(
       st,
       'elision-final-ol',
@@ -420,25 +423,25 @@ test('Elision', function(t) {
     st.end()
   })
 
-  t.test("should treat `'em` as one word", function(st) {
+  t.test("should treat `'em` as one word", function (st) {
     describeFixture(st, 'elision-initial-em', "Tell 'em, tell \u2019em.")
 
     st.end()
   })
 
-  t.test("should treat `'er` as one word", function(st) {
+  t.test("should treat `'er` as one word", function (st) {
     describeFixture(st, 'elision-initial-er', "Tell 'er, tell \u2019er.")
 
     st.end()
   })
 
-  t.test("should treat `'im` as one word", function(st) {
+  t.test("should treat `'im` as one word", function (st) {
     describeFixture(st, 'elision-initial-im', "Tell 'im, tell \u2019im.")
 
     st.end()
   })
 
-  t.test("should treat `'cause` as one word", function(st) {
+  t.test("should treat `'cause` as one word", function (st) {
     describeFixture(
       st,
       'elision-initial-cause',
@@ -448,13 +451,13 @@ test('Elision', function(t) {
     st.end()
   })
 
-  t.test("should treat `'n'` as one word", function(st) {
+  t.test("should treat `'n'` as one word", function (st) {
     describeFixture(st, 'elision-n', "Rock 'n' Roll, Rock \u2019n\u2019 Roll!")
 
     st.end()
   })
 
-  t.test("should treat `'twas` as one word", function(st) {
+  t.test("should treat `'twas` as one word", function (st) {
     describeFixture(
       st,
       'elision-initial-twas',
@@ -464,7 +467,7 @@ test('Elision', function(t) {
     st.end()
   })
 
-  t.test("should treat `'tis` as one word", function(st) {
+  t.test("should treat `'tis` as one word", function (st) {
     describeFixture(
       st,
       'elision-initial-tis',
@@ -474,7 +477,7 @@ test('Elision', function(t) {
     st.end()
   })
 
-  t.test("should treat `'twere` as one word", function(st) {
+  t.test("should treat `'twere` as one word", function (st) {
     describeFixture(
       st,
       'elision-initial-twere',
@@ -484,7 +487,7 @@ test('Elision', function(t) {
     st.end()
   })
 
-  t.test("should treat `'70s` as one word", function(st) {
+  t.test("should treat `'70s` as one word", function (st) {
     describeFixture(
       st,
       'elision-initial-year-plural',
@@ -494,13 +497,13 @@ test('Elision', function(t) {
     st.end()
   })
 
-  t.test("should treat `'49` as one word", function(st) {
+  t.test("should treat `'49` as one word", function (st) {
     describeFixture(st, 'elision-initial-year', "In '49, in \u201949...")
 
     st.end()
   })
 
-  t.test('should NOT treat other initial apostrophes as word', function(st) {
+  t.test('should NOT treat other initial apostrophes as word', function (st) {
     describeFixture(st, 'elision-non-initial', "Such as 'the previous.")
 
     // This is commented out because `parse-latin` always thinks apostrophes at
@@ -510,7 +513,7 @@ test('Elision', function(t) {
     st.end()
   })
 
-  t.test('should NOT treat other final apostrophes as word', function(st) {
+  t.test('should NOT treat other final apostrophes as word', function (st) {
     describeFixture(st, 'elision-non-final', "Such as the' previous.")
 
     describeFixture(
@@ -522,13 +525,13 @@ test('Elision', function(t) {
     st.end()
   })
 
-  t.test('should treat `w/` as one word', function(st) {
+  t.test('should treat `w/` as one word', function (st) {
     describeFixture(st, 'elision-w', "Let's meet w/ Eric.")
 
     st.end()
   })
 
-  t.test('should NOT treat the slash in`with/` as one word', function(st) {
+  t.test('should NOT treat the slash in`with/` as one word', function (st) {
     describeFixture(st, 'elision-non-with', "Let's meet with/ Eric.")
 
     st.end()
@@ -549,8 +552,8 @@ function describeFixture(t, name, doc, method) {
   nlcstTest(nlcstA)
   nlcstTest(nlcstB)
 
-  t.deepEqual(nlcstA, fixture, 'should match w/ position')
-  t.deepEqual(
+  t.deepLooseEqual(nlcstA, fixture, 'should match w/ position')
+  t.deepLooseEqual(
     nlcstB,
     removePosition(fixture, true),
     'should match w/o position'
