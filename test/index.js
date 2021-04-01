@@ -254,17 +254,18 @@ test('Abbreviations: Geographic', function (t) {
     })
 
   'Alta|Man|Ont|Qué|Que|Sask|Yuk'.split('|').forEach(function (state) {
-    t.test('should NOT treat `' + state + '.` as a terminal marker', function (
-      st
-    ) {
-      describeFixture(
-        st,
-        'geographic-state-' + state.toLowerCase(),
-        "I'm from Mt. Pleasant, " + state + '. Canada.'
-      )
+    t.test(
+      'should NOT treat `' + state + '.` as a terminal marker',
+      function (st) {
+        describeFixture(
+          st,
+          'geographic-state-' + state.toLowerCase(),
+          "I'm from Mt. Pleasant, " + state + '. Canada.'
+        )
 
-      st.end()
-    })
+        st.end()
+      }
+    )
   })
   ;(
     'Beds|Berks|Bucks|Cambs|Ches|Corn|Cumb|Derbys|' +
@@ -341,17 +342,18 @@ test('Abbreviations: English unit abbreviations', function (t) {
   'bbl|cu|doz|fl|oz|ft|gal|gr|gro|in|kt|lb|mi|pt|qt|sq|tbsp|tsp|yd'
     .split('|')
     .forEach(function (unit) {
-      t.test('should NOT treat `' + unit + '.` as a terminal marker', function (
-        st
-      ) {
-        describeFixture(
-          st,
-          'unit-' + unit,
-          "What's the price for 1 " + unit + '. Eric?'
-        )
+      t.test(
+        'should NOT treat `' + unit + '.` as a terminal marker',
+        function (st) {
+          describeFixture(
+            st,
+            'unit-' + unit,
+            "What's the price for 1 " + unit + '. Eric?'
+          )
 
-        st.end()
-      })
+          st.end()
+        }
+      )
     })
 
   t.end()
@@ -359,31 +361,33 @@ test('Abbreviations: English unit abbreviations', function (t) {
 
 test('Abbreviations: Time references', function (t) {
   'sec|min|hr'.split('|').forEach(function (time) {
-    t.test('should NOT treat `' + time + '.` as a terminal marker', function (
-      st
-    ) {
-      describeFixture(
-        st,
-        'time-' + time,
-        "What's the price for 30 " + time + '. Eric?'
-      )
+    t.test(
+      'should NOT treat `' + time + '.` as a terminal marker',
+      function (st) {
+        describeFixture(
+          st,
+          'time-' + time,
+          "What's the price for 30 " + time + '. Eric?'
+        )
 
-      st.end()
-    })
+        st.end()
+      }
+    )
   })
 
   'Mon|Tue|Tues|Wed|Thu|Thurs|Fri|Sat|Sun'.split('|').forEach(function (day) {
-    t.test('should NOT treat `' + day + '.` as a terminal marker', function (
-      st
-    ) {
-      describeFixture(
-        st,
-        'day-' + day.toLowerCase(),
-        'Move the meeting to next ' + day + '. Smith.'
-      )
+    t.test(
+      'should NOT treat `' + day + '.` as a terminal marker',
+      function (st) {
+        describeFixture(
+          st,
+          'day-' + day.toLowerCase(),
+          'Move the meeting to next ' + day + '. Smith.'
+        )
 
-      st.end()
-    })
+        st.end()
+      }
+    )
   })
 
   'Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec'

@@ -3,27 +3,31 @@
 var fs = require('fs')
 var path = require('path')
 var toString = require('nlcst-to-string')
-var negate = require('negate')
 var hidden = require('is-hidden')
-var English = require('..')
+var ParseEnglish = require('..')
 
 var root = path.join('test', 'fixture')
-var english = new English()
+var parser = new ParseEnglish()
+var files = fs.readdirSync(root)
+var index = -1
+var tree
+var fn
+var nlcst
 
-fs.readdirSync(root)
-  .filter(negate(hidden))
-  .forEach(function (name) {
-    var doc = fs.readFileSync(path.join(root, name))
-    var tree = JSON.parse(doc)
-    var fn = 'tokenize' + tree.type.slice(0, tree.type.indexOf('Node'))
-    var nlcst
+while (++index < files.length) {
+  if (hidden(files[index])) continue
 
-    if (fn === 'tokenizeRoot') {
-      fn = 'parse'
-    }
+  tree = JSON.parse(fs.readFileSync(path.join(root, files[index])))
+  fn = 'tokenize' + tree.type.slice(0, tree.type.indexOf('Node'))
 
-    nlcst = english[fn](toString(tree))
-    nlcst = JSON.stringify(nlcst, 0, 2) + '\n'
+  if (fn === 'tokenizeRoot') {
+    fn = 'parse'
+  }
 
-    fs.writeFileSync(path.join(root, name), nlcst)
-  })
+  nlcst = parser[fn](toString(tree))
+
+  fs.writeFileSync(
+    path.join(root, files[index]),
+    JSON.stringify(nlcst, null, 2) + '\n'
+  )
+}
