@@ -229,7 +229,7 @@ function highlightJSONString(json) {
 
   elementNode.dataset.tokenValue = json
 
-  json.replace(escapeRe, function($0, $1, $2) {
+  json.replace(escapeRe, function ($0, $1, $2) {
     elementNode.appendChild(
       $1 ? highlightJSONEscape($1) : document.createTextNode($2)
     )
