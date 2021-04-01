@@ -99,9 +99,9 @@ English natural language:
 
 <!-- Definitions -->
 
-[build-badge]: https://img.shields.io/travis/wooorm/parse-english.svg
+[build-badge]: https://github.com/wooorm/parse-english/workflows/main/badge.svg
 
-[build]: https://travis-ci.org/wooorm/parse-english
+[build]: https://github.com/wooorm/parse-english/actions
 
 [coverage-badge]: https://img.shields.io/codecov/c/github/wooorm/parse-english.svg
 
