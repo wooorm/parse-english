@@ -1,12 +1,10 @@
-'use strict'
-
-var fs = require('fs')
-var path = require('path')
-var test = require('tape')
-var nlcstTest = require('nlcst-test')
-var vfile = require('vfile')
-var removePosition = require('unist-util-remove-position')
-var ParseEnglish = require('..')
+import fs from 'fs'
+import path from 'path'
+import test from 'tape'
+import nlcstTest from 'nlcst-test'
+import vfile from 'vfile'
+import removePosition from 'unist-util-remove-position'
+import {ParseEnglish} from '../index.js'
 
 var english = new ParseEnglish()
 var englishNoPosition = new ParseEnglish()
@@ -16,9 +14,6 @@ test('ParseEnglish', function (t) {
   t.equal(typeof ParseEnglish, 'function', 'should be a `function`')
 
   t.ok(new ParseEnglish() instanceof ParseEnglish, 'should instantiate')
-
-  // eslint-disable-next-line new-cap
-  t.ok(ParseEnglish() instanceof ParseEnglish, 'should instantiate (#2)')
 
   t.equal(new ParseEnglish().position, true, 'should set `position`')
 
@@ -550,7 +545,7 @@ function describeFixture(t, name, doc, method) {
   var nlcstA = english[method || 'parse'](doc)
   var nlcstB = englishNoPosition[method || 'parse'](doc)
   var fixture = JSON.parse(
-    fs.readFileSync(path.join(__dirname, 'fixture', name + '.json'))
+    fs.readFileSync(path.join('test', 'fixture', name + '.json'))
   )
 
   nlcstTest(nlcstA)

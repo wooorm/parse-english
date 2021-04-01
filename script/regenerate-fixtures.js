@@ -1,10 +1,8 @@
-'use strict'
-
-var fs = require('fs')
-var path = require('path')
-var toString = require('nlcst-to-string')
-var hidden = require('is-hidden')
-var ParseEnglish = require('..')
+import fs from 'fs'
+import path from 'path'
+import toString from 'nlcst-to-string'
+import {isHidden} from 'is-hidden'
+import {ParseEnglish} from '../index.js'
 
 var root = path.join('test', 'fixture')
 var parser = new ParseEnglish()
@@ -15,7 +13,7 @@ var fn
 var nlcst
 
 while (++index < files.length) {
-  if (hidden(files[index])) continue
+  if (isHidden(files[index])) continue
 
   tree = JSON.parse(fs.readFileSync(path.join(root, files[index])))
   fn = 'tokenize' + tree.type.slice(0, tree.type.indexOf('Node'))

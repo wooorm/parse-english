@@ -10,6 +10,9 @@ English language parser for [**retext**][retext] producing **[nlcst][]** nodes.
 
 ## Install
 
+This package is ESM only: Node 12+ is needed to use it and it must be `import`ed
+instead of `require`d.
+
 [npm][]:
 
 ```sh
@@ -19,10 +22,10 @@ npm install parse-english
 ## Use
 
 ```js
-var inspect = require('unist-util-inspect')
-var English = require('parse-english')
+import inspect from 'unist-util-inspect'
+import {ParseEnglish} from 'parse-english'
 
-var tree = new English().parse(
+var tree = new ParseEnglish().parse(
   'Mr. Henry Brown: A hapless but friendly City of London worker.'
 )
 
@@ -73,6 +76,9 @@ RootNode[1] (1:1-1:63, 0-62)
 ```
 
 ## API
+
+This package exports the following identifiers: `ParseEnglish`.
+There is no default export.
 
 `parse-english` has [the same API as `parse-latin`][latin].
 

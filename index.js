@@ -1,39 +1,19 @@
-'use strict'
-
-var Parser = require('parse-latin')
-var toString = require('nlcst-to-string')
-var visitChildren = require('unist-util-visit-children')
-var modifyChildren = require('unist-util-modify-children')
-
-module.exports = ParseEnglish
-
-// Inherit from `ParseLatin`.
-ParserPrototype.prototype = Parser.prototype
-
-var proto = new ParserPrototype()
-
-ParseEnglish.prototype = proto
-
-// Add modifiers to `parser`.
-proto.tokenizeSentencePlugins = [
-  visitChildren(mergeEnglishElisionExceptions)
-].concat(proto.tokenizeSentencePlugins)
-
-proto.tokenizeParagraphPlugins = [
-  modifyChildren(mergeEnglishPrefixExceptions)
-].concat(proto.tokenizeParagraphPlugins)
+import {ParseLatin} from 'parse-latin'
+import toString from 'nlcst-to-string'
+import visitChildren from 'unist-util-visit-children'
+import modifyChildren from 'unist-util-modify-children'
 
 // Transform English natural language into an NLCST-tree.
-function ParseEnglish(doc, file) {
-  if (!(this instanceof ParseEnglish)) {
-    return new ParseEnglish(doc, file)
-  }
+export class ParseEnglish extends ParseLatin {}
 
-  Parser.apply(this, arguments)
-}
+// Add modifiers to `parser`.
+ParseEnglish.prototype.tokenizeSentencePlugins = [
+  visitChildren(mergeEnglishElisionExceptions)
+].concat(ParseEnglish.prototype.tokenizeSentencePlugins)
 
-// Constructor to create a `ParseEnglish` prototype.
-function ParserPrototype() {}
+ParseEnglish.prototype.tokenizeParagraphPlugins = [
+  modifyChildren(mergeEnglishPrefixExceptions)
+].concat(ParseEnglish.prototype.tokenizeParagraphPlugins)
 
 // Match a blacklisted (case-insensitive) abbreviation which when followed by a
 // full-stop does not depict a sentence terminal marker.
@@ -283,12 +263,10 @@ function mergeEnglishElisionExceptions(child, index, sentence) {
 
         // Update position.
         if (sibling.position) {
-          /* istanbul ignore else */
           if (child.position) {
             sibling.position.start = child.position.start
           }
 
-          /* istanbul ignore else */
           if (other.position) {
             sibling.position.end = other.position.end
           }
