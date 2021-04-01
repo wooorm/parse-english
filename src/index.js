@@ -1,13 +1,13 @@
-'use strict'
-
 /* eslint-env browser */
 
-var ParseEnglish = require('parse-english')
+import {ParseEnglish} from 'parse-english'
 
-var parseEnglish = new ParseEnglish()
+var parser = new ParseEnglish()
 
 var $input = document.querySelector('textarea')
 var $output = document.querySelector('code')
+
+var own = {}.hasOwnProperty
 
 var currentTree
 var currentTextNodes
@@ -43,7 +43,7 @@ function onuserinput() {
     $output.removeChild($output.firstChild)
   }
 
-  highlightedSourceCode = highlightJSON(parseEnglish.tokenizeRoot($input.value))
+  highlightedSourceCode = highlightJson(parser.tokenizeRoot($input.value))
 
   highlightedSourceCode.className += ' root'
 
@@ -75,13 +75,13 @@ function onpossiblecaretchange() {
 }
 
 function oncaretchange(newPosition) {
-  var iterator = -1
+  var index = -1
   var startOfNode = 0
   var currentSelectedNode
   var textNodeLength
   var textNode
 
-  while ((textNode = currentTextNodes[++iterator])) {
+  while ((textNode = currentTextNodes[++index])) {
     textNodeLength = textNode.textContent.length
 
     if (textNode.hasAttribute('data-token-value')) {
@@ -111,28 +111,28 @@ function oncaretchange(newPosition) {
   }
 }
 
-function highlightJSON(json) {
+function highlightJson(json) {
   if (typeof json === 'object') {
     if (json === null) {
-      return highlightJSONNull(json)
+      return highlightJsonNull(json)
     }
 
     if ('length' in json) {
-      return highlightJSONArray(json)
+      return highlightJsonArray(json)
     }
 
-    return highlightJSONObject(json)
+    return highlightJsonObject(json)
   }
 
   if (typeof json === 'number') {
-    return highlightJSONNumber(json)
+    return highlightJsonNumber(json)
   }
 
   if (typeof json === 'boolean') {
-    return highlightJSONBoolean(json)
+    return highlightJsonBoolean(json)
   }
 
-  return highlightJSONString(json)
+  return highlightJsonString(json)
 }
 
 function scrollToElementNode(elementNode) {
@@ -146,7 +146,6 @@ function scrollToElementNode(elementNode) {
     if (ancestorNode.offsetTop === 0) {
       totalOffset = elementNode.offsetTop
       totalOffset -= ancestorNode.offsetHeight / 2
-
       ancestorNode.scrollTop = totalOffset
 
       return
@@ -160,7 +159,7 @@ function scrollToElementNode(elementNode) {
   window.scrollTo(0, totalOffset)
 }
 
-function highlightJSONNameValuePair(name, json) {
+function highlightJsonNameValuePair(name, json) {
   var elementNode = document.createElement('li')
   var separatorNode
   var nameNode
@@ -168,7 +167,7 @@ function highlightJSONNameValuePair(name, json) {
 
   elementNode.className = 'token pair'
 
-  nameNode = highlightJSONString(name)
+  nameNode = highlightJsonString(name)
   nameNode.className += ' key'
   elementNode.appendChild(nameNode)
 
@@ -177,7 +176,7 @@ function highlightJSONNameValuePair(name, json) {
   separatorNode.appendChild(document.createTextNode(': '))
   elementNode.appendChild(separatorNode)
 
-  valueNode = highlightJSON(json)
+  valueNode = highlightJson(json)
   valueNode.className += ' pair-value'
   valueNode.dataset.tokenValueName = name
   elementNode.appendChild(valueNode)
@@ -185,97 +184,82 @@ function highlightJSONNameValuePair(name, json) {
   return elementNode
 }
 
-function highlightJSONValue(json) {
+function highlightJsonValue(json) {
   var elementNode = document.createElement('li')
 
   elementNode.className = 'token value'
-
-  elementNode.appendChild(highlightJSON(json))
+  elementNode.appendChild(highlightJson(json))
 
   return elementNode
 }
 
-function highlightJSONObject(json) {
+function highlightJsonObject(json) {
   var elementNode = document.createElement('ul')
   var name
 
   elementNode.className = 'token object'
 
   for (name in json) {
-    elementNode.appendChild(highlightJSONNameValuePair(name, json[name]))
+    if (own.call(json, name)) {
+      elementNode.appendChild(highlightJsonNameValuePair(name, json[name]))
+    }
   }
 
   return elementNode
 }
 
-function highlightJSONArray(json) {
+function highlightJsonArray(json) {
   var elementNode = document.createElement('ol')
-  var iterator = -1
-  var length = json.length
+  var index = -1
 
   elementNode.className = 'token array'
 
-  while (++iterator < length) {
-    elementNode.appendChild(highlightJSONValue(json[iterator]))
+  while (++index < json.length) {
+    elementNode.appendChild(highlightJsonValue(json[index]))
   }
 
   return elementNode
 }
 
-function highlightJSONString(json) {
+function highlightJsonString(json) {
   var elementNode = document.createElement('span')
-
   elementNode.className = 'token string'
-
   elementNode.dataset.tokenValue = json
 
-  json.replace(escapeRe, function ($0, $1, $2) {
+  json.replace(escapeRe, ($0, $1, $2) => {
     elementNode.appendChild(
-      $1 ? highlightJSONEscape($1) : document.createTextNode($2)
+      $1 ? highlightJsonEscape($1) : document.createTextNode($2)
     )
-
     return ''
   })
 
   return elementNode
 }
 
-function highlightJSONEscape(json) {
+function highlightJsonEscape(json) {
   var elementNode = document.createElement('span')
-
   elementNode.className = 'token escape'
-
   elementNode.textContent = escapes[json] || '\\' + json
-
   return elementNode
 }
 
-function highlightJSONNull(json) {
+function highlightJsonNull(json) {
   var elementNode = document.createElement('span')
-
   elementNode.className = 'token null'
-
   elementNode.textContent = json
-
   return elementNode
 }
 
-function highlightJSONNumber(json) {
+function highlightJsonNumber(json) {
   var elementNode = document.createElement('span')
-
   elementNode.className = 'token number'
-
   elementNode.textContent = json
-
   return elementNode
 }
 
-function highlightJSONBoolean(json) {
+function highlightJsonBoolean(json) {
   var elementNode = document.createElement('span')
-
   elementNode.className = 'token boolean'
-
   elementNode.textContent = json
-
   return elementNode
 }
