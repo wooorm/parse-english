@@ -1,7 +1,7 @@
 import {ParseLatin} from 'parse-latin'
-import toString from 'nlcst-to-string'
-import visitChildren from 'unist-util-visit-children'
-import modifyChildren from 'unist-util-modify-children'
+import {toString} from 'nlcst-to-string'
+import {visitChildren} from 'unist-util-visit-children'
+import {modifyChildren} from 'unist-util-modify-children'
 
 // Transform English natural language into an NLCST-tree.
 export class ParseEnglish extends ParseLatin {}

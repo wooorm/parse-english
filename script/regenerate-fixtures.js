@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import toString from 'nlcst-to-string'
 import {isHidden} from 'is-hidden'
 import {ParseEnglish} from '../index.js'

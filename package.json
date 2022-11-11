@@ -27,22 +27,22 @@
     "index.js"
   ],
   "dependencies": {
-    "nlcst-to-string": "^2.0.0",
+    "nlcst-to-string": "^3.0.0",
     "parse-latin": "^5.0.0",
-    "unist-util-modify-children": "^2.0.0",
-    "unist-util-visit-children": "^1.0.0"
+    "unist-util-modify-children": "^3.0.0",
+    "unist-util-visit-children": "^2.0.0"
   },
   "devDependencies": {
     "c8": "^7.0.0",
     "is-hidden": "^2.0.0",
-    "nlcst-test": "^2.0.0",
+    "nlcst-test": "^3.0.0",
     "prettier": "^2.0.0",
-    "remark-cli": "^9.0.0",
-    "remark-preset-wooorm": "^8.0.0",
+    "remark-cli": "^11.0.0",
+    "remark-preset-wooorm": "^9.0.0",
     "tape": "^5.0.0",
-    "unist-util-remove-position": "^3.0.0",
-    "vfile": "^4.0.0",
-    "xo": "^0.38.0"
+    "unist-util-remove-position": "^4.0.0",
+    "vfile": "^5.0.0",
+    "xo": "^0.52.0"
   },
   "scripts": {
     "format": "remark . -qfo && prettier . -w --loglevel warn && xo --fix",

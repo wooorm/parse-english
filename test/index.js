@@ -1,9 +1,9 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import test from 'tape'
-import nlcstTest from 'nlcst-test'
-import vfile from 'vfile'
-import removePosition from 'unist-util-remove-position'
+import {assert as nlcstTest} from 'nlcst-test'
+import {VFile} from 'vfile'
+import {removePosition} from 'unist-util-remove-position'
 import {ParseEnglish} from '../index.js'
 
 var english = new ParseEnglish()
@@ -18,7 +18,7 @@ test('ParseEnglish', function (t) {
   t.equal(new ParseEnglish().position, true, 'should set `position`')
 
   t.deepLooseEqual(
-    new ParseEnglish(vfile('Alpha bravo charlie')).parse(),
+    new ParseEnglish(new VFile('Alpha bravo charlie')).parse(),
     english.parse('Alpha bravo charlie'),
     'should accept a vfile'
   )
