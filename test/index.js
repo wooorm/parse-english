@@ -3,10 +3,9 @@ import path from 'node:path'
 import test from 'tape'
 import {assert as nlcstTest} from 'nlcst-test'
 import {VFile} from 'vfile'
-import {removePosition} from 'unist-util-remove-position'
 import {ParseEnglish} from '../index.js'
 
-var english = new ParseEnglish()
+const english = new ParseEnglish()
 
 test('ParseEnglish', function (t) {
   t.equal(typeof ParseEnglish, 'function', 'should be a `function`')
@@ -222,29 +221,32 @@ test('Abbreviations: Geographic', function (t) {
 
     st.end()
   })
-  ;(
+
+  const states = (
     'Ala|Ariz|Ark|Cal|Calif|Col|Colo|Conn|Dak|Del|Fla|Ga|Ia|Id|' +
     'Ida|Ill|Ind|Kan|Kans|Ken|Ky|La|Mass|Md|Me|Mex|Mich|Minn|Miss|' +
     'Mo|Mont|Neb|Nebr|Nev|Ok|Okla|Ore|Pa|Penn|Penna|Tenn|Tex|Ut|Va|' +
     'Vt|Wash|Wis|Wisc|Wyo'
-  )
-    .split('|')
-    .forEach(function (state) {
-      t.test(
-        'should NOT treat `' + state + '.` as a terminal marker',
-        function (st) {
-          describeFixture(
-            st,
-            'geographic-state-' + state.toLowerCase(),
-            'I live in ' + state + '. Clinton on 2nd street.'
-          )
+  ).split('|')
 
-          st.end()
-        }
-      )
-    })
+  for (const state of states) {
+    t.test(
+      'should NOT treat `' + state + '.` as a terminal marker',
+      function (st) {
+        describeFixture(
+          st,
+          'geographic-state-' + state.toLowerCase(),
+          'I live in ' + state + '. Clinton on 2nd street.'
+        )
 
-  'Alta|Man|Ont|Qué|Que|Sask|Yuk'.split('|').forEach(function (state) {
+        st.end()
+      }
+    )
+  }
+
+  const statesCa = 'Alta|Man|Ont|Qué|Que|Sask|Yuk'.split('|')
+
+  for (const state of statesCa) {
     t.test(
       'should NOT treat `' + state + '.` as a terminal marker',
       function (st) {
@@ -257,61 +259,64 @@ test('Abbreviations: Geographic', function (t) {
         st.end()
       }
     )
-  })
-  ;(
+  }
+
+  const counties = (
     'Beds|Berks|Bucks|Cambs|Ches|Corn|Cumb|Derbys|' +
     'Derbs|Dev|Dor|Dur|Glos|Hants|Here|Heref|Herts|Hunts|' +
     'Lancs|Leics|Lincs|Mx|Middx|Mddx|Norf|Northants|' +
     'Northumb|Northd|Notts|Oxon|Rut|Shrops|Salop|Som|' +
     'Staffs|Staf|Suff|Sy|Sx|Ssx|Warks|War|Warw|Westm|Wilts|' +
     'Worcs|Yorks'
-  )
-    .split('|')
-    .forEach(function (county) {
-      t.test(
-        'should NOT treat `' + county + '.` as a terminal marker',
-        function (st) {
-          describeFixture(
-            st,
-            'geographic-state-' + county.toLowerCase(),
-            "I'm from Newton, " + county + '. England.'
-          )
+  ).split('|')
 
-          st.end()
-        }
-      )
-    })
+  for (const county of counties) {
+    t.test(
+      'should NOT treat `' + county + '.` as a terminal marker',
+      function (st) {
+        describeFixture(
+          st,
+          'geographic-state-' + county.toLowerCase(),
+          "I'm from Newton, " + county + '. England.'
+        )
+
+        st.end()
+      }
+    )
+  }
 
   t.end()
 })
 
 test('Abbreviations: Title abbreviations', function (t) {
-  ;(
+  const titles = (
     'Amb|Amd|Atty|Br|Brig|Capt|Cdr|Col|Dr|Fr|Gen|Gov|Hon|Jr|Lt|' +
     'M|Maj|Messrs|Mgr|Miss|Mlle|Mme|Mmes|Mr|Mrs|Ms|Msgr|Ph|Po|' +
     'Pres|Prof|Rep|Rev|Sec|Sen|Sgt|Snr|Sr|St|Supt|Treas|Wo'
-  )
-    .split('|')
-    .forEach(function (title) {
-      t.test(
-        'should NOT treat `' + title + '.` as a terminal marker',
-        function (st) {
-          describeFixture(
-            st,
-            'title-' + title.toLowerCase(),
-            'You should talk to ' + title + '. Smith.'
-          )
+  ).split('|')
 
-          st.end()
-        }
-      )
-    })
+  for (const title of titles) {
+    t.test(
+      'should NOT treat `' + title + '.` as a terminal marker',
+      function (st) {
+        describeFixture(
+          st,
+          'title-' + title.toLowerCase(),
+          'You should talk to ' + title + '. Smith.'
+        )
+
+        st.end()
+      }
+    )
+  }
 
   t.end()
 })
 
 test('Abbreviations: Business', function (t) {
-  'Inc|Ltd'.split('|').forEach(function (abbreviation) {
+  const abbreviations = 'Inc|Ltd'.split('|')
+
+  for (const abbreviation of abbreviations) {
     t.test(
       'should NOT treat `' + abbreviation + '.` as a terminal marker',
       function (st) {
@@ -324,34 +329,37 @@ test('Abbreviations: Business', function (t) {
         st.end()
       }
     )
-  })
+  }
 
   t.end()
 })
 
 test('Abbreviations: English unit abbreviations', function (t) {
-  'bbl|cu|doz|fl|oz|ft|gal|gr|gro|in|kt|lb|mi|pt|qt|sq|tbsp|tsp|yd'
-    .split('|')
-    .forEach(function (unit) {
-      t.test(
-        'should NOT treat `' + unit + '.` as a terminal marker',
-        function (st) {
-          describeFixture(
-            st,
-            'unit-' + unit,
-            "What's the price for 1 " + unit + '. Eric?'
-          )
+  const units =
+    'bbl|cu|doz|fl|oz|ft|gal|gr|gro|in|kt|lb|mi|pt|qt|sq|tbsp|tsp|yd'.split('|')
 
-          st.end()
-        }
-      )
-    })
+  for (const unit of units) {
+    t.test(
+      'should NOT treat `' + unit + '.` as a terminal marker',
+      function (st) {
+        describeFixture(
+          st,
+          'unit-' + unit,
+          "What's the price for 1 " + unit + '. Eric?'
+        )
+
+        st.end()
+      }
+    )
+  }
 
   t.end()
 })
 
 test('Abbreviations: Time references', function (t) {
-  'sec|min|hr'.split('|').forEach(function (time) {
+  const times = 'sec|min|hr'.split('|')
+
+  for (const time of times) {
     t.test(
       'should NOT treat `' + time + '.` as a terminal marker',
       function (st) {
@@ -364,9 +372,11 @@ test('Abbreviations: Time references', function (t) {
         st.end()
       }
     )
-  })
+  }
 
-  'Mon|Tue|Tues|Wed|Thu|Thurs|Fri|Sat|Sun'.split('|').forEach(function (day) {
+  const days = 'Mon|Tue|Tues|Wed|Thu|Thurs|Fri|Sat|Sun'.split('|')
+
+  for (const day of days) {
     t.test(
       'should NOT treat `' + day + '.` as a terminal marker',
       function (st) {
@@ -379,24 +389,24 @@ test('Abbreviations: Time references', function (t) {
         st.end()
       }
     )
-  })
+  }
 
-  'Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec'
-    .split('|')
-    .forEach(function (month) {
-      t.test(
-        'should NOT treat `' + month + '.` as a terminal marker',
-        function (st) {
-          describeFixture(
-            st,
-            'month-' + month.toLowerCase(),
-            'My birthday is ' + month + '. Giberish.'
-          )
+  const months = 'Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec'.split('|')
 
-          st.end()
-        }
-      )
-    })
+  for (const month of months) {
+    t.test(
+      'should NOT treat `' + month + '.` as a terminal marker',
+      function (st) {
+        describeFixture(
+          st,
+          'month-' + month.toLowerCase(),
+          'My birthday is ' + month + '. Giberish.'
+        )
+
+        st.end()
+      }
+    )
+  }
 
   t.end()
 })
@@ -538,8 +548,8 @@ test('Elision', function (t) {
 // Utility to test if a given document is both a valid node, and matches a
 // fixture.
 function describeFixture(t, name, doc, method) {
-  var nlcstA = english[method || 'parse'](doc)
-  var fixture = JSON.parse(
+  const nlcstA = english[method || 'parse'](doc)
+  const fixture = JSON.parse(
     fs.readFileSync(path.join('test', 'fixture', name + '.json'))
   )
 

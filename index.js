@@ -19,7 +19,7 @@ ParseEnglish.prototype.tokenizeParagraphPlugins = [
 
 // Match a blacklisted (case-insensitive) abbreviation which when followed by a
 // full-stop does not depict a sentence terminal marker.
-var abbreviations = new RegExp(
+const abbreviations = new RegExp(
   '^(' +
     // Business Abbreviations: Incorporation, Limited company.
     'inc|ltd|' +
@@ -46,7 +46,7 @@ var abbreviations = new RegExp(
 
 // Match a blacklisted (case-sensitive) abbreviation which when followed by a
 // full-stop does not depict a sentence terminal marker.
-var abbreviationsSensitive = new RegExp(
+const abbreviationsSensitive = new RegExp(
   '^(' +
     // Social:
     // Mister, Mistress, Mistress, woman, Mademoiselle, Madame, Monsieur,
@@ -100,7 +100,7 @@ var abbreviationsSensitive = new RegExp(
 
 // Match a blacklisted word which when followed by an apostrophe depicts
 // elision.
-var elisionPrefix = new RegExp(
+const elisionPrefix = new RegExp(
   '^(' +
     // Includes: - o' > of; - ol' > old.
     'o|ol' +
@@ -109,7 +109,7 @@ var elisionPrefix = new RegExp(
 
 // Match a blacklisted word which when preceded by an apostrophe depicts
 // elision.
-var elisionAffix = new RegExp(
+const elisionAffix = new RegExp(
   '^(' +
     // Includes: 'im > him; 'er > her; 'em > them. 'cause > because.
     'im|er|em|cause|' +
@@ -121,19 +121,17 @@ var elisionAffix = new RegExp(
 )
 
 // Match one apostrophe.
-var apostrophe = /^['\u2019]$/
+const apostrophe = /^['\u2019]$/
 
 // Merge a sentence into its next sentence, when the sentence ends with a
 // certain word.
 function mergeEnglishPrefixExceptions(sentence, index, paragraph) {
-  var children = sentence.children
-  var period = children[children.length - 1]
-  var word = children[children.length - 2]
-  var value
-  var next
+  const children = sentence.children
+  const period = children[children.length - 1]
+  const word = children[children.length - 2]
 
   if (period && toString(period) === '.' && word && word.type === 'WordNode') {
-    value = toString(word)
+    const value = toString(word)
 
     if (
       abbreviations.test(lower(value)) ||
@@ -148,7 +146,7 @@ function mergeEnglishPrefixExceptions(sentence, index, paragraph) {
       }
 
       // Merge sentences.
-      next = paragraph.children[index + 1]
+      const next = paragraph.children[index + 1]
 
       if (next) {
         sentence.children = children.concat(next.children)
@@ -169,23 +167,17 @@ function mergeEnglishPrefixExceptions(sentence, index, paragraph) {
 
 // Merge an apostrophe depicting elision into its surrounding word.
 function mergeEnglishElisionExceptions(child, index, sentence) {
-  var siblings
-  var sibling
-  var other
-  var length
-  var value
-
   if (child.type !== 'PunctuationNode' && child.type !== 'SymbolNode') {
     return
   }
 
-  siblings = sentence.children
-  length = siblings.length
-  value = toString(child)
+  const siblings = sentence.children
+  const length = siblings.length
+  const value = toString(child)
 
   // Match abbreviation of `with`, `w/`
   if (value === '/') {
-    sibling = siblings[index - 1]
+    const sibling = siblings[index - 1]
 
     if (sibling && lower(toString(sibling)) === 'w') {
       // Remove the slash from the sentence.
@@ -202,7 +194,7 @@ function mergeEnglishElisionExceptions(child, index, sentence) {
   } else if (apostrophe.test(value)) {
     // If two preceding (the first white space and the second a word), and one
     // following (white space) nodes exist...
-    sibling = siblings[index - 1]
+    const sibling = siblings[index - 1]
 
     if (
       index > 2 &&
@@ -232,8 +224,8 @@ function mergeEnglishElisionExceptions(child, index, sentence) {
       siblings[index + 1].type === 'WordNode' &&
       (index === 0 || siblings[index - 1].type !== 'WordNode')
     ) {
-      sibling = siblings[index + 1]
-      value = lower(toString(sibling))
+      const sibling = siblings[index + 1]
+      const value = lower(toString(sibling))
 
       if (elisionAffix.test(value)) {
         // Remove the apostrophe from the sentence.
@@ -253,7 +245,7 @@ function mergeEnglishElisionExceptions(child, index, sentence) {
         index < length - 2 &&
         apostrophe.test(toString(siblings[index + 2]))
       ) {
-        other = siblings[index + 2]
+        const other = siblings[index + 2]
 
         // Remove the apostrophe from the sentence.
         siblings.splice(index, 1)

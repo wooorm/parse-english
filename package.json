@@ -27,6 +27,7 @@
     "index.js"
   ],
   "dependencies": {
+    "@types/nlcst": "^1.0.0",
     "nlcst-to-string": "^3.0.0",
     "parse-latin": "^6.0.0",
     "unist-util-modify-children": "^3.0.0",
@@ -40,7 +41,6 @@
     "remark-cli": "^11.0.0",
     "remark-preset-wooorm": "^9.0.0",
     "tape": "^5.0.0",
-    "unist-util-remove-position": "^4.0.0",
     "vfile": "^5.0.0",
     "xo": "^0.52.0"
   },
@@ -62,10 +62,7 @@
     "prettier": true,
     "rules": {
       "complexity": "off",
-      "max-depth": "off",
-      "no-var": "off",
-      "prefer-arrow-callback": "off",
-      "unicorn/no-array-for-each": "off"
+      "max-depth": "off"
     }
   },
   "remarkConfig": {
