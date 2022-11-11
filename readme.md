@@ -52,14 +52,14 @@ npm install parse-english
 In Deno with [`esm.sh`][esmsh]:
 
 ```js
-import {ParseEnglish} from 'https://esm.sh/parse-english@5'
+import {ParseEnglish} from 'https://esm.sh/parse-english@6'
 ```
 
 In browsers with [`esm.sh`][esmsh]:
 
 ```html
 <script type="module">
-  import {ParseEnglish} from 'https://esm.sh/parse-english@5?bundle'
+  import {ParseEnglish} from 'https://esm.sh/parse-english@6?bundle'
 </script>
 ```
 
