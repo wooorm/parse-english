@@ -491,8 +491,15 @@ test('Elision', async function (t) {
   )
 })
 
-// Utility to test if a given document is both a valid node, and matches a
-// fixture.
+/**
+ * Utility to test if a given document is both a valid node, and matches a
+ * fixture.
+ *
+ * @param {string} name
+ * @param {string} doc
+ * @param {'parse'|'tokenizeRoot'|'tokenizeParagraph'|'tokenizeSentence'} [method='parse']
+ * @returns {Promise<void>}
+ */
 async function describeFixture(name, doc, method) {
   const nlcstA = english[method || 'parse'](doc)
   const fixture = JSON.parse(
