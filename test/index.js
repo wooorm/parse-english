@@ -7,18 +7,14 @@ import {removePosition} from 'unist-util-remove-position'
 import {ParseEnglish} from '../index.js'
 
 var english = new ParseEnglish()
-var englishNoPosition = new ParseEnglish()
-englishNoPosition.position = false
 
 test('ParseEnglish', function (t) {
   t.equal(typeof ParseEnglish, 'function', 'should be a `function`')
 
   t.ok(new ParseEnglish() instanceof ParseEnglish, 'should instantiate')
 
-  t.equal(new ParseEnglish().position, true, 'should set `position`')
-
   t.deepLooseEqual(
-    new ParseEnglish(new VFile('Alpha bravo charlie')).parse(),
+    new ParseEnglish(null, new VFile('Alpha bravo charlie')).parse(),
     english.parse('Alpha bravo charlie'),
     'should accept a vfile'
   )
@@ -543,18 +539,11 @@ test('Elision', function (t) {
 // fixture.
 function describeFixture(t, name, doc, method) {
   var nlcstA = english[method || 'parse'](doc)
-  var nlcstB = englishNoPosition[method || 'parse'](doc)
   var fixture = JSON.parse(
     fs.readFileSync(path.join('test', 'fixture', name + '.json'))
   )
 
   nlcstTest(nlcstA)
-  nlcstTest(nlcstB)
 
   t.deepLooseEqual(nlcstA, fixture, 'should match w/ position')
-  t.deepLooseEqual(
-    nlcstB,
-    removePosition(fixture, true),
-    'should match w/o position'
-  )
 }

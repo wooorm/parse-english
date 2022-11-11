@@ -8,12 +8,14 @@ export class ParseEnglish extends ParseLatin {}
 
 // Add modifiers to `parser`.
 ParseEnglish.prototype.tokenizeSentencePlugins = [
-  visitChildren(mergeEnglishElisionExceptions)
-].concat(ParseEnglish.prototype.tokenizeSentencePlugins)
+  visitChildren(mergeEnglishElisionExceptions),
+  ...ParseEnglish.prototype.tokenizeSentencePlugins
+]
 
 ParseEnglish.prototype.tokenizeParagraphPlugins = [
-  modifyChildren(mergeEnglishPrefixExceptions)
-].concat(ParseEnglish.prototype.tokenizeParagraphPlugins)
+  modifyChildren(mergeEnglishPrefixExceptions),
+  ...ParseEnglish.prototype.tokenizeParagraphPlugins
+]
 
 // Match a blacklisted (case-insensitive) abbreviation which when followed by a
 // full-stop does not depict a sentence terminal marker.
