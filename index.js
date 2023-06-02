@@ -3,10 +3,10 @@
  * @typedef {import('nlcst').Sentence} Sentence
  */
 
-import {ParseLatin} from 'parse-latin'
 import {toString} from 'nlcst-to-string'
-import {visitChildren} from 'unist-util-visit-children'
+import {ParseLatin} from 'parse-latin'
 import {modifyChildren} from 'unist-util-modify-children'
+import {visitChildren} from 'unist-util-visit-children'
 
 // Transform English natural language into an NLCST-tree.
 export class ParseEnglish extends ParseLatin {}
@@ -22,6 +22,9 @@ ParseEnglish.prototype.tokenizeParagraphPlugins = [
   modifyChildren(mergeEnglishPrefixExceptions),
   ...ParseLatin.prototype.tokenizeParagraphPlugins
 ]
+
+// To do: generate these expressions in a build script.
+// <https://github.com/wooorm/markdown-tm-language/blob/0d68d92/build.js#L101>.
 
 // Match a blacklisted (case-insensitive) abbreviation which when followed by a
 // full-stop does not depict a sentence terminal marker.
@@ -87,7 +90,7 @@ const abbreviationsSensitive = new RegExp(
     'Wash|Wis|Wisc|Wyo|' +
     // Canadian province abbreviations:
     // Alberta, Manitoba, Ontario, Quebec, *, Saskatchewan, Yukon Territory.
-    'Alta|Man|Ont|Qu\u00E9|Que|Sask|Yuk|' +
+    'Alta|Man|Ont|Que|Qué|Sask|Yuk|' +
     // English county abbreviations:
     // Bedfordshire, Berkshire, Buckinghamshire, Cambridgeshire, Cheshire,
     // Cornwall, Cumberland, Derbyshire, *, Devon, Dorset, Durham,
@@ -127,7 +130,7 @@ const elisionAffix = new RegExp(
 )
 
 // Match one apostrophe.
-const apostrophe = /^['\u2019]$/
+const apostrophe = /^['’]$/
 
 /**
  * Merge a sentence into its next sentence, when the sentence ends with a

@@ -1,5 +1,4 @@
 import fs from 'node:fs/promises'
-import path from 'node:path'
 import process from 'node:process'
 import {ParseEnglish} from '../index.js'
 
@@ -11,21 +10,24 @@ if (parameters.length < 2) {
   console.log('Usage:')
   console.log('  npm run fixture name document [method]')
 } else {
-  const fp = path.join('test', 'fixture', parameters[0] + '.json')
-  const name = parameters[2] || 'parse'
+  const basename = parameters[0]
+  const functionName = parameters[2] || 'parse'
 
   if (
-    name !== 'parse' &&
-    name !== 'tokenizeRoot' &&
-    name !== 'tokenizeParagraph' &&
-    name !== 'tokenizeSentence'
+    functionName !== 'parse' &&
+    functionName !== 'tokenizeRoot' &&
+    functionName !== 'tokenizeParagraph' &&
+    functionName !== 'tokenizeSentence'
   ) {
-    throw new Error('Expected valid parse name')
+    throw new Error('Expected valid function name')
   }
 
-  const nlcst = parser[name](parameters[1])
+  const nlcst = parser[functionName](parameters[1])
 
-  await fs.writeFile(fp, JSON.stringify(nlcst, null, 2) + '\n')
+  await fs.writeFile(
+    new URL('../test/fixture/' + basename + '.json', import.meta.url),
+    JSON.stringify(nlcst, null, 2) + '\n'
+  )
 
-  console.log('Wrote file to `' + fp + '`')
+  console.log('Wrote `' + basename + '`')
 }

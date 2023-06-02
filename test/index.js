@@ -9,15 +9,9 @@ import {assert as nlcstTest} from 'nlcst-test'
 import {VFile} from 'vfile'
 import {ParseEnglish} from '../index.js'
 
-/* eslint-disable no-await-in-loop */
-
 const english = new ParseEnglish()
 
 test('ParseEnglish', function () {
-  assert.equal(typeof ParseEnglish, 'function', 'should be a `function`')
-
-  assert.ok(new ParseEnglish() instanceof ParseEnglish, 'should instantiate')
-
   assert.deepEqual(
     new ParseEnglish(null, new VFile('Alpha bravo charlie')).parse(),
     english.parse('Alpha bravo charlie'),
@@ -517,5 +511,3 @@ async function describeFixture(name, doc, method) {
 
   assert.deepEqual(nlcstA, fixture, 'should match w/ position')
 }
-
-/* eslint-enable no-await-in-loop */

@@ -64,13 +64,6 @@
     "semi": false,
     "trailingComma": "none"
   },
-  "xo": {
-    "prettier": true,
-    "rules": {
-      "complexity": "off",
-      "max-depth": "off"
-    }
-  },
   "remarkConfig": {
     "plugins": [
       "remark-preset-wooorm"
@@ -81,5 +74,23 @@
     "detail": true,
     "strict": true,
     "ignoreCatch": true
+  },
+  "xo": {
+    "prettier": true,
+    "rules": {
+      "complexity": "off",
+      "max-depth": "off"
+    },
+    "overrides": [
+      {
+        "files": [
+          "script/**/*.js",
+          "test/**/*.js"
+        ],
+        "rules": {
+          "no-await-in-loop": "off"
+        }
+      }
+    ]
   }
 }
