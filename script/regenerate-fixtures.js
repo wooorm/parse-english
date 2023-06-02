@@ -13,7 +13,9 @@ const root = new URL('../test/fixture/', import.meta.url)
 const english = new ParseEnglish()
 
 const files = await fs.readdir(root)
-const applicable = files.filter((d) => !isHidden(d))
+const applicable = files.filter(function (d) {
+  return !isHidden(d)
+})
 let index = -1
 
 while (++index < applicable.length) {
