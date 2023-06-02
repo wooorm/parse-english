@@ -1,3 +1,7 @@
+/**
+ * @typedef {import('nlcst').Root} Root
+ */
+
 import assert from 'node:assert/strict'
 import fs from 'node:fs/promises'
 import test from 'node:test'
@@ -502,6 +506,7 @@ test('Elision', async function (t) {
  */
 async function describeFixture(name, doc, method) {
   const nlcstA = english[method || 'parse'](doc)
+  /** @type {Root} */
   const fixture = JSON.parse(
     String(
       await fs.readFile(new URL('fixture/' + name + '.json', import.meta.url))
