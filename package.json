@@ -36,7 +36,7 @@
     "unist-util-visit-children": "^2.0.0"
   },
   "devDependencies": {
-    "@types/node": "^18.0.0",
+    "@types/node": "^20.0.0",
     "c8": "^7.0.0",
     "is-hidden": "^2.0.0",
     "nlcst-test": "^3.0.0",
@@ -46,7 +46,7 @@
     "type-coverage": "^2.0.0",
     "typescript": "^4.0.0",
     "vfile": "^5.0.0",
-    "xo": "^0.52.0"
+    "xo": "^0.54.0"
   },
   "scripts": {
     "prepack": "npm run build && npm run format",
