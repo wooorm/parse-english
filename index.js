@@ -11,13 +11,17 @@ import {visitChildren} from 'unist-util-visit-children'
 // Transform English natural language into an NLCST-tree.
 export class ParseEnglish extends ParseLatin {}
 
-/** List of transforms handling a sentence. */
+/**
+ * List of transforms handling a sentence.
+ */
 ParseEnglish.prototype.tokenizeSentencePlugins = [
   visitChildren(mergeEnglishElisionExceptions),
   ...ParseLatin.prototype.tokenizeSentencePlugins
 ]
 
-/** List of transforms handling a paragraph. */
+/**
+ * List of transforms handling a paragraph.
+ */
 ParseEnglish.prototype.tokenizeParagraphPlugins = [
   modifyChildren(mergeEnglishPrefixExceptions),
   ...ParseLatin.prototype.tokenizeParagraphPlugins

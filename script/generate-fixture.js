@@ -26,7 +26,7 @@ if (parameters.length < 2) {
 
   await fs.writeFile(
     new URL('../test/fixture/' + basename + '.json', import.meta.url),
-    JSON.stringify(nlcst, null, 2) + '\n'
+    JSON.stringify(nlcst, undefined, 2) + '\n'
   )
 
   console.log('Wrote `' + basename + '`')

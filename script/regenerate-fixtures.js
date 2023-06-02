@@ -19,12 +19,12 @@ let index = -1
 while (++index < applicable.length) {
   const url = new URL(applicable[index], root)
   const doc = String(await fs.readFile(url))
-  /** @type {Root|Paragraph|Sentence} */
+  /** @type {Paragraph | Root | Sentence} */
   const tree = JSON.parse(doc)
-  const name = /** @type {'Root'|'Paragraph'|'Sentence'} */ (
+  const name = /** @type {'Paragraph' | 'Root' | 'Sentence'} */ (
     tree.type.slice(0, tree.type.indexOf('Node'))
   )
   const nlcst = english[`tokenize${name}`](toString(tree))
 
-  await fs.writeFile(url, JSON.stringify(nlcst, null, 2) + '\n')
+  await fs.writeFile(url, JSON.stringify(nlcst, undefined, 2) + '\n')
 }

@@ -13,7 +13,7 @@ const english = new ParseEnglish()
 
 test('ParseEnglish', function () {
   assert.deepEqual(
-    new ParseEnglish(null, new VFile('Alpha bravo charlie')).parse(),
+    new ParseEnglish(undefined, new VFile('Alpha bravo charlie')).parse(),
     english.parse('Alpha bravo charlie'),
     'should accept a vfile'
   )
@@ -495,8 +495,8 @@ test('Elision', async function (t) {
  *
  * @param {string} name
  * @param {string} doc
- * @param {'parse'|'tokenizeRoot'|'tokenizeParagraph'|'tokenizeSentence'} [method='parse']
- * @returns {Promise<void>}
+ * @param {'parse' | 'tokenizeParagraph' | 'tokenizeRoot' | 'tokenizeSentence' | undefined} [method='parse']
+ * @returns {Promise<undefined>}
  */
 async function describeFixture(name, doc, method) {
   const nlcstA = english[method || 'parse'](doc)
