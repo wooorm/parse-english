@@ -193,9 +193,9 @@ See [How to Contribute to Open Source][contribute].
 
 [downloads]: https://www.npmjs.com/package/parse-english
 
-[size-badge]: https://img.shields.io/bundlephobia/minzip/parse-english.svg
+[size-badge]: https://img.shields.io/badge/dynamic/json?label=minzipped%20size&query=$.size.compressedSize&url=https://deno.bundlejs.com/?q=parse-english
 
-[size]: https://bundlephobia.com/result?p=parse-english
+[size]: https://bundlejs.com/?q=parse-english
 
 [npm]: https://docs.npmjs.com/cli/install
 
