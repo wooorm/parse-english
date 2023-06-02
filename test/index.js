@@ -11,7 +11,13 @@ import {ParseEnglish} from '../index.js'
 
 const english = new ParseEnglish()
 
-test('ParseEnglish', function () {
+test('ParseEnglish', async function () {
+  assert.deepEqual(
+    Object.keys(await import('../index.js')).sort(),
+    ['ParseEnglish'],
+    'should expose the public api'
+  )
+
   assert.deepEqual(
     new ParseEnglish(undefined, new VFile('Alpha bravo charlie')).parse(),
     english.parse('Alpha bravo charlie'),
