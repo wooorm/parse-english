@@ -38,10 +38,12 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@types/regexgen": "^1.0.0",
     "c8": "^7.0.0",
     "is-hidden": "^2.0.0",
     "nlcst-test": "^3.0.0",
     "prettier": "^2.0.0",
+    "regexgen": "^1.0.0",
     "remark-cli": "^11.0.0",
     "remark-preset-wooorm": "^9.0.0",
     "type-coverage": "^2.0.0",
@@ -53,11 +55,12 @@
     "prepack": "npm run build && npm run format",
     "build": "tsc --build --clean && tsc --build && type-coverage",
     "format": "remark . -qfo && prettier . -w --loglevel warn && xo --fix",
+    "generate": "node --conditions development script/generate-regex.js",
     "test-api-prod": "node --conditions production test/index.js",
     "test-api-dev": "node --conditions development test/index.js",
     "test-api": "npm run test-api-dev && npm run test-api-prod",
     "test-coverage": "c8 --100 --reporter lcov npm run test-api",
-    "test": "npm run build && npm run format && npm run test-coverage"
+    "test": "npm run generate && npm run build && npm run format && npm run test-coverage"
   },
   "prettier": {
     "tabWidth": 2,
