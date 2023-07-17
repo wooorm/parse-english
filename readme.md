@@ -155,9 +155,12 @@ It exports no additional types.
 
 ## Compatibility
 
-This package is at least compatible with all maintained versions of Node.js.
-As of now, that is Node.js 16.0+.
-It also works in Deno and modern browsers.
+Projects maintained by me are compatible with maintained versions of Node.js.
+
+When I cut a new major release, I drop support for unmaintained versions of
+Node.
+This means I try to keep the current release line, `parse-english@^6`,
+compatible with Node.js 12.
 
 ## Security
 
