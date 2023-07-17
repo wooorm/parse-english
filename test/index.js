@@ -11,18 +11,19 @@ import {ParseEnglish} from '../index.js'
 
 const english = new ParseEnglish()
 
-test('ParseEnglish', async function () {
-  assert.deepEqual(
-    Object.keys(await import('../index.js')).sort(),
-    ['ParseEnglish'],
-    'should expose the public api'
-  )
+test('ParseEnglish', async function (t) {
+  await t.test('should expose the public api', async function () {
+    assert.deepEqual(Object.keys(await import('../index.js')).sort(), [
+      'ParseEnglish'
+    ])
+  })
 
-  assert.deepEqual(
-    new ParseEnglish(undefined, new VFile('Alpha bravo charlie')).parse(),
-    english.parse('Alpha bravo charlie'),
-    'should accept a vfile'
-  )
+  await t.test('should accept a vfile', async function () {
+    assert.deepEqual(
+      new ParseEnglish(undefined, new VFile('Alpha bravo charlie')).parse(),
+      english.parse('Alpha bravo charlie')
+    )
+  })
 })
 
 test('Abbreviations: at sentence end', async function (t) {
@@ -515,5 +516,5 @@ async function describeFixture(name, doc, method) {
 
   nlcstTest(nlcstA)
 
-  assert.deepEqual(nlcstA, fixture, 'should match w/ position')
+  assert.deepEqual(nlcstA, fixture)
 }
