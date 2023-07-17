@@ -5,9 +5,9 @@
  */
 
 import fs from 'node:fs/promises'
-import {toString} from 'nlcst-to-string'
 import {isHidden} from 'is-hidden'
-import {ParseEnglish} from '../index.js'
+import {toString} from 'nlcst-to-string'
+import {ParseEnglish} from 'parse-english'
 
 const root = new URL('../test/fixture/', import.meta.url)
 const english = new ParseEnglish()
